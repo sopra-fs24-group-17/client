@@ -1,19 +1,23 @@
 import React from "react";
-import Header from "./components/views/Header";
 import AppRouter from "./components/routing/routers/AppRouter";
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import theme from "./styles/Theme";
+
 
 /**
  * Happy coding!
- * React Template by Lucas Pelloni
+ * React Template  by Lucas Pelloni
  * Overhauled by Kyrill Hux
  * Updated by Marco Leder
  */
 const App = () => {
   return (
-    <div>
-      <Header height="100" />
-      <AppRouter />
-    </div>
+    <>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppRouter />
+      </ThemeProvider>
+    </>
   );
 };
 

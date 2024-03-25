@@ -1,25 +1,21 @@
 import React, { useState } from 'react';
 import { api, handleError } from "helpers/api";
 import { useNavigate } from "react-router-dom";
-import User from "models/User";
-import Layout from '../ui/Layout';
+import User from "models/User"; import Layout from '../ui/Layout';
 import { TextField, Button, Typography } from '@mui/material';
 
-
-
-
-
-const Login = () => {
+const Register = () => {
     const navigate = useNavigate();
     const [password, setPassword] = useState<string>("");
     const [username, setUsername] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
 
-    const doLogin = async () => {
+    const doRegister = async () => {
         event.preventDefault();
 
         try {
-            const requestBody = JSON.stringify({ username, password });
-            const response = await api.post("/users/login", requestBody);
+            const requestBody = JSON.stringify({ username, email, password });
+            const response = await api.post("/users/register", requestBody);
 
             // Get the returned user and update a new object.
             const user = new User(response.data);
@@ -45,7 +41,7 @@ const Login = () => {
     return (
         <Layout>
             <Typography variant="h4" gutterBottom>
-                Login
+                Register
             </Typography>
             <form noValidate autoComplete="off">
                 <TextField
@@ -65,6 +61,18 @@ const Login = () => {
                     margin="normal"
                     required
                     fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
                     name="password"
                     label="Password"
                     type="password"
@@ -78,16 +86,16 @@ const Login = () => {
                     fullWidth
                     variant="contained"
                     color="primary"
-                    onClick={doLogin}
+                    onClick={doRegister}
                 >
-                    Login
+                    Register
                 </Button>
             </form>
             <p>
-                Don&apos;t have an account? <a href="/register">Register</a>
+                Already have an account? <a href="/login">Login</a>
             </p>
         </Layout>
     );
 };
 
-export default Login;
+export default Register;
