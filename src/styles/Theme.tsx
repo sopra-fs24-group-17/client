@@ -11,7 +11,16 @@ const theme = createTheme({
     },
     typography: {
     },
-    // Other global styles here
+    components: {
+        MuiAlert: {
+            styleOverrides: {
+                root: {
+                    marginTop: "1rem",
+                    marginBottom: "1rem",
+                },
+            },
+        },
+    },
 });
 
 export default theme;

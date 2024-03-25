@@ -6,38 +6,25 @@ import Layout from '../ui/Layout';
 import { TextField, Button, Typography, Container, Alert } from '@mui/material';
 
 
-const Login = () => {
+const PasswordForgotten = () => {
     const navigate = useNavigate();
-    const [password, setPassword] = useState<string>("");
     const [username, setUsername] = useState<string>("");
-    const [loginFailed, setLoginFailed] = useState<boolean>(false);
+    const [email, setEmail] = useState<string>("");
+    const [resetSuccess, setResetSuccess] = useState<boolean>(false);
 
-    const doLogin = async () => {
+    const doRequestPassword = async () => {
         event.preventDefault();
 
         try {
-            const requestBody = JSON.stringify({ username, password });
-            const response = await api.post("/users/login", requestBody);
+            const requestBody = JSON.stringify({ username, email });
+            api.post("users/password-reset", requestBody);
 
-            // Get the returned user and update a new object.
-            const user = new User(response.data);
-
-            // Store the token into the local storage.
-            const token = response.headers.token;
-
-            if (token) {
-                localStorage.setItem("token", token);
-                localStorage.setItem("id", response.data.id);
-            }
-
-            // Login successfully worked --> navigate to the route /game in the GameRouter
-            setLoginFailed(false);
-            navigate("/game");
+            setResetSuccess(true);
         } catch (error) {
             alert(
-                `Something went wrong during the login: \n${handleError(error)}`
+                `Something went wrong during the reset: \n${handleError(error)}`
             );
-            setLoginFailed(true);
+            setResetSuccess(false);
         }
     };
 
@@ -45,8 +32,9 @@ const Login = () => {
         <Layout>
             <Container maxWidth="sm">
                 <Typography variant="h4" gutterBottom>
-                    Login
+                    Password Reset
                 </Typography>
+                <p>Enter your email address and username to reset your password. If there exists a user with these credentials, you will receive a one-time password</p>
                 <form noValidate autoComplete="off">
                     <TextField
                         variant="outlined"
@@ -65,17 +53,16 @@ const Login = () => {
                         margin="normal"
                         required
                         fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        id="email"
+                        label="Email"
+                        name="email"
+                        autoFocus
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
-                    {loginFailed && (
-                        <Alert severity="error">
-                            Login failed. <a href="/forgot-password">Forgot your password?</a>
+                    {resetSuccess && (
+                        <Alert severity="success">
+                            Password reset email sent. Check your inbox.
                         </Alert>
                     )}
                     <Button
@@ -83,17 +70,14 @@ const Login = () => {
                         fullWidth
                         variant="contained"
                         color="primary"
-                        onClick={doLogin}
+                        onClick={doRequestPassword}
                     >
-                        Login
+                        Submit
                     </Button>
                 </form>
-                <p>
-                    Don&apos;t have an account? <a href="/register">Register</a>
-                </p>
             </Container>
         </Layout>
     );
 };
 
-export default Login;
+export default PasswordForgotten;
