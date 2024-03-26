@@ -1,29 +1,28 @@
 import React, { useState } from 'react';
 import { api, handleError } from "helpers/api";
 import { useNavigate } from "react-router-dom";
-import User from "models/User";
-import Layout from '../ui/Layout';
-import { TextField, Button, Typography, Container, Alert } from '@mui/material';
+import User from "models/User"; import Layout from '../ui/Layout';
+import { TextField, Button, Typography, Container } from '@mui/material';
 
-
-const Login = () => {
+const Register = () => {
     const navigate = useNavigate();
     const [password, setPassword] = useState<string>("");
     const [username, setUsername] = useState<string>("");
-    const [loginFailed, setLoginFailed] = useState<boolean>(false);
+    const [email, setEmail] = useState<string>("");
 
-    const doLogin = async () => {
+    const doRegister = async () => {
         event.preventDefault();
 
         try {
-            const requestBody = JSON.stringify({ username, password });
-            const response = await api.post("/users/login", requestBody);
+            const requestBody = JSON.stringify({ username, email, password });
+            const response = await api.post("/users/register", requestBody);
 
             // Get the returned user and update a new object.
             const user = new User(response.data);
 
             // Store the token into the local storage.
             const token = response.headers.token;
+            console.log(token);
 
             if (token) {
                 localStorage.setItem("token", token);
@@ -31,13 +30,11 @@ const Login = () => {
             }
 
             // Login successfully worked --> navigate to the route /game in the GameRouter
-            setLoginFailed(false);
             navigate("/game");
         } catch (error) {
             alert(
                 `Something went wrong during the login: \n${handleError(error)}`
             );
-            setLoginFailed(true);
         }
     };
 
@@ -45,7 +42,7 @@ const Login = () => {
         <Layout>
             <Container maxWidth="sm">
                 <Typography variant="h4" gutterBottom>
-                    Login
+                    Register
                 </Typography>
                 <form noValidate autoComplete="off">
                     <TextField
@@ -65,6 +62,18 @@ const Login = () => {
                         margin="normal"
                         required
                         fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
                         name="password"
                         label="Password"
                         type="password"
@@ -73,27 +82,22 @@ const Login = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    {loginFailed && (
-                        <Alert severity="error">
-                            Login failed. <a href="/forgot-password">Forgot your password?</a>
-                        </Alert>
-                    )}
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         color="primary"
-                        onClick={doLogin}
+                        onClick={doRegister}
                     >
-                        Login
+                        Register
                     </Button>
                 </form>
                 <p>
-                    Don&apos;t have an account? <a href="/register">Register</a>
+                    Already have an account? <a href="/login">Login</a>
                 </p>
             </Container>
         </Layout>
     );
 };
 
-export default Login;
+export default Register;
