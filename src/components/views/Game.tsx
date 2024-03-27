@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 
 
+
 const Game: React.FC = () => {
     const navigate = useNavigate();
 
@@ -31,7 +32,7 @@ const Game: React.FC = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: "column", justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ display: 'flex', flexDirection: "column", justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <h1>Game View Placeholder</h1>
             <Button variant="contained" color="primary" onClick={doLogout}>
                 Logout
