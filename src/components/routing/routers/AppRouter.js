@@ -11,6 +11,7 @@ import PasswordForgotten from "../../views/PasswordForgotten";
 import Game from "../../views/Game";
 import Drawer from "../../views/Dashboard";
 import { DashboardGuard } from "../routeProtectors/DashboardGuard";
+import Profile from "../../views/Profile";
 
 /**
  * Main router of your application.
@@ -42,9 +43,9 @@ const AppRouter = () => {
           <Route path="/game" element={<Game />} />
         </Route>
 
-        {/* <Route path="users/:userId" element={<ProfileGuard />}>
+        <Route path="users/:userId" element={<ProfileGuard />}>
           <Route path="users/:userId" element={<Profile />} />
-        </Route> */}
+        </Route> 
 
         <Route path="/dashboard" element={<DashboardGuard />}>
         <Route path="/dashboard" element={<Drawer />} />
