@@ -18,6 +18,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import CreateGame from 'components/views/CreateGame';
 
 const drawerWidth = 240;
 
@@ -73,7 +74,7 @@ export default function ClippedDrawer() {
                                             </ListItemButton>
                                         </ListItem>
                                         <ListItem sx={{ paddingLeft: 4 }}>
-                                            <ListItemButton onClick={() => setSelectedView('Game')}>
+                                            <ListItemButton onClick={() => setSelectedView('CreateGame')}>
                                                 <ListItemIcon>
                                                     <GamesIcon />
                                                 </ListItemIcon>
@@ -112,6 +113,7 @@ export default function ClippedDrawer() {
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                 <Toolbar />
                 {selectedView === 'Game' && <Game />}
+                {selectedView === 'CreateGame' && <CreateGame />}
                 {selectedView === 'SocialTemp' && <SocialTemp />}
             </Box>
         </Box>
