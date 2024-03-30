@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { api, handleError } from "helpers/api";
 import { useNavigate } from "react-router-dom";
 import User from "models/User";
-import Layout from '../ui/Layout';
+import Layout from '../ui/LayoutLoginRegister';
 import { TextField, Button, Typography, Container, Alert } from '@mui/material';
 
 
@@ -30,9 +30,9 @@ const Login = () => {
                 localStorage.setItem("id", response.data.id);
             }
 
-            // Login successfully worked --> navigate to the route /game in the GameRouter
+            // Login successfully worked --> navigate to the route /dashboard
             setLoginFailed(false);
-            navigate("/game");
+            navigate("/dashboard");
         } catch (error) {
             alert(
                 `Something went wrong during the login: \n${handleError(error)}`
