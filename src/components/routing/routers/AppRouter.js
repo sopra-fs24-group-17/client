@@ -45,8 +45,8 @@ const AppRouter = () => {
         </Route>
 
         <Route path="users/:userId" element={<ProfileGuard />}>
-          <Route path="users/:userId" element={<Profile />} />
-        </Route> 
+          <Route index element={<Profile />} />
+        </Route>
 
         <Route path="/dashboard" element={<DashboardGuard />}>
         <Route path="/dashboard" element={<Drawer />} />
