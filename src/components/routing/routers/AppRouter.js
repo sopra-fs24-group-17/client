@@ -7,6 +7,7 @@ import { ForgotPasswordGuard } from "../routeProtectors/ForgotPasswordGuard";
 import { ProfileGuard } from "../routeProtectors/ProfileGuard";
 import Login from "../../views/Login";
 import Register from "../../views/Register";
+import Profile from "../../views/Profile";
 import PasswordForgotten from "../../views/PasswordForgotten";
 import Game from "../../views/Game";
 import Drawer from "../../views/Dashboard";
@@ -43,9 +44,9 @@ const AppRouter = () => {
           <Route path="/game" element={<Game />} />
         </Route>
 
-        {/* <Route path="users/:userId" element={<ProfileGuard />}>
-          <Route path="users/:userId" element={<Profile />} />
-        </Route>  */}
+        <Route path="users/:userId" element={<ProfileGuard />}>
+          <Route index element={<Profile />} />
+        </Route>
 
         <Route path="/dashboard" element={<DashboardGuard />}>
         <Route path="/dashboard" element={<Drawer />} />
