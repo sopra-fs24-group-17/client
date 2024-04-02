@@ -8,7 +8,6 @@ import PropTypes from "prop-types";
  */
 export const DashboardGuard = () => {
   if (localStorage.getItem("token")) {
-
     return <Outlet />;
   }
 
@@ -16,5 +15,5 @@ export const DashboardGuard = () => {
 };
 
 DashboardGuard.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };

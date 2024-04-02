@@ -30,12 +30,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 'v20.11.0'
+          node-version: "v20.11.0"
       - name: Install Dependencies
         run: npm install
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run eslint
+
+      - name: Run Prettier
+        run: npm run prettier
 
   deploy:
     name: Deploying to Google Cloud

@@ -31,8 +31,8 @@
     "gcp-build": "",
     "eject": "react-scripts eject",
     "test": "react-scripts test --env=jsdom",
-    "lint": "eslint src",
-    "format": "eslint src --fix"
+    "eslint": "eslint --fix",
+    "prettier": "prettier --write ."
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -56,6 +56,7 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/preset-react": "^7.24.1",
     "eslint-plugin-react": "^7.34.1",
+    "prettier": "^3.2.5",
     "sass": "^1.70.0"
   }
 }
