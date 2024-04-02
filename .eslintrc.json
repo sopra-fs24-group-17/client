@@ -22,40 +22,40 @@
         "parser": "@babel/eslint-parser",
         "plugins": [
             "react"
-        ],
-        "settings": {
-            "react": {
-                "version": "detect"
-            }
-        },
-        "rules": {
-            "eqeqeq": "error",
-            "no-unreachable": "error",
-            "no-duplicate-imports": "error",
-            "no-multiple-empty-lines": "warn",
-            "indent": [
-                "warn",
-                2
-            ],
-            "quotes": [
-                "warn",
-                "double"
-            ],
-            "newline-before-return": "warn",
-            "padding-line-between-statements": [
-                "warn",
-                {
-                    "blankLine": "always",
-                    "prev": "*",
-                    "next": "export"
-                }
-            ]
-        },
-        "ignorePatterns": [
-            "node_modules",
-            "build",
-            "dist",
-            "public"
         ]
-    }
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "rules": {
+        "eqeqeq": "error",
+        "no-unreachable": "error",
+        "no-duplicate-imports": "error",
+        "no-multiple-empty-lines": "warn",
+        "indent": [
+            "warn",
+            2
+        ],
+        "quotes": [
+            "warn",
+            "double"
+        ],
+        "newline-before-return": "warn",
+        "padding-line-between-statements": [
+            "warn",
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": "export"
+            }
+        ]
+    },
+    "ignorePatterns": [
+        "node_modules",
+        "build",
+        "dist",
+        "public"
+    ]
 }

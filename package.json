@@ -30,7 +30,9 @@
     "build": "react-scripts build",
     "gcp-build": "",
     "eject": "react-scripts eject",
-    "test": "react-scripts test --env=jsdom"
+    "test": "react-scripts test --env=jsdom",
+    "lint": "eslint src",
+    "format": "eslint src --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
