@@ -1,4 +1,4 @@
-import { isProduction } from "./isProduction"
+import { isProduction } from "./isProduction";
 
 /**
  * This helper function returns the current domain of the API.
@@ -7,8 +7,8 @@ import { isProduction } from "./isProduction"
  * @returns {string}
  */
 export const getDomain = () => {
-  const prodUrl = "https://sopra-fs24-group-17-server.oa.r.appspot.com" // TODO: insert your prod url for server (once deployed)
-  const devUrl = "http://localhost:8080"
+  const prodUrl = "https://sopra-fs24-group-17-server.oa.r.appspot.com"; // TODO: insert your prod url for server (once deployed)
+  const devUrl = "http://localhost:8080";
 
-  return isProduction() ? prodUrl : devUrl
-}
+  return isProduction() ? prodUrl : devUrl;
+};

@@ -21,13 +21,12 @@ import { DashboardGuard } from "../routeProtectors/DashboardGuard";
  * The main difference between these two routes is the following:
  * /login renders another component without any sub-route
  * /game renders a Router that contains other sub-routes that render in turn other react components
- * Documentation about routing in React: https://reactrouter.com/en/main/start/tutorial 
+ * Documentation about routing in React: https://reactrouter.com/en/main/start/tutorial
  */
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/register" element={<RegisterGuard />}>
           <Route path="/register" element={<Register />} />
         </Route>
@@ -35,11 +34,11 @@ const AppRouter = () => {
         <Route path="/login" element={<LoginGuard />}>
           <Route path="/login" element={<Login />} />
         </Route>
-        
+
         <Route path="/forgot-password" element={<ForgotPasswordGuard />}>
           <Route path="/forgot-password" element={<PasswordForgotten />} />
         </Route>
-        
+
         <Route path="/game" element={<GameGuard />}>
           <Route path="/game" element={<Game />} />
         </Route>
@@ -53,13 +52,12 @@ const AppRouter = () => {
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />
-
       </Routes>
     </BrowserRouter>
   );
 };
 
 /*
-* Don't forget to export your component!
+ * Don't forget to export your component!
  */
 export default AppRouter;
