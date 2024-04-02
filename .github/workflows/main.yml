@@ -2,12 +2,7 @@ name: Deploy Project to App Engine and Check Code Quality
 
 on:
   push:
-    branches-ignore:
-      - '**' # This will trigger on pushes to any branch
   pull_request:
-    branches-ignore:
-      - '**' # This will trigger on pull requests to any branch
-
 
   # run the workflow manually from the Actions tab
   workflow_dispatch:
@@ -46,7 +41,7 @@ jobs:
     name: Deploying to Google Cloud
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
