@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
  * @Guard
  * @param props
  */
-export const GameGuard = () => {
+export const ProfileGuard = () => {
   if (localStorage.getItem("token")) {
     
     return <Outlet />;
@@ -15,6 +15,6 @@ export const GameGuard = () => {
   return <Navigate to="/login" replace />;
 };
 
-GameGuard.propTypes = {
+ProfileGuard.propTypes = {
   children: PropTypes.node
 };
