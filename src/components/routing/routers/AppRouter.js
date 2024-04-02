@@ -49,7 +49,7 @@ const AppRouter = () => {
         </Route>
 
         <Route path="/dashboard" element={<DashboardGuard />}>
-        <Route path="/dashboard" element={<Drawer />} />
+          <Route path="/dashboard" element={<Drawer />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />

@@ -14,6 +14,7 @@
     "axios": "^1.6.7",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
+    "eslint": "^8.57.0",
     "eslint-config-react-app": "^7.0.1",
     "moment": "^2.30.1",
     "react": "^18.2.0",
@@ -29,7 +30,9 @@
     "build": "react-scripts build",
     "gcp-build": "",
     "eject": "react-scripts eject",
-    "test": "react-scripts test --env=jsdom"
+    "test": "react-scripts test --env=jsdom",
+    "lint": "eslint src",
+    "format": "eslint src --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -49,7 +52,10 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@babel/eslint-parser": "^7.24.1",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-react": "^7.24.1",
+    "eslint-plugin-react": "^7.34.1",
     "sass": "^1.70.0"
   }
 }

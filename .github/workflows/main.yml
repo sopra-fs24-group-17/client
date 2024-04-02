@@ -1,9 +1,8 @@
-name: Deploy Project to App Engine
+name: Deploy Project to App Engine and Check Code Quality
 
 on:
   push:
-    branches:
-      - main
+  pull_request:
 
   # run the workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,9 +21,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  lint-and-format:
+    name: Lint and Format Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'v20.11.0'
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npm run lint
+
   deploy:
     name: Deploying to Google Cloud
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout
