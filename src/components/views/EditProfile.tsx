@@ -142,14 +142,13 @@ const EditProfile = () => {
           token: token,
         },
       });
-      navigate(`/users/${userId}`);
     } catch (error) {
       alert(`Updating profile failed: ${handleError(error)}`);
     }
   };
 
   if (!isEditing) {
-    return <Profile />;
+    return <Profile userId={localStorage.getItem("id")} />;
   }
 
   if (user) {

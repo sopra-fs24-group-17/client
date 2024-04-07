@@ -16,6 +16,7 @@ import {
   Typography,
   Button,
   Container,
+  TableContainer,
 } from "@mui/material";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import EditProfile from "./EditProfile";
@@ -113,77 +114,68 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   if (user) {
     return (
       <Container maxWidth="xl">
-        <Grid
-          container
-          style={{ minHeight: "100vh" }}
-          alignItems="center"
-          justifyContent="space-between"
+        <Grid container spacing={3}
         >
-          <Grid item component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <strong>Games Played</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>#Wins</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>#Losses</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Win/Loss Ratio</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>#Friends</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>#Achievements unlocked</strong>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    {user.gamesplayed}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.gameswon}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {losses}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.winlossratio}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.totalfriends}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.achievementsunlocked}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+          <Grid item xs={12} md={8}>
+            <TableContainer component={Paper}>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Games Played</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>#Wins</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>#Losses</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Win/Loss Ratio</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>#Friends</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>#Achievements unlocked</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell component="th" scope="row">
+                      {user.gamesplayed}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {user.gameswon}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {losses}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {user.winlossratio}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {user.totalfriends}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {user.achievementsunlocked}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
 
-          <Grid item>
-            <Card sx={{ width: 345 }}>
-              <div style={{ height: 345, position: "relative" }}>
+          <Grid item xs={12} md={4}>
+            <Card>
                 <CardMedia
                   sx={{
-                    height: 345,
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    height: "20vh",
                   }}
                   image={avatar}
                   title="profile"
                 />
-              </div>
               <CardContent>
                 <Typography
                   gutterBottom
@@ -256,10 +248,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                   Country:{" "}
                   {user.countryoforigin ? user.countryoforigin : "Not set"}
                 </Typography>
-
-                {/* <Typography variant="body2" color="text.secondary" align='center' marginBottom={2.5}>
-                                    {user.bio}
-                                </Typography> */}
               </CardContent>
               <CardActions sx={{ justifyContent: "center", marginBottom: 2 }}>
                 {currentUserID === userId && (

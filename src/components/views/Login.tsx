@@ -31,7 +31,7 @@ const Login = () => {
 
       // Login successfully worked --> navigate to the route /dashboard
       setLoginFailed(false);
-      navigate("/dashboard");
+      navigate("/dashboard/create-game");
     } catch (error) {
       alert(`Something went wrong during the login: \n${handleError(error)}`);
       setLoginFailed(true);

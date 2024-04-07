@@ -31,7 +31,7 @@ const Register = () => {
       }
 
       // Login successfully worked --> navigate to the route /dashboard
-      navigate("/dashboard");
+      navigate("/dashboard/create-game");
     } catch (error) {
       alert(`Something went wrong during the login: \n${handleError(error)}`);
     }
