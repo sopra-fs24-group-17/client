@@ -19,6 +19,7 @@ import { DateField } from "@mui/x-date-pickers/DateField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { isCallChain } from "typescript";
 
 const EditProfile = () => {
   const { userId } = useParams();
@@ -33,7 +34,14 @@ const EditProfile = () => {
   const [birthdate, setBirthdate] = useState(null);
   const [email, setEmail] = useState("");
   const [countryoforigin, setCountry] = useState(null);
-  const [avatar, setAvatar] = useState(null);
+
+  const [avatarPlaceholder, setAvatarPlaceholder] = useState("/profile_image_placeholder.webp");
+  const [avatarPath, setAvatarPath] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [isChanging, setIsChanging] = useState(false);
+
+  const [domain, setDomain] = useState(null);
+
 
   enum ProfileVisibility {
     TRUE,
@@ -45,6 +53,8 @@ const EditProfile = () => {
   );
 
   useEffect(() => {
+    setDomain(process.env.REACT_APP_API_URL);
+
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -54,12 +64,12 @@ const EditProfile = () => {
         const fetchedUser = response.data;
 
         setUser(fetchedUser);
-        setAvatar("/profile_image_placeholder.webp");
+        if (fetchedUser.avatar && fetchedUser.avatar !== "") {
+          const path = `/images/avatars/${fetchedUser.avatar.split('/').pop()}`;
+          setAvatarPath(path);
+        }
 
-        const visibility =
-          fetchedUser.profilevisibility === "TRUE"
-            ? ProfileVisibility.TRUE
-            : ProfileVisibility.FALSE;
+        const visibility = fetchedUser.profilevisibility === "TRUE" ? ProfileVisibility.TRUE : ProfileVisibility.FALSE;
         setProfileVisibility(visibility);
       } catch (error) {
         console.error(`Failed to fetch user data: ${handleError(error)}`);
@@ -93,14 +103,17 @@ const EditProfile = () => {
     }
   };
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setAvatar(imageUrl);
-      // Here, upload the file to your server and get the permanent URL
+  const handleAvatarChange = async (event) => {
+    setIsChanging(true);
+
+    if (event.target.files[0]) {
+      const imageUrl = URL.createObjectURL(event.target.files[0]);
+      setAvatarPlaceholder(imageUrl);
+
+      setAvatarFile(event.target.files[0]);
     }
-  };
+};
+
 
   interface UpdateData {
     username?: string;
@@ -108,35 +121,48 @@ const EditProfile = () => {
     email?: string;
     countryoforigin?: string;
     profilevisibility?: ProfileVisibility;
+    avatar?: string;
   }
 
-  function convertDateFormat(dateStr) {
-    // Assuming dateStr is in 'MM-DD-YYYY'
-    const parts = dateStr.split("-"); // Split the string into an array ['MM', 'DD', 'YYYY']
-    return `${parts[2]}-${parts[0]}-${parts[1]}`; // Reassemble in 'YYYY-MM-DD' format
-  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("token");
     const updateData: UpdateData = {};
 
+    if (avatarFile) {
+      console.log("file exists")
+      // Create a FormData object and append the file
+      const formData = new FormData();
+      formData.append('avatar', avatarFile);
+
+      try {
+          // Make the API call using FormData
+          const response = await api.post(`/dashboard/${userId}/profile/uploadAvatar`, formData, {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+                  token: token,
+              },
+          });
+          navigate(`/users/${userId}`);
+          updateData.avatar = response.data;
+      } catch (error) {
+          alert(`Uploading avatar failed: ${error.message || 'Unknown error'}`);
+      }
+  }
+
     // Only add fields to the update object if they are not empty
-    if (username && username.trim() !== "") updateData.username = username;
-    if (birthdate) {
-      updateData.birthdate = birthdate;
-    }
-    if (email && email.trim() !== "") updateData.email = email;
-    if (countryoforigin && countryoforigin.trim() !== "")
+    if (username && username.trim() !== "") {updateData.username = username;}
+    if (birthdate) {updateData.birthdate = birthdate;}
+    if (email && email.trim() !== "") {updateData.email = email;}
+    if (countryoforigin && countryoforigin.trim() !== "") {      
       updateData.countryoforigin = countryoforigin;
-    updateData.profilevisibility =
-      profilevisibility === ProfileVisibility.TRUE
-        ? ProfileVisibility.TRUE
-        : ProfileVisibility.FALSE;
+    }
+    updateData.profilevisibility = profilevisibility === ProfileVisibility.TRUE ? ProfileVisibility.TRUE : ProfileVisibility.FALSE;
 
     console.log(updateData);
     try {
-      await api.put(`dashboard/${userId}/profile`, JSON.stringify(updateData), {
+      const profileResponse = await api.put(`dashboard/${userId}/profile`, JSON.stringify(updateData), {
         headers: {
           "Content-Type": "application/json",
           token: token,
@@ -174,7 +200,7 @@ const EditProfile = () => {
             >
               <CardMedia
                 sx={{ height: 300, width: 300 }}
-                image={avatar}
+                image={isChanging || avatarPath === null ? avatarPlaceholder : domain + avatarPath}
                 title="profile"
               />
               <input

@@ -27,7 +27,8 @@ const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [losses, setLosses] = useState(null);
-  const [avatar, setAvatar] = useState(null);
+  
+  const [avatarPath, setAvatarPath] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const toggleEdit = () => setIsEditing(!isEditing);
@@ -37,9 +38,16 @@ const Profile = () => {
 
   const [isAuthorizedToView, setIsAuthorizedToView] = useState(true);
 
+  const [domain, setDomain] = useState(null);
+
+
   const currentUserID = localStorage.getItem("id");
 
+
   useEffect(() => {
+    setDomain(process.env.REACT_APP_API_URL);
+    console.log(process.env.REACT_APP_API_URL)
+
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -49,7 +57,8 @@ const Profile = () => {
         const fetchedUser = response.data;
 
         setUser(fetchedUser);
-        setAvatar("/profile_image_placeholder.webp");
+        console.log(fetchedUser.avatar);
+        setAvatarPath(fetchedUser.avatar);
         const losses = fetchedUser.gamesplayed - fetchedUser.gameswon;
         setLosses(losses);
       } catch (error) {
@@ -175,7 +184,7 @@ const Profile = () => {
                     right: 0,
                     bottom: 0,
                   }}
-                  image={avatar}
+                  image={avatarPath ? domain + avatarPath : "/profile_image_placeholder.webp"}
                   title="profile"
                 />
               </div>
