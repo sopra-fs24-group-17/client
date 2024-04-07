@@ -80,7 +80,6 @@ const ChangePassword = () => {
           token: token,
         },
       });
-      navigate(`/users/${userId}`);
     } catch (error) {
       alert(`Updating profile failed: ${handleError(error)}`);
     }
