@@ -22,8 +22,13 @@ import EditProfile from "./EditProfile";
 import BlockIcon from "@mui/icons-material/Block";
 import ChangePassword from "./ChangePassword";
 
-const Profile = () => {
-  const { userId } = useParams();
+interface ProfileProps {
+  userId: string;
+}
+
+const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
+  const { userId: paramUserId } = useParams();
+  const userId = propUserId || paramUserId;
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [losses, setLosses] = useState(null);
