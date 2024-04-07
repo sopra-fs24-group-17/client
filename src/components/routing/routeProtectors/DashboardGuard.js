@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import PropTypes from "prop-types";
+import Dashboard from "../../ui/Dashboard";
 
 /**
  * @Guard
@@ -8,7 +9,11 @@ import PropTypes from "prop-types";
  */
 export const DashboardGuard = () => {
   if (localStorage.getItem("token")) {
-    return <Outlet />;
+    return (
+      <>
+        <Dashboard />
+      </>
+    );
   }
 
   return <Navigate to="/login" replace />;
