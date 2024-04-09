@@ -10,7 +10,7 @@ import Register from "../../views/Register";
 import Profile from "../../views/Profile";
 import PasswordForgotten from "../../views/PasswordForgotten";
 import Game from "../../views/Game";
-import Drawer from "../../views/Dashboard";
+import Drawer from "../../ui/Dashboard";
 import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
@@ -47,7 +47,6 @@ const AppRouter = () => {
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
         </Route>
-
 
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
