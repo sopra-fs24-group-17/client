@@ -71,8 +71,14 @@ const FriendsList = () => {
                 'token': token // Include the token in request headers
               }
             }); 
-            setFriends(response.data);
-            setFilteredFriends(response.data); // Initialize with fetched data
+            const transformedFriends = response.data.map(friend => ({
+              ...friend,
+              username: friend.friendName, // Assuming the friendName is the username
+              avatar: friend.friendAvatar, // Direct mapping
+              status: friend.status // Assuming status is provided by the backend
+            }));
+            setFriends(transformedFriends);
+            setFilteredFriends(transformedFriends); // Initialize with fetched data
           } catch (error) {
             console.error('Error fetching data:', error);
           }
@@ -108,9 +114,6 @@ const FriendsList = () => {
                 <TableCell>Username</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Avatar</TableCell>
-                <TableCell>Score</TableCell>
-                <TableCell>Country</TableCell>
-                <TableCell>Email</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
