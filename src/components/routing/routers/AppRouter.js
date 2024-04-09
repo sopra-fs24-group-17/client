@@ -10,9 +10,10 @@ import Register from "../../views/Register";
 import Profile from "../../views/Profile";
 import PasswordForgotten from "../../views/PasswordForgotten";
 import Game from "../../views/Game";
-import Drawer from "../../ui/Dashboard";
+import Drawer from "../../views/Dashboard";
 import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
+import FriendsList from "../../views/Friends";
 
 /**
  * Main router of your application.
@@ -44,7 +45,9 @@ const AppRouter = () => {
           <Route path="join-game" element={<Game />} />
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
+          <Route path="friends" element={<FriendsList />} />
         </Route>
+
 
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
