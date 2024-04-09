@@ -13,6 +13,7 @@ import Game from "../../views/Game";
 import Drawer from "../../views/Dashboard";
 import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
+import FriendsList from "../../views/Friends";
 
 /**
  * Main router of your application.
