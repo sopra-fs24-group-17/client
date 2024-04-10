@@ -21,12 +21,16 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
 
-const CreateGame: React.FC = () => {
+
+
+const CreateGame: React.FC= () => {
+
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [totalPlayers, setTotalPlayers] = useState(localStorage.getItem('totalPlayersRequired') || '2');
   // const [gameCode, setGameCode] = useState('');
-  const [numberOfPlayers, setNumberOfPlayers] = useState("2");
+  // const [numberOfPlayers, setNumberOfPlayers] = useState("2");
   const [gameMode, setGameMode] = useState("option1");
   const gameCode = "0934";
   const handlePrivateToggle = (event) => {
@@ -35,10 +39,19 @@ const CreateGame: React.FC = () => {
     // Set game code and open dialog
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleNumberOfPlayersChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = Number(event.target.value);
+    if ([2, 3, 4, 5].includes(value)) {
+      localStorage.setItem('totalPlayersRequired', value.toString());
+    }
   };
-  const handleCreateGame = () => {};
+  // const handleCloseDialog = () => {
+  //   setOpenDialog(false);
+  // };
+
+  
+  const handleCreateGame = () => {
+     navigate('/dashboard/lobby')};
 
   return (
     <Box
@@ -104,8 +117,11 @@ const CreateGame: React.FC = () => {
         <TextField
           select
           id="number-of-players"
-          value={numberOfPlayers}
-          onChange={(e) => setNumberOfPlayers(e.target.value)}
+          value={totalPlayers} // Use local state initialized from local storage
+          onChange={(event) => {
+            handleNumberOfPlayersChange(event);
+            setTotalPlayers(event.target.value as string); // Also update local state for re-render
+          }} // Parse to int and call the parent's function
           variant="outlined"
           sx={{ mb: 2 }}
           helperText="This is a description"
