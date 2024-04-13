@@ -33,7 +33,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [losses, setLosses] = useState(null);
-  const [avatar, setAvatar] = useState(null);
+  
+  const [avatarPath, setAvatarPath] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const toggleEdit = () => setIsEditing(!isEditing);
@@ -43,9 +44,16 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
 
   const [isAuthorizedToView, setIsAuthorizedToView] = useState(true);
 
+  const [domain, setDomain] = useState(null);
+
+
   const currentUserID = localStorage.getItem("id");
 
+
   useEffect(() => {
+    setDomain(process.env.REACT_APP_API_URL);
+    console.log(process.env.REACT_APP_API_URL)
+
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -55,7 +63,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
         const fetchedUser = response.data;
 
         setUser(fetchedUser);
-        setAvatar("/profile_image_placeholder.webp");
+        console.log(fetchedUser.avatar);
+        setAvatarPath(fetchedUser.avatar);
         const losses = fetchedUser.gamesplayed - fetchedUser.gameswon;
         setLosses(losses);
       } catch (error) {
@@ -173,7 +182,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                   sx={{
                     height: "20vh",
                   }}
-                  image={avatar}
+                  image={avatarPath ? domain + avatarPath : "/profile_image_placeholder.webp"}
                   title="profile"
                 />
               <CardContent>
