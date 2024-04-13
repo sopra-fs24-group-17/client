@@ -1,4 +1,4 @@
-// WebsocketConnection.js
+// Websocket Connection
 import { Client } from '@stomp/stompjs';
 
 let stompClient = null;
@@ -42,12 +42,13 @@ export const disconnectWebSocket = () => {
 
 export const subscribeToChannel = (channel, callback) => {
     if (stompClient) {
-        return stompClient.subscribe(channel, (message) => {
-            console.log(`Received message on ${channel}:`, message);
-            callback(message);
-        });
+        const subscription = stompClient.subscribe(channel, callback);
+        return subscription;
+    } else {
+        console.log("WebSocket is not connected.");
     }
 };
+
 
 export const unsubscribeFromChannel = (subscription) => {
     if (subscription) {

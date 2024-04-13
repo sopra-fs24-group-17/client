@@ -16,14 +16,14 @@ import { connectWebSocket, disconnectWebSocket, subscribeToChannel } from "./Web
     const [email, setEmail] = useState("");
     const [isConnected, setIsConnected] = useState(false); // State to track WebSocket connection
   
-    useEffect(() => {
-      // Cleanup WebSocket connection when component unmounts
-      return () => {
-        if (isConnected) {
-          disconnectWebSocket();
-        }
-      };
-    }, [isConnected]);
+    // useEffect(() => {
+    //   // Cleanup WebSocket connection when component unmounts
+    //   return () => {
+    //     if (isConnected) {
+    //       disconnectWebSocket();
+    //     }
+    //   };
+    // }, [isConnected]);
   
     const doRegister = async (event) => {
       event.preventDefault();
