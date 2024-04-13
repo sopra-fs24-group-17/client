@@ -14,6 +14,7 @@ import Drawer from "../../ui/Dashboard";
 import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
+import GameJoinTestView from "../../views/GameJoinTestView";
 
 /**
  * Main router of your application.
@@ -49,6 +50,9 @@ const AppRouter = () => {
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />
+
+        <Route path="/gameroom" element={<GameJoinTestView />} />
+
       </Routes>
     </BrowserRouter>
   );
