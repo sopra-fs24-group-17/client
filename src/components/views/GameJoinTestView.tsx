@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TextField } from "@mui/material";
 import { Client } from '@stomp/stompjs';
 import { api, handleError } from "helpers/api";
+import { connectWebSocket, disconnectWebSocket, subscribeToChannel } from "./WebsocketConnection";
+
 
 
 const GameJoinTestView = () => {
@@ -11,44 +13,17 @@ const GameJoinTestView = () => {
 
     useEffect(() => {
         // Initialize WebSocket connection using @stomp/stompjs
-        stompClient.current = new Client({
-            brokerURL: 'ws://localhost:8080/ws',
-            debug: function (str) {
-                console.log('STOMP: ' + str);
-            },
-            reconnectDelay: 5000,
-            heartbeatIncoming: 20000,
-            heartbeatOutgoing: 20000,
-            onConnect: function () {
-                console.log('Connected to WebSocket');
-            },
-            onStompError: function (frame) {
-                console.error('Broker reported error: ' + frame.headers['message']);
-                console.error('Additional details: ' + frame.body);
-            },
-        });
-
-        stompClient.current.activate();
+        const initialiseWebsocketConnection = async () => {
+            await connectWebSocket();
+        };
+        initialiseWebsocketConnection();
 
         return () => {
-            stompClient.current.deactivate();
+            disconnectWebSocket();
             console.log('Disconnected from WebSocket');
         };
     }, []);
 
-    const subscribeToChannel = () => {
-        if (stompClient.current && gameId) {
-            const subscription = stompClient.current.subscribe(`/game/${gameId}`, (message) => {
-                console.log(`Received message on /game/${gameId}`, message);
-                const message2 = `A new player joined game with ID ${gameId}`;
-                setMessages(prev => [...prev, message2]);
-
-        }, { id: `sub-${gameId}` });
-            console.log(`Subscribed to game ID ${gameId}`);
-        } else {
-            console.log('WebSocket is not connected or Game ID is not set.');
-        }
-    };
 
     const joinGame = async () => {
         try {
@@ -63,6 +38,14 @@ const GameJoinTestView = () => {
             console.error(`Error joining game: ${error}`);
         }
     };
+    
+    const handleSubcribe = () => {
+        subscribeToChannel(`/game/${gameId}`, (message) => {
+            console.log(`Received message on /game/${gameId}`, message);
+            const message2 = `A new player joined game with ID ${gameId}`;
+            setMessages(prev => [...prev, message2]);
+        });
+    };
 
     return (
         <div>
@@ -76,7 +59,7 @@ const GameJoinTestView = () => {
                 sx={{ width: "500px" }}
                 InputLabelProps={{ shrink: true }}
             />
-            <button onClick={subscribeToChannel}>Subscribe to Game Channel</button>
+            <button onClick={handleSubcribe}>Subscribe to Game Channel</button>
             <button onClick={joinGame}>Join Game</button>
             <div>
                 <h2>Messages</h2>
