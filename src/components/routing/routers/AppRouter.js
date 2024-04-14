@@ -14,6 +14,7 @@ import Drawer from "../../ui/Dashboard";
 import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
+import Lobby from "../../views/Lobby";
 import GameJoinTestView from "../../views/GameJoinTestView";
 
 /**
@@ -47,6 +48,7 @@ const AppRouter = () => {
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
+          <Route path="lobby/:gameId" element={<Lobby />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />

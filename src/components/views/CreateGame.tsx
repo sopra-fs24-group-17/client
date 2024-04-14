@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { api, handleError } from "helpers/api";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
@@ -21,24 +21,102 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
 
-const CreateGame: React.FC = () => {
+const CreateGame: React.FC= () => {
+
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  // const [gameCode, setGameCode] = useState('');
-  const [numberOfPlayers, setNumberOfPlayers] = useState("2");
-  const [gameMode, setGameMode] = useState("option1");
-  const gameCode = "0934";
+  const [totalPlayers, setTotalPlayers] = useState(localStorage.getItem('totalPlayersRequired') || '2');
+  const [gameCode, setGameCode] = useState('');
+  const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
+  const [mode, setMode] = useState('PUBLIC') //public or private
+
   const handlePrivateToggle = (event) => {
     setIsPrivate(event.target.checked);
     // Logic to handle when switch is toggled
     // Set game code and open dialog
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleNumberOfPlayersChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = Number(event.target.value);
+    if ([2, 3, 4, 5].includes(value)) {
+      localStorage.setItem('totalPlayersRequired', value.toString());
+    }
   };
-  const handleCreateGame = () => {};
+    // ... (existing state and functions)
+    useEffect(() => {
+      const fetchPrivateCode = async () => {
+        if (isPrivate) {
+          // If the game is set to private, we set the game mode to 'PRIVATE'
+          setMode('PRIVATE');
+          
+          const requestBody = JSON.stringify({
+            mode: 'PRIVATE',
+            maxPlayers: parseInt(totalPlayers, 10)
+          });
+      
+          // Make the API request to create a new game
+          try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+              throw new Error('No authentication token found');
+            }
+    
+            const response = await api.post(`/dashboard/games/new`, requestBody, {
+              headers: {
+                token: token
+              }
+            });
+            
+            // Assuming the server sends back the game ID
+            const newGameCode = response.data.gameId;
+            setGameCode(newGameCode);
+            localStorage.setItem("gameId", newGameCode);
+          } catch (error) {
+            handleError(error);
+            console.error('Error creating new game:', error);
+          }
+        } else {
+          // If the game is not set to private, we set the game mode to 'PUBLIC'
+          const requestBody = JSON.stringify({
+            mode: 'PUBLIC',
+            maxPlayers: parseInt(totalPlayers, 10)
+          });
+      
+          // Make the API request to create a new game
+          try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+              throw new Error('No authentication token found');
+            }
+    
+            const response = await api.post(`/dashboard/games/new`, requestBody, {
+              headers: {
+                token: token
+              }
+            });
+            
+            // Assuming the server sends back the game ID
+            const newGameCode = response.data.gameId;
+            setGameCode(newGameCode);
+            localStorage.setItem("gameId", newGameCode);
+          } catch (error) {
+            handleError(error);
+            console.error('Error creating new game:', error);
+          }
+        }
+      };
+      
+      fetchPrivateCode();
+    }, [isPrivate]); 
+
+    const handleCreateGame = async () => {
+      navigate(`/dashboard/lobby/${gameCode}`);
+
+    };
+  
+  // const handleCreateGame = () => {
+  //    navigate('/dashboard/lobby')};
 
   return (
     <Box
@@ -78,7 +156,7 @@ const CreateGame: React.FC = () => {
         <TextField
           fullWidth
           variant="outlined"
-          value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`} // Using a template string to combine game code and additional text
+          value={`${gameCode ? gameCode : "Waiting for code..."}\n${"Give this code to your friends to allow them to join your private game"}`} // Using a template string to combine game code and additional text
           multiline // Allows the text field to accommodate multiple lines
           rows={2} // Sets the number of lines the text field initially presents
           InputProps={{
@@ -104,8 +182,11 @@ const CreateGame: React.FC = () => {
         <TextField
           select
           id="number-of-players"
-          value={numberOfPlayers}
-          onChange={(e) => setNumberOfPlayers(e.target.value)}
+          value={totalPlayers} // Use local state initialized from local storage
+          onChange={(event) => {
+            handleNumberOfPlayersChange(event);
+            setTotalPlayers(event.target.value as string); // Also update local state for re-render
+          }} // Parse to int and call the parent's function
           variant="outlined"
           sx={{ mb: 2 }}
           helperText="This is a description"
