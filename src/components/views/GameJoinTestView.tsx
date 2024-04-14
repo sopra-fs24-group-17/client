@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TextField } from "@mui/material";
-import { Client } from '@stomp/stompjs';
 import { api, handleError } from "helpers/api";
 import { connectWebSocket, disconnectWebSocket, subscribeToChannel } from "./WebsocketConnection";
 

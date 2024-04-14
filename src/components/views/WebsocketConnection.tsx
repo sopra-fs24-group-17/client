@@ -40,14 +40,15 @@ export const disconnectWebSocket = () => {
     }
 };
 
-export const subscribeToChannel = (channel, callback) => {
-    if (stompClient) {
-        const subscription = stompClient.subscribe(channel, callback);
+export const subscribeToChannel = (channel, callback, options = {}) => {
+    if (stompClient && stompClient.connected) {
+        const subscription = stompClient.subscribe(channel, callback, options);
         return subscription;
     } else {
         console.log("WebSocket is not connected.");
     }
 };
+
 
 
 export const unsubscribeFromChannel = (subscription) => {

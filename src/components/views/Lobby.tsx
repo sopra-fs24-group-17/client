@@ -1,77 +1,78 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useState , useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import SockJS from 'sockjs-client';
-import Stomp from 'webstomp-client';
-import { Client } from '@stomp/stompjs';
 import { api, handleError } from "helpers/api";
+import { connectWebSocket, disconnectWebSocket, subscribeToChannel } from "./WebsocketConnection";
+import { mergeDateAndTime } from '@mui/x-date-pickers/internals';
+import { Button } from '@mui/material';
+
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
   const navigate = useNavigate();
   const [joinButtonDisabled, setJoinButtonDisabled] = useState(false);
+  const [leaveButtonDisabled, setLeaveButtonDisabled] = useState(false);
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(
     parseInt(localStorage.getItem('totalPlayersRequired') || '2', 10)
   );
-  const [messages, setMessages] = useState([]);
-  const stompClient = useRef(null);
   const { gameId } = useParams();
+  const [message, setMessage] = useState(null);
+
   useEffect(() => {
-    stompClient.current = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
-      debug: function (str) {
-        console.log('STOMP: ' + str);
-      },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 20000,
-      heartbeatOutgoing: 20000,
-      onConnect: function () {
-        console.log('Connected to WebSocket');
-        // Do not place join game logic here
-      },
-      onStompError: function (frame) {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
-      },
-    });
-  
-    stompClient.current.activate();
-  
+    // Initialize WebSocket connection using @stomp/stompjs
+    const initialiseWebsocketConnection = async () => {
+        await connectWebSocket();
+    };
+    initialiseWebsocketConnection();
+
     return () => {
-      stompClient.current.deactivate();
-      console.log('Disconnected from WebSocket');
+        disconnectWebSocket();
+        console.log('Disconnected from WebSocket');
     };
   }, []);
 
+
   const handleJoinGame = async () => {
     const token = localStorage.getItem('token');
-  
     try {
       const response = await api.put(`/dashboard/games/join/${gameId}`, {}, {
-        headers: {
-          'token': token,
-        }
+        headers: { 'token': token }
       });
-      
       console.log('Joined game successfully', response.data);
-      setCurrentPlayers(currentPlayers + 1); // Update the number of players
-      // Additional logic for subscribing to WebSocket updates
     } catch (error) {
       console.error('Error joining game:', error.response ? error.response.data : error.message);
     }
-  }
-  const subscribeToChannel = () => {
-    if (stompClient.current && gameId) {
-      stompClient.current.subscribe(`/game/${gameId}`, (message) => {
-        const messageBody = message.body
-        if (messageBody.type === 'PLAYER_JOINED') {
-          setCurrentPlayers(prev => prev + 1);
-        } else if (messageBody.type === 'PLAYER_LEFT') {
-          setCurrentPlayers(prev => Math.max(prev - 1, 0));
-        }
-      }, { id: `sub-${gameId}` });console.log(currentPlayers)
+  };
+
+
+  const handleLeaveGame = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await api.put(`/dashboard/games/leave/${gameId}`, {}, {
+        headers: { 'token': token }
+      });
+      console.log('Joined left successfully', response.data);
+    } catch (error) {
+      console.error('Error leaving game:', error.response ? error.response.data : error.message);
     }
   };
+  
+
+  const handleSubcribe = () => {
+    subscribeToChannel(`/game/${gameId}`, (message) => {
+        console.log(message);
+        setMessage(message); 
+        const messageBody = JSON.parse(message.body);
+        if (messageBody.type === "join") {
+          setCurrentPlayers(prevPlayers => prevPlayers + 1);
+        } else if (messageBody.type === "leave") {
+          setCurrentPlayers(prevPlayers => prevPlayers - 1);
+        }
+
+    }, { id: `sub-${gameId}` }
+  );
+  };
+
   // Annotate style objects with React.CSSProperties
   const lobbyContainerStyle: React.CSSProperties = {
     display: 'flex',
@@ -138,8 +139,9 @@ const Lobby = () => {
         </ul>
       </div>
       {/* Adding a Join Game button */}
-      <button onClick={handleJoinGame} disabled={joinButtonDisabled}>Join Game</button>
-<button onClick={subscribeToChannel}>Subscribe to Game Channel</button>
+      <Button onClick={handleJoinGame} disabled={joinButtonDisabled} variant='outlined'>Join Game</Button>
+      <Button onClick={handleLeaveGame} disabled={leaveButtonDisabled} variant='outlined'>Leave Game</Button>
+      <Button onClick={handleSubcribe} variant='outlined'>Subscribe to Game Channel</Button>
 
     </div>
   );
