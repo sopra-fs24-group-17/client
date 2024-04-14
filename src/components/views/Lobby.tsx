@@ -1,14 +1,77 @@
 import PropTypes from 'prop-types';
-import React, { useState } from "react";
+import React, { useEffect, useState , useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import SockJS from 'sockjs-client';
+import Stomp from 'webstomp-client';
+import { Client } from '@stomp/stompjs';
+import { api, handleError } from "helpers/api";
 
-const Lobby: React.FC = () => {
-  // Mock data for display
-  const currentPlayers = 2;
-  const [totalPlayersRequired, setTotalPlayersRequired] = useState<number>(
+const Lobby = () => {
+  const [currentPlayers, setCurrentPlayers] = useState(1);
+  const navigate = useNavigate();
+  const [joinButtonDisabled, setJoinButtonDisabled] = useState(false);
+  const [totalPlayersRequired, setTotalPlayersRequired] = useState(
     parseInt(localStorage.getItem('totalPlayersRequired') || '2', 10)
   );
+  const [messages, setMessages] = useState([]);
+  const stompClient = useRef(null);
+  const { gameId } = useParams();
+  useEffect(() => {
+    stompClient.current = new Client({
+      brokerURL: 'ws://localhost:8080/ws',
+      debug: function (str) {
+        console.log('STOMP: ' + str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 20000,
+      heartbeatOutgoing: 20000,
+      onConnect: function () {
+        console.log('Connected to WebSocket');
+        // Do not place join game logic here
+      },
+      onStompError: function (frame) {
+        console.error('Broker reported error: ' + frame.headers['message']);
+        console.error('Additional details: ' + frame.body);
+      },
+    });
+  
+    stompClient.current.activate();
+  
+    return () => {
+      stompClient.current.deactivate();
+      console.log('Disconnected from WebSocket');
+    };
+  }, []);
 
-
+  const handleJoinGame = async () => {
+    const token = localStorage.getItem('token');
+  
+    try {
+      const response = await api.put(`/dashboard/games/join/${gameId}`, {}, {
+        headers: {
+          'token': token,
+        }
+      });
+      
+      console.log('Joined game successfully', response.data);
+      setCurrentPlayers(currentPlayers + 1); // Update the number of players
+      // Additional logic for subscribing to WebSocket updates
+    } catch (error) {
+      console.error('Error joining game:', error.response ? error.response.data : error.message);
+    }
+  }
+  const subscribeToChannel = () => {
+    if (stompClient.current && gameId) {
+      stompClient.current.subscribe(`/game/${gameId}`, (message) => {
+        const messageBody = message.body
+        if (messageBody.type === 'PLAYER_JOINED') {
+          setCurrentPlayers(prev => prev + 1);
+        } else if (messageBody.type === 'PLAYER_LEFT') {
+          setCurrentPlayers(prev => Math.max(prev - 1, 0));
+        }
+      }, { id: `sub-${gameId}` });console.log(currentPlayers)
+    }
+  };
   // Annotate style objects with React.CSSProperties
   const lobbyContainerStyle: React.CSSProperties = {
     display: 'flex',
@@ -74,13 +137,14 @@ const Lobby: React.FC = () => {
           <li style={hintListItemStyle}>You can also do this.</li>
         </ul>
       </div>
+      {/* Adding a Join Game button */}
+      <button onClick={handleJoinGame} disabled={joinButtonDisabled}>Join Game</button>
+<button onClick={subscribeToChannel}>Subscribe to Game Channel</button>
+
     </div>
   );
 };
 
-Lobby.propTypes = {
-    totalPlayersRequired: PropTypes.number.isRequired
-  };
   
 
 export default Lobby;

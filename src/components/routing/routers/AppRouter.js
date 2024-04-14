@@ -47,7 +47,7 @@ const AppRouter = () => {
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
-          <Route path="lobby" element={<Lobby />} />
+          <Route path="lobby/:gameId" element={<Lobby />} />
         </Route>
 
 
