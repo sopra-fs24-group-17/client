@@ -18,6 +18,7 @@ import {
   Paper,
   TableContainer
 } from '@mui/material';
+import { HowToVoteRounded } from '@mui/icons-material';
 
 // Sample data
 // const friends = [
@@ -41,6 +42,7 @@ import {
 // ];
 
 const FriendsList = () => {
+    const navigate = useNavigate();
     const { userId } = useParams();
     // State for the search query
     const [searchQuery, setSearchQuery] = useState('');
@@ -60,6 +62,7 @@ const FriendsList = () => {
       );
       setFilteredFriends(filtered);
     };
+
       useEffect(() => {
         const fetchFriends = async () => {
           try {
@@ -86,6 +89,13 @@ const FriendsList = () => {
         
         fetchFriends(); // Call the async function
       }, [userId]);
+
+
+      const handleFriendClick = (userid) => {
+        navigate(`../users/${userid}`);
+      }
+
+
   return (
     <Container maxWidth={false} sx={{ mt: 2 }}>
       <Grid container justifyContent="space-between" alignItems="flex-start">
@@ -118,7 +128,11 @@ const FriendsList = () => {
             </TableHead>
             <TableBody>
               {filteredFriends.map((friend) => (
-                <TableRow key={friend.username}>
+                <TableRow 
+                  key={friend.username}
+                  hover
+                  onClick={() => handleFriendClick(friend.userid)}
+                >
                   <TableCell>{friend.username}</TableCell>
                   <TableCell>{friend.status}</TableCell>
                   <TableCell>
