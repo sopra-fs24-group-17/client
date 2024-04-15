@@ -18,7 +18,6 @@ import {
   Paper,
   TableContainer
 } from '@mui/material';
-import { HowToVoteRounded } from '@mui/icons-material';
 
 // Sample data
 // const friends = [
