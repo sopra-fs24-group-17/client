@@ -11,16 +11,26 @@
     "@mui/lab": "^5.0.0-alpha.169",
     "@mui/material": "^5.15.14",
     "@mui/x-date-pickers": "^7.1.0",
+    "@stomp/stompjs": "^7.0.0",
     "axios": "^1.6.7",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
+    "eslint": "^8.57.0",
     "eslint-config-react-app": "^7.0.1",
     "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.3",
     "react-scripts": "^5.0.1",
+    "react-use-websocket": "^4.8.1",
     "serve": "^14.2.1",
+
+    "sockjs-client": "^1.6.1",
+    "webstomp-client": "^1.2.6",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
     "typescript": "^3.2.1"
   },
   "scripts": {
@@ -29,7 +39,9 @@
     "build": "react-scripts build",
     "gcp-build": "",
     "eject": "react-scripts eject",
-    "test": "react-scripts test --env=jsdom"
+    "test": "react-scripts test --env=jsdom",
+    "eslint": "eslint --fix",
+    "prettier": "prettier --write ."
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -49,7 +61,11 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@babel/eslint-parser": "^7.24.1",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-react": "^7.24.1",
+    "eslint-plugin-react": "^7.34.1",
+    "prettier": "^3.2.5",
     "sass": "^1.70.0"
   }
 }

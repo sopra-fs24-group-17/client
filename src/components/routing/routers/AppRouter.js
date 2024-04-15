@@ -10,9 +10,12 @@ import Register from "../../views/Register";
 import Profile from "../../views/Profile";
 import PasswordForgotten from "../../views/PasswordForgotten";
 import Game from "../../views/Game";
-import Drawer from "../../views/Dashboard";
+import Drawer from "../../ui/Dashboard";
 import { DashboardGuard } from "../routeProtectors/DashboardGuard";
-// import Profile from "../../views/Profile";
+import CreateGame from "../../views/CreateGame";
+import FriendsList from "../../views/Friends";
+import Lobby from "../../views/Lobby";
+import GameJoinTestView from "../../views/GameJoinTestView";
 
 /**
  * Main router of your application.
@@ -21,13 +24,12 @@ import { DashboardGuard } from "../routeProtectors/DashboardGuard";
  * The main difference between these two routes is the following:
  * /login renders another component without any sub-route
  * /game renders a Router that contains other sub-routes that render in turn other react components
- * Documentation about routing in React: https://reactrouter.com/en/main/start/tutorial 
+ * Documentation about routing in React: https://reactrouter.com/en/main/start/tutorial
  */
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/register" element={<RegisterGuard />}>
           <Route path="/register" element={<Register />} />
         </Route>
@@ -35,24 +37,23 @@ const AppRouter = () => {
         <Route path="/login" element={<LoginGuard />}>
           <Route path="/login" element={<Login />} />
         </Route>
-        
+
         <Route path="/forgot-password" element={<ForgotPasswordGuard />}>
           <Route path="/forgot-password" element={<PasswordForgotten />} />
         </Route>
-        
-        <Route path="/game" element={<GameGuard />}>
-          <Route path="/game" element={<Game />} />
-        </Route>
 
-        <Route path="users/:userId" element={<ProfileGuard />}>
-          <Route index element={<Profile />} />
-        </Route>
-
-        <Route path="/dashboard" element={<DashboardGuard />}>
-        <Route path="/dashboard" element={<Drawer />} />
+        <Route path="/dashboard/*" element={<DashboardGuard />}>
+          <Route index element={<Drawer />} />
+          <Route path="join-game" element={<Game />} />
+          <Route path="create-game" element={<CreateGame />} />
+          <Route path="users/:userId" element={<Profile />} />
+          <Route path="friends" element={<FriendsList />} />
+          <Route path="lobby/:gameId" element={<Lobby />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />
+
+        <Route path="/gameroom" element={<GameJoinTestView />} />
 
       </Routes>
     </BrowserRouter>
@@ -60,6 +61,6 @@ const AppRouter = () => {
 };
 
 /*
-* Don't forget to export your component!
+ * Don't forget to export your component!
  */
 export default AppRouter;

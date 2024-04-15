@@ -1,35 +1,34 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
-    palette: {
-        primary: {
-            main: "rgb(0, 0, 0)",
-        },
-        secondary: {
-            main: "rgb(255, 255, 255)",
-        },
+  palette: {
+    primary: {
+      main: "rgb(0, 0, 0)",
     },
-    typography: {
+    secondary: {
+      main: "rgb(255, 255, 255)",
     },
-    components: {
-        MuiAlert: {
-            styleOverrides: {
-                root: {
-                    marginTop: "1rem",
-                    marginBottom: "1rem",
-                },
-            },
+  },
+  typography: {},
+  components: {
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          marginTop: "1rem",
+          marginBottom: "1rem",
         },
-        MuiListItemButton: {
-            styleOverrides: {
-                root: {
-                    "&.Mui-selected": {
-                        backgroundColor: "rgba(0, 0, 0, 0.1)",
-                    },
-                },
-            },
-        },
+      },
     },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected": {
+            backgroundColor: "rgba(0, 0, 0, 0.1)",
+          },
+        },
+      },
+    },
+  },
 });
 
 export default theme;
