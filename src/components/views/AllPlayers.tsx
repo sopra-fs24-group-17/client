@@ -45,7 +45,7 @@ const AllPlayers = () => {
           // Assuming the token is stored in local storage or context
           const token = localStorage.getItem("token") 
           
-          const response = await api.get(`/dashboard/profile/stats`, {
+          const response = await api.get(`/dashboard/420/profile/stats`, { // this userId could be any number because it's never checked, but for some server tests we need to pass a userId
             headers: { 'token': token }
           }); 
           console.log(response)
