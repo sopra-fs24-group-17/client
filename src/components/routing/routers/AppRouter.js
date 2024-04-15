@@ -16,6 +16,7 @@ import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
 import Lobby from "../../views/Lobby";
 import GameJoinTestView from "../../views/GameJoinTestView";
+import AllPlayers from "../../views/AllPlayers";
 
 /**
  * Main router of your application.
@@ -48,6 +49,7 @@ const AppRouter = () => {
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
+          <Route path="all-players" element={<AllPlayers />} />
           <Route path="lobby/:gameId" element={<Lobby />} />
         </Route>
 
