@@ -33,7 +33,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [losses, setLosses] = useState(null);
-  
+
   const [avatarPath, setAvatarPath] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -46,13 +46,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
 
   const [domain, setDomain] = useState(null);
 
-
   const currentUserID = localStorage.getItem("id");
-
 
   useEffect(() => {
     setDomain(process.env.REACT_APP_API_URL);
-    console.log(process.env.REACT_APP_API_URL)
+    console.log(process.env.REACT_APP_API_URL);
 
     const fetchUser = async () => {
       try {
@@ -123,8 +121,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   if (user) {
     return (
       <Container maxWidth="xl">
-        <Grid container spacing={3}
-        >
+        <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
             <TableContainer component={Paper}>
               <Table aria-label="simple table">
@@ -178,13 +175,17 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
 
           <Grid item xs={12} md={4}>
             <Card>
-                <CardMedia
-                  sx={{
-                    height: "20vh",
-                  }}
-                  image={avatarPath ? domain + avatarPath : "/profile_image_placeholder.webp"}
-                  title="profile"
-                />
+              <CardMedia
+                sx={{
+                  height: "20vh",
+                }}
+                image={
+                  avatarPath
+                    ? domain + avatarPath
+                    : "/profile_image_placeholder.webp"
+                }
+                title="profile"
+              />
               <CardContent>
                 <Typography
                   gutterBottom

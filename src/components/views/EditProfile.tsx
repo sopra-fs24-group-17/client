@@ -35,13 +35,14 @@ const EditProfile = () => {
   const [email, setEmail] = useState("");
   const [countryoforigin, setCountry] = useState(null);
 
-  const [avatarPlaceholder, setAvatarPlaceholder] = useState("/profile_image_placeholder.webp");
+  const [avatarPlaceholder, setAvatarPlaceholder] = useState(
+    "/profile_image_placeholder.webp"
+  );
   const [avatarPath, setAvatarPath] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [isChanging, setIsChanging] = useState(false);
 
   const [domain, setDomain] = useState(null);
-
 
   enum ProfileVisibility {
     TRUE,
@@ -65,11 +66,14 @@ const EditProfile = () => {
 
         setUser(fetchedUser);
         if (fetchedUser.avatar && fetchedUser.avatar !== "") {
-          const path = `/images/avatars/${fetchedUser.avatar.split('/').pop()}`;
+          const path = `/images/avatars/${fetchedUser.avatar.split("/").pop()}`;
           setAvatarPath(path);
         }
 
-        const visibility = fetchedUser.profilevisibility === "TRUE" ? ProfileVisibility.TRUE : ProfileVisibility.FALSE;
+        const visibility =
+          fetchedUser.profilevisibility === "TRUE"
+            ? ProfileVisibility.TRUE
+            : ProfileVisibility.FALSE;
         setProfileVisibility(visibility);
       } catch (error) {
         console.error(`Failed to fetch user data: ${handleError(error)}`);
@@ -112,8 +116,7 @@ const EditProfile = () => {
 
       setAvatarFile(event.target.files[0]);
     }
-};
-
+  };
 
   interface UpdateData {
     username?: string;
@@ -124,50 +127,66 @@ const EditProfile = () => {
     avatar?: string;
   }
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("token");
     const updateData: UpdateData = {};
 
     if (avatarFile) {
-      console.log("file exists")
+      console.log("file exists");
       // Create a FormData object and append the file
       const formData = new FormData();
-      formData.append('avatar', avatarFile);
+      formData.append("avatar", avatarFile);
 
       try {
-          // Make the API call using FormData
-          const response = await api.post(`/dashboard/${userId}/profile/uploadAvatar`, formData, {
-              headers: {
-                  'Content-Type': 'multipart/form-data',
-                  token: token,
-              },
-          });
-          navigate(`/users/${userId}`);
-          updateData.avatar = response.data;
+        // Make the API call using FormData
+        const response = await api.post(
+          `/dashboard/${userId}/profile/uploadAvatar`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              token: token,
+            },
+          }
+        );
+        navigate(`/users/${userId}`);
+        updateData.avatar = response.data;
       } catch (error) {
-          alert(`Uploading avatar failed: ${error.message || 'Unknown error'}`);
+        alert(`Uploading avatar failed: ${error.message || "Unknown error"}`);
       }
-  }
+    }
 
     // Only add fields to the update object if they are not empty
-    if (username && username.trim() !== "") {updateData.username = username;}
-    if (birthdate) {updateData.birthdate = birthdate;}
-    if (email && email.trim() !== "") {updateData.email = email;}
-    if (countryoforigin && countryoforigin.trim() !== "") {      
+    if (username && username.trim() !== "") {
+      updateData.username = username;
+    }
+    if (birthdate) {
+      updateData.birthdate = birthdate;
+    }
+    if (email && email.trim() !== "") {
+      updateData.email = email;
+    }
+    if (countryoforigin && countryoforigin.trim() !== "") {
       updateData.countryoforigin = countryoforigin;
     }
-    updateData.profilevisibility = profilevisibility === ProfileVisibility.TRUE ? ProfileVisibility.TRUE : ProfileVisibility.FALSE;
+    updateData.profilevisibility =
+      profilevisibility === ProfileVisibility.TRUE
+        ? ProfileVisibility.TRUE
+        : ProfileVisibility.FALSE;
 
     console.log(updateData);
     try {
-      const profileResponse = await api.put(`dashboard/${userId}/profile`, JSON.stringify(updateData), {
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-      });
+      const profileResponse = await api.put(
+        `dashboard/${userId}/profile`,
+        JSON.stringify(updateData),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
     } catch (error) {
       alert(`Updating profile failed: ${handleError(error)}`);
     }
@@ -199,7 +218,11 @@ const EditProfile = () => {
             >
               <CardMedia
                 sx={{ height: 300, width: 300 }}
-                image={isChanging || avatarPath === null ? avatarPlaceholder : domain + avatarPath}
+                image={
+                  isChanging || avatarPath === null
+                    ? avatarPlaceholder
+                    : domain + avatarPath
+                }
                 title="profile"
               />
               <input
