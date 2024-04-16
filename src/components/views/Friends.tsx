@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, handleError } from "helpers/api";
 import {
@@ -16,8 +16,8 @@ import {
   Container,
   Grid,
   Paper,
-  TableContainer
-} from '@mui/material';
+  TableContainer,
+} from "@mui/material";
 
 // Sample data
 // const friends = [
@@ -115,7 +115,7 @@ const FriendsList = () => {
           />
         </Grid>
       </Grid>
-      <Paper sx={{ width: '100%', mb: 2, overflowX: 'auto' }}>
+      <Paper sx={{ width: "100%", mb: 2, overflowX: "auto" }}>
         <TableContainer>
           <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
             <TableHead>

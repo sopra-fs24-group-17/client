@@ -43,9 +43,13 @@ const AppRouter = () => {
           <Route path="/forgot-password" element={<PasswordForgotten />} />
         </Route>
 
+        <Route path="/game/*" element={<GameGuard />}>
+          <Route index element={<Game />} />
+        </Route>
+
         <Route path="/dashboard/*" element={<DashboardGuard />}>
           <Route index element={<Drawer />} />
-          <Route path="join-game" element={<Game />} />
+          <Route path="join-game" element={<CreateGame />} />
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
@@ -56,7 +60,6 @@ const AppRouter = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
 
         <Route path="/gameroom" element={<GameJoinTestView />} />
-
       </Routes>
     </BrowserRouter>
   );
