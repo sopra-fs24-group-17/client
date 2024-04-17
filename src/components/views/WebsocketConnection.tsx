@@ -1,13 +1,15 @@
 // Websocket Connection
 import { Client } from "@stomp/stompjs";
+import { getDomainWS } from "../../helpers/getDomain"
 
 let stompClient = null;
 
 export const connectWebSocket = () => {
   return new Promise((resolve, reject) => {
     if (!stompClient) {
+      const WS_URL = getDomainWS();
       stompClient = new Client({
-        brokerURL: "ws://localhost:8765/ws",
+        brokerURL: WS_URL,
         reconnectDelay: 5000,
         heartbeatIncoming: 20000,
         heartbeatOutgoing: 20000,
@@ -40,15 +42,13 @@ export const disconnectWebSocket = () => {
 };
 
 export const subscribeToChannel = (channel, callback, options = {}) => {
-    if (stompClient && stompClient.connected) {
-        const subscription = stompClient.subscribe(channel, callback, options);
-        return subscription;
-    } else {
-        console.log("WebSocket is not connected.");
-    }
+  if (stompClient && stompClient.connected) {
+    const subscription = stompClient.subscribe(channel, callback, options);
+    return subscription;
+  } else {
+    console.log("WebSocket is not connected.");
+  }
 };
-
-
 
 export const unsubscribeFromChannel = (subscription) => {
   if (subscription) {
