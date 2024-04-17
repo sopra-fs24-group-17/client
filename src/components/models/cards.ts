@@ -10,6 +10,10 @@ export const cardTypes = [
     { id: 9, name: 'Cattermelon', effect: 'Play two to steal a random card.', imageUrl: 'cards/randchick-2.png', isOpen: true },
     { id: 10, name: 'Hairy Potato Cat', effect: 'Play two to steal a random card.', imageUrl: 'cards/randchick-3.png', isOpen: true },
     { id: 11, name: 'Beard Cat', effect: 'Play two to steal a random card.', imageUrl: 'cards/randchick-4.png', isOpen: true },
+    // TODO : Remove comment when we have a valid negation image path and extra cat
+    //{ id: 12, name: 'Extra Cat', effect: 'Play two to steal a random card.', imageUrl: 'cards/randchick-5.png', isOpen: true },
+    //{ id: 13, name: 'No', effect: 'Negates the action of a player.', imageUrl: 'cards/negation.png', isOpen: true },
+
 ];
 
 
