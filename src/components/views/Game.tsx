@@ -8,7 +8,7 @@ import { Grid, Stack, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import { cardTypes } from "components/models/cards";
 import "../../styles/Style.css";
-import { connectWebSocket, disconnectWebSocket, subscribeToChannel, unsubscribeFromChannel } from "components/views/WebsocketConnection";
+import { connectWebSocket, disconnectWebSocket, subscribeToChannel, unsubscribeFromChannel, sendMessage } from "components/views/WebsocketConnection";
 
 const Game = () => {
   const [closedDeck, setClosedDeck] = useState(cardTypes); // The deck that players will draw from
@@ -28,11 +28,15 @@ const Game = () => {
 
   useEffect(() => {
     let stompClient = null;
+    const gameId = localStorage.getItem("gameId");
 
     // Establish the WebSocket connection and subscribe to the channel
     connectWebSocket().then(client => {
       stompClient = client;
-      subscriptionRef.current = subscribeToChannel("/game/update", handleIncomingMessage);
+      subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleIncomingMessage);
+
+      // Send a message to the server that the game is starting
+      sendMessage(`/app/game/${gameId}/start`, {});
     });
 
     // Clean up on unmount

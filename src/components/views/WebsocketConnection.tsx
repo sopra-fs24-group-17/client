@@ -55,3 +55,23 @@ export const unsubscribeFromChannel = (subscription) => {
     subscription.unsubscribe();
   }
 };
+
+/**
+ * Sends a message to a specified destination over the WebSocket connection.
+ * @param {string} destination The destination endpoint on the server.
+ * @param {Object} headers Optional headers for the message.
+ * @param {string} body The message body to send.
+ */
+export const sendMessage = (destination, body, headers = {}) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({
+      destination,
+      headers,
+      body: JSON.stringify(body),
+    });
+    console.log(`Message published to ${destination}:`, body);
+  } else {
+    console.log("WebSocket is not connected. Unable to send message.");
+  }
+};
+
