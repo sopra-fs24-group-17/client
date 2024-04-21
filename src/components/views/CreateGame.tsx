@@ -25,12 +25,11 @@ const CreateGame: React.FC = () => {
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [totalPlayers, setTotalPlayers] = useState(
-    localStorage.getItem("totalPlayersRequired") || "2"
-  );
-  const [gameCode, setGameCode] = useState("");
-  const [gameMode, setGameMode] = useState(""); //option 1 or option2 .....
-  const [mode, setMode] = useState("PUBLIC"); //public or private
+  const [totalPlayers, setTotalPlayers] = useState(localStorage.getItem('totalPlayersRequired') || '2');
+  // const [totalPlayers, setTotalPlayers] = useState('2');
+  const [gameCode, setGameCode] = useState('');
+  const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
+  const [mode, setMode] = useState('PUBLIC') //public or private
 
   const handlePrivateToggle = (event) => {
     setIsPrivate(event.target.checked);
@@ -113,10 +112,11 @@ const CreateGame: React.FC = () => {
     fetchPrivateCode();
   }, [isPrivate]);
 
-  const handleCreateGame = async () => {
-    navigate(`/dashboard/lobby/${gameCode}`);
-  };
+    const handleCreateGame = async () => {
+      navigate(`/dashboard/lobby/${gameCode}`, { state: { totalPlayersRequired: totalPlayers , from: 'CreateGame' } });
 
+    };
+  
   // const handleCreateGame = () => {
   //    navigate('/dashboard/lobby')};
 

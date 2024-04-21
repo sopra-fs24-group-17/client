@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import PropTypes from 'prop-types';
+import React, { useEffect, useState , useRef } from "react";
+import { useNavigate, useParams, useLocation  } from "react-router-dom";
 import { api, handleError } from "helpers/api";
 import {
   connectWebSocket,
@@ -16,8 +16,20 @@ const Lobby = () => {
   const [joinButtonDisabled, setJoinButtonDisabled] = useState(false);
   const [leaveButtonDisabled, setLeaveButtonDisabled] = useState(false);
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(
-    parseInt(localStorage.getItem("totalPlayersRequired") || "2", 10)
+    parseInt(localStorage.getItem('totalPlayersRequired') || '2', 10)
   );
+  // const location = useLocation();
+  // const { totalPlayersRequired, from } = location.state || {};
+
+  // if (from === 'JoinGame') {
+  //   const totalPlayersRequired = location.state?.totalPlayersRequired;
+  // } else if (from === 'CreateGame') {
+  //   const totalPlayersRequired = location.state?.totalPlayersRequired;
+  // }
+  
+  //   parseInt(localStorage.getItem('totalPlayersRequired') || '2', 10)
+  // );
+  // const [gameDetails, setGameDetails] = useState(null);
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
 
