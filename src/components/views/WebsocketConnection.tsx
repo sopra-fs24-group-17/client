@@ -7,7 +7,7 @@ export const connectWebSocket = () => {
   return new Promise((resolve, reject) => {
     if (!stompClient) {
       stompClient = new Client({
-        brokerURL: "ws://localhost:8765/ws",
+        brokerURL: "ws://localhost:8080/ws",
         reconnectDelay: 5000,
         heartbeatIncoming: 20000,
         heartbeatOutgoing: 20000,
