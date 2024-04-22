@@ -63,32 +63,34 @@ const FriendsList = () => {
     setFilteredFriends(filtered);
   };
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        // Assuming the token is stored in local storage or context
-        const token = localStorage.getItem("token");
+      useEffect(() => {
+        const fetchFriends = async () => {
+          try {
+            // Assuming the token is stored in local storage or context
+            const token = localStorage.getItem("token") 
+            const userId = localStorage.getItem("id")
+            
+            const response = await api.get(`dashboard/${userId}/friends`, {
+              headers: {
+                'token': token // Include the token in request headers
+              }
+            }); 
+            const transformedFriends = response.data.map(friend => ({
+              ...friend,
+              username: friend.friendName, // Assuming the friendName is the username
+              avatar: friend.friendAvatar, // Direct mapping
+              status: friend.status // Assuming status is provided by the backend
+            }));
+            setFriends(transformedFriends);
+            setFilteredFriends(transformedFriends); // Initialize with fetched data
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        };
+        
+        fetchFriends(); // Call the async function
+      }, [userId]);
 
-        const response = await api.get(`dashboard/${userId}/friends`, {
-          headers: {
-            token: token, // Include the token in request headers
-          },
-        });
-        const transformedFriends = response.data.map((friend) => ({
-          ...friend,
-          username: friend.friendName, // Assuming the friendName is the username
-          avatar: friend.friendAvatar, // Direct mapping
-          status: friend.status, // Assuming status is provided by the backend
-        }));
-        setFriends(transformedFriends);
-        setFilteredFriends(transformedFriends); // Initialize with fetched data
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchFriends(); // Call the async function
-  }, [userId]);
 
   const handleFriendClick = (userid) => {
     navigate(`../users/${userid}`);
