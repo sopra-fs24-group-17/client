@@ -14,6 +14,7 @@ const Game = () => {
   const [closedDeck, setClosedDeck] = useState(cardTypes); // The deck that players will draw from
   const [openDeck, setOpenDeck] = useState([]); // The deck that shows the played cards
   const [playerHand, setPlayerHand] = useState([]); // The current player's hand
+  const numberOfPlayers = 5;
 
   // Stomp subscription reference
   const subscriptionRef = useRef(null);
@@ -113,33 +114,140 @@ const Game = () => {
 
   return (
     <Grid container spacing={2} style={{ height: "100vh", padding: "20px" }}>
-      <Grid
-        item
-        xs={12}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {/* Enemy's Hand */}
-        <Stack spacing={1} direction="row">
-          {playerHand.map((card, index) => (
-            <CardComponent
-              key={index}
-              text={card.text}
-              description={card.description}
-              image="cards/card_back.png"
-              onClick={() => playCard(card.id)}
-            />
-          ))}
-        </Stack>
-      </Grid>
+      {numberOfPlayers <= 2 && (
+        <Grid
+          item
+          xs={12}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {/* Enemy's Hand 1 */}
+          <div className="card-stack">
+            {playerHand.slice(0, 5).map(
+              (
+                card,
+                index
+              ) => (
+                <div
+                  key={card.id}
+                  className="card"
+                  style={{
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                  }}
+                >
+                  <CardComponent
+                    key={index}
+                    text={card.text}
+                    description={card.description}
+                    image="cards/card_back.png"
+                  />
+                </div>
+              ))}
+          </div>
+        </Grid>
+      )}
+      {numberOfPlayers >= 3 && (
+        <>
+          <Grid
+            item
+            xs={6}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            {/* Enemy's Hand 1 */}
+            <div className="card-stack">
+              {playerHand.slice(0, 5).map(
+                (
+                  card,
+                  index
+                ) => (
+                  <div
+                    key={card.id}
+                    className="card"
+                    style={{
+                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                    }}
+                  >
+                    <CardComponent
+                      key={index}
+                      text={card.text}
+                      description={card.description}
+                      image="cards/card_back.png"
+                    />
+                  </div>
+                ))}
+            </div>
+          </Grid>
+          <Grid
+            item
+            xs={6}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            {/* Enemy's Hand 1 */}
+            <div className="card-stack">
+              {playerHand.slice(0, 5).map(
+                (
+                  card,
+                  index
+                ) => (
+                  <div
+                    key={card.id}
+                    className="card"
+                    style={{
+                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                    }}
+                  >
+                    <CardComponent
+                      key={index}
+                      text={card.text}
+                      description={card.description}
+                      image="cards/card_back.png"
+                    />
+                  </div>
+                ))}
+            </div>
+          </Grid>
+        </>
+
+      )}
       <Grid
         item
         xs={3}
         style={{ display: "flex", justifyContent: "center" }}
-      ></Grid>
+      >
+        {/* Enemy's Hand 2 */}
+        {numberOfPlayers >= 4 && (
+          <div className="card-stack">
+            {playerHand.slice(0, 5).map(
+              (
+                card,
+                index
+              ) => (
+                <div
+                  key={card.id}
+                  className="card"
+                  style={{
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                  }}
+                >
+                  <CardComponent
+                    key={index}
+                    text={card.text}
+                    description={card.description}
+                    image="cards/card_back.png"
+                  />
+                </div>
+              ))}
+          </div>
+        )}
+      </Grid>
       <Grid item xs={3} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
         <div className="card-stack">
@@ -190,11 +298,37 @@ const Game = () => {
           </Stack>
         </div>
       </Grid>
+      {/* Enemy's Hand 3 */}
       <Grid
         item
         xs={3}
         style={{ display: "flex", justifyContent: "center" }}
-      ></Grid>
+      >
+        {numberOfPlayers >= 5 && (
+          <div className="card-stack">
+            {playerHand.slice(0, 5).map(
+              (
+                card,
+                index
+              ) => (
+                <div
+                  key={card.id}
+                  className="card"
+                  style={{
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                  }}
+                >
+                  <CardComponent
+                    key={index}
+                    text={card.text}
+                    description={card.description}
+                    image="cards/card_back.png"
+                  />
+                </div>
+              ))}
+          </div>
+        )}
+      </Grid>
       <Grid
         item
         xs={12}
@@ -217,7 +351,7 @@ const Game = () => {
           ))}
         </Stack>
       </Grid>
-    </Grid>
+    </Grid >
   );
 };
 
