@@ -20,6 +20,8 @@ import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
+import PopupNotification from "components/ui/TutorialPopup";
+
 
 const CreateGame: React.FC= () => {
 
@@ -30,6 +32,8 @@ const CreateGame: React.FC= () => {
   const [gameCode, setGameCode] = useState('');
   const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
   const [mode, setMode] = useState('PUBLIC') //public or private
+  const [showTutorialPopup, setShowTutorialPopup] = useState(false);
+
 
   const handlePrivateToggle = (event) => {
     setIsPrivate(event.target.checked);
@@ -43,8 +47,28 @@ const CreateGame: React.FC= () => {
       localStorage.setItem('totalPlayersRequired', value.toString());
     }
   };
-    // ... (existing state and functions)
+    
     useEffect(() => {
+      console.log("fetching user")
+
+      const fetchUser = async () => {
+        const response = await api.get(`/dashboard/${localStorage.getItem('id')}/profile`, {
+          headers: { token: localStorage.getItem("token") },
+        });
+        console.log(response.data)
+        if (response.data.tutorialflag === "TRUE") {
+          setShowTutorialPopup(true);
+        } else {
+          setShowTutorialPopup(false);
+        }
+      };
+      fetchUser();
+
+    }, []);
+
+
+    useEffect(() => {
+
       const fetchPrivateCode = async () => {
         if (isPrivate) {
           // If the game is set to private, we set the game mode to 'PRIVATE'
@@ -255,6 +279,13 @@ const CreateGame: React.FC= () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <PopupNotification
+        open={showTutorialPopup}
+        message="It looks like you have a tutorial available. Would you like to start the tutorial now?"
+        onClose={() => setShowTutorialPopup(false)}
+      />
+
     </Box>
   );
 };
