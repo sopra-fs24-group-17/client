@@ -25,7 +25,6 @@
     "react-scripts": "^5.0.1",
     "react-use-websocket": "^4.8.1",
     "serve": "^14.2.1",
-
     "sockjs-client": "^1.6.1",
     "webstomp-client": "^1.2.6",
     "socket.io": "^4.7.5",

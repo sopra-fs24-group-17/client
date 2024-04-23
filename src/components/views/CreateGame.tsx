@@ -21,15 +21,16 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
 
-const CreateGame: React.FC= () => {
-
+const CreateGame: React.FC = () => {
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [totalPlayers, setTotalPlayers] = useState(localStorage.getItem('totalPlayersRequired') || '2');
-  const [gameCode, setGameCode] = useState('');
-  const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
-  const [mode, setMode] = useState('PUBLIC') //public or private
+  const [totalPlayers, setTotalPlayers] = useState(
+    localStorage.getItem("totalPlayersRequired") || "2"
+  );
+  const [gameCode, setGameCode] = useState("");
+  const [gameMode, setGameMode] = useState(""); //option 1 or option2 .....
+  const [mode, setMode] = useState("PUBLIC"); //public or private
 
   const handlePrivateToggle = (event) => {
     setIsPrivate(event.target.checked);
@@ -37,84 +38,85 @@ const CreateGame: React.FC= () => {
     // Set game code and open dialog
   };
 
-  const handleNumberOfPlayersChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleNumberOfPlayersChange = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
     const value = Number(event.target.value);
     if ([2, 3, 4, 5].includes(value)) {
-      localStorage.setItem('totalPlayersRequired', value.toString());
+      localStorage.setItem("totalPlayersRequired", value.toString());
     }
   };
-    // ... (existing state and functions)
-    useEffect(() => {
-      const fetchPrivateCode = async () => {
-        if (isPrivate) {
-          // If the game is set to private, we set the game mode to 'PRIVATE'
-          setMode('PRIVATE');
-          
-          const requestBody = JSON.stringify({
-            mode: 'PRIVATE',
-            maxPlayers: parseInt(totalPlayers, 10)
-          });
-      
-          // Make the API request to create a new game
-          try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-              throw new Error('No authentication token found');
-            }
-    
-            const response = await api.post(`/dashboard/games/new`, requestBody, {
-              headers: {
-                token: token
-              }
-            });
-            
-            // Assuming the server sends back the game ID
-            const newGameCode = response.data.gameId;
-            setGameCode(newGameCode);
-            localStorage.setItem("gameId", newGameCode);
-          } catch (error) {
-            handleError(error);
-            console.error('Error creating new game:', error);
+  // ... (existing state and functions)
+  useEffect(() => {
+    const fetchPrivateCode = async () => {
+      if (isPrivate) {
+        // If the game is set to private, we set the game mode to 'PRIVATE'
+        setMode("PRIVATE");
+
+        const requestBody = JSON.stringify({
+          mode: "PRIVATE",
+          maxPlayers: parseInt(totalPlayers, 10),
+        });
+
+        // Make the API request to create a new game
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            throw new Error("No authentication token found");
           }
-        } else {
-          // If the game is not set to private, we set the game mode to 'PUBLIC'
-          const requestBody = JSON.stringify({
-            mode: 'PUBLIC',
-            maxPlayers: parseInt(totalPlayers, 10)
+
+          const response = await api.post(`/dashboard/games/new`, requestBody, {
+            headers: {
+              token: token,
+            },
           });
-      
-          // Make the API request to create a new game
-          try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-              throw new Error('No authentication token found');
-            }
-    
-            const response = await api.post(`/dashboard/games/new`, requestBody, {
-              headers: {
-                token: token
-              }
-            });
-            
-            // Assuming the server sends back the game ID
-            const newGameCode = response.data.gameId;
-            setGameCode(newGameCode);
-            localStorage.setItem("gameId", newGameCode);
-          } catch (error) {
-            handleError(error);
-            console.error('Error creating new game:', error);
-          }
+
+          // Assuming the server sends back the game ID
+          const newGameCode = response.data.gameId;
+          setGameCode(newGameCode);
+          localStorage.setItem("gameId", newGameCode);
+        } catch (error) {
+          handleError(error);
+          console.error("Error creating new game:", error);
         }
-      };
-      
-      fetchPrivateCode();
-    }, [isPrivate]); 
+      } else {
+        // If the game is not set to private, we set the game mode to 'PUBLIC'
+        const requestBody = JSON.stringify({
+          mode: "PUBLIC",
+          maxPlayers: parseInt(totalPlayers, 10),
+        });
 
-    const handleCreateGame = async () => {
-      navigate(`/dashboard/lobby/${gameCode}`);
+        // Make the API request to create a new game
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            throw new Error("No authentication token found");
+          }
 
+          const response = await api.post(`/dashboard/games/new`, requestBody, {
+            headers: {
+              token: token,
+            },
+          });
+
+          // Assuming the server sends back the game ID
+          const newGameCode = response.data.gameId;
+          setGameCode(newGameCode);
+          localStorage.setItem("gameId", newGameCode);
+        } catch (error) {
+          handleError(error);
+          console.error("Error creating new game:", error);
+        }
+      }
     };
-  
+
+    fetchPrivateCode();
+  }, [isPrivate]);
+
+  const handleCreateGame = async () => {
+    navigate(`/dashboard/lobby/${gameCode}`);
+  };
+
   // const handleCreateGame = () => {
   //    navigate('/dashboard/lobby')};
 

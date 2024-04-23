@@ -1,13 +1,15 @@
 // Websocket Connection
 import { Client } from "@stomp/stompjs";
+import { getDomainWS } from "../../helpers/getDomain"
 
 let stompClient = null;
 
 export const connectWebSocket = () => {
   return new Promise((resolve, reject) => {
     if (!stompClient) {
+      const WS_URL = getDomainWS();
       stompClient = new Client({
-        brokerURL: "ws://localhost:8080/ws",
+        brokerURL: WS_URL,
         reconnectDelay: 5000,
         heartbeatIncoming: 20000,
         heartbeatOutgoing: 20000,
@@ -40,18 +42,36 @@ export const disconnectWebSocket = () => {
 };
 
 export const subscribeToChannel = (channel, callback, options = {}) => {
-    if (stompClient && stompClient.connected) {
-        const subscription = stompClient.subscribe(channel, callback, options);
-        return subscription;
-    } else {
-        console.log("WebSocket is not connected.");
-    }
+  if (stompClient && stompClient.connected) {
+    const subscription = stompClient.subscribe(channel, callback, options);
+    return subscription;
+  } else {
+    console.log("WebSocket is not connected.");
+  }
 };
-
-
 
 export const unsubscribeFromChannel = (subscription) => {
   if (subscription) {
     subscription.unsubscribe();
   }
 };
+
+/**
+ * Sends a message to a specified destination over the WebSocket connection.
+ * @param {string} destination The destination endpoint on the server.
+ * @param {Object} headers Optional headers for the message.
+ * @param {string} body The message body to send.
+ */
+export const sendMessage = (destination, body, headers = {}) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({
+      destination,
+      headers,
+      body: JSON.stringify(body),
+    });
+    console.log(`Message published to ${destination}:`, body);
+  } else {
+    console.log("WebSocket is not connected. Unable to send message.");
+  }
+};
+
