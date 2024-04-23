@@ -216,6 +216,7 @@ const AllPlayers = () => {
                                     <TableCell>{player.achievementsunlocked}</TableCell>
                                     <TableCell>{player.lastplayed}</TableCell>
                                     <TableCell>
+                                    {localStorage.getItem('id') !== player.userid.toString() ? (
                                         <Button
                                             variant="contained"
                                             size="small"
@@ -226,7 +227,17 @@ const AllPlayers = () => {
                                         >
                                             Add Friend
                                         </Button>
-                                    </TableCell>
+                                    ) : (
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            disabled
+                                            style={{ opacity: 0.5 }}
+                                        >
+                                            Yourself
+                                        </Button>
+                                    )}
+                                </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
