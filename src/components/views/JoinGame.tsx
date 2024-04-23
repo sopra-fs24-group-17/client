@@ -15,8 +15,7 @@ const JoinGame = () => {
   const [games, setGames] = useState([]);
   const [gameId, setGameId] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
-  const [totalPlayers, setTotalPlayers] = useState(localStorage.getItem('totalPlayersRequired') || '2');
-  // const [totalPlayersRequired, setTotalPlayersRequired] = useState(1);
+
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -30,7 +29,8 @@ const JoinGame = () => {
           const response = await api.get('dashboard/games', {
             headers: { token }
           });
-          setGames(response.data);
+          const publicGames = response.data.filter(game => game.mode === "PUBLIC");
+          setGames(response.data);  
         }
       } catch (error) {
         handleError(error);
@@ -71,8 +71,7 @@ const JoinGame = () => {
           onChange={e => setGameId(e.target.value)}
           sx={{ mb: 2 }}
         />
-      ) : (
-        games.map(game => (
+      ) : (games.filter(game => game.mode === "PUBLIC").map(game => (
           <Button
             key={game.gameId}
             onClick={() => handleJoinGame(game.gameId)}

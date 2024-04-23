@@ -7,7 +7,6 @@ import {
   disconnectWebSocket,
   subscribeToChannel,
 } from "./WebsocketConnection";
-import { mergeDateAndTime } from "@mui/x-date-pickers/internals";
 import { Button } from "@mui/material";
 
 const Lobby = () => {
@@ -15,29 +14,39 @@ const Lobby = () => {
   const navigate = useNavigate();
   const [joinButtonDisabled, setJoinButtonDisabled] = useState(false);
   const [leaveButtonDisabled, setLeaveButtonDisabled] = useState(false);
-  const [totalPlayersRequired, setTotalPlayersRequired] = useState(
-    parseInt(localStorage.getItem('totalPlayersRequired') || '2', 10)
-  );
-  // const location = useLocation();
-  // const { totalPlayersRequired, from } = location.state || {};
-
-  // if (from === 'JoinGame') {
-  //   const totalPlayersRequired = location.state?.totalPlayersRequired;
-  // } else if (from === 'CreateGame') {
-  //   const totalPlayersRequired = location.state?.totalPlayersRequired;
-  // }
-  
-  //   parseInt(localStorage.getItem('totalPlayersRequired') || '2', 10)
-  // );
-  // const [gameDetails, setGameDetails] = useState(null);
+  const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
+    const fetchGameData = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await api.get(`dashboard/games`, {
+          headers: { 'token': token } 
+        });
+console.log(response.data)
+    if (response.data && response.data.length > 0) {
+      const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
+      if (game && game.maxPlayers !== undefined) {
+        setTotalPlayersRequired(game.maxPlayers);
+      } else {
+        console.error("Game with specified ID not found or lacks 'maxPlayers' data");
+      }
+    } else {
+      console.error("Invalid or empty response data");
+    }
+      } catch (error) {
+        console.error("Failed to fetch game data:", error);
+      }
+    };
+
     // Initialize WebSocket connection using @stomp/stompjs
     const initialiseWebsocketConnection = async () => {
       await connectWebSocket();
     };
+
+    fetchGameData();
     initialiseWebsocketConnection();
 
     return () => {
