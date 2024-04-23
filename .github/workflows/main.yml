@@ -33,12 +33,10 @@ jobs:
           node-version: "v20.11.0"
       - name: Install Dependencies
         run: npm install
-
-      - name: Run ESLint
-        run: npm run eslint
-
       - name: Run Prettier
         run: npm run prettier
+      - name: Run ESLint
+        run: npm run eslint
 
   deploy:
     name: Deploying to Google Cloud
@@ -55,7 +53,7 @@ jobs:
           node-version: "20.x"
       - run: npm install
       - run: npm run build
-        env: 
+        env:
           CI: false
 
       - name: Deploy to App Engine
