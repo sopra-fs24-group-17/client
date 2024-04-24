@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import CardComponent from "components/ui/CardComponent";
-import { Grid, Stack, Paper } from "@mui/material";
+import { Grid, Stack, Paper, Button } from "@mui/material";
 import { cardTypes } from "components/models/cards";
 import "../../styles/Style.css";
 import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
@@ -9,6 +9,8 @@ import { drawCard } from "components/game/drawCard";
 import { playCard } from "components/game/playCard";
 
 const Game = () => {
+  const gameId = localStorage.getItem("gameId");
+  const userId = localStorage.getItem("id");
   const [closedDeck, setClosedDeck] = useState(cardTypes); // The deck that players will draw from
   const [openDeck, setOpenDeck] = useState([]); // The deck that shows the played cards
   const [playerHand, setPlayerHand] = useState([]); // The current player's hand
@@ -28,8 +30,7 @@ const Game = () => {
       setPlayerHand(enhanceCardDetails(gameState.cards));
       console.log("Received and enhanced cards:", enhanceCardDetails(gameState.cards));
     }
-    else if (gameState.type === "startTurn")
-    {
+    else if (gameState.type === "startTurn") {
       setPlayerTurn(true);
     }
   }, []);
@@ -48,23 +49,23 @@ const Game = () => {
 
   useEffect(() => {
     let stompClient = null;
-    const gameId = localStorage.getItem("gameId");
-    const userId = localStorage.getItem("id");
-
     // Establish the WebSocket connection and subscribe to the channel
     connectWebSocket().then(client => {
       stompClient = client;
       subscriptionRef.current = subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessage);
       // subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleGameMessage);
-
-      // Send a message to the server that the game is starting
-      sendMessage(`/app/start/${gameId}`, {});
     });
-  }, [handleIncomingMessage]);
+  }, []);
+
+  const startGame = () => {
+    // Send a message to the server that the game is starting
+    sendMessage(`/app/start/${gameId}`, {});
+  };
 
 
   return (
     <Grid container spacing={2} style={{ height: "100vh", padding: "20px" }}>
+      <Button onClick={startGame}>Start Game</Button>
       {numberOfPlayers <= 2 && (
         <Grid
           item
