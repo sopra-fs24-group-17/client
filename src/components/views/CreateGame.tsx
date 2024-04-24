@@ -20,8 +20,6 @@ import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
-import PopupNotification from "components/ui/TutorialPopup";
-
 
 const CreateGame: React.FC = () => {
   const navigate = useNavigate();
@@ -31,100 +29,12 @@ const CreateGame: React.FC = () => {
   const [gameCode, setGameCode] = useState("");
   const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
   const [mode, setMode] = useState('PUBLIC') //public or private
-  const [showTutorialPopup, setShowTutorialPopup] = useState(false);
-
   const [gameCreated, setGameCreated] = useState(false);
 
   const handlePrivateToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsPrivate(event.target.checked);
 
   };
-    
-    useEffect(() => {
-      console.log("fetching user")
-
-      const fetchUser = async () => {
-        const response = await api.get(`/dashboard/${localStorage.getItem('id')}/profile`, {
-          headers: { token: localStorage.getItem("token") },
-        });
-        console.log(response.data)
-        if (response.data.tutorialflag === "TRUE") {
-          setShowTutorialPopup(true);
-        } else {
-          setShowTutorialPopup(false);
-        }
-      };
-      fetchUser();
-
-    }, []);
-
-
-    useEffect(() => {
-
-      const fetchPrivateCode = async () => {
-        if (isPrivate) {
-          // If the game is set to private, we set the game mode to 'PRIVATE'
-          setMode('PRIVATE');
-          
-          const requestBody = JSON.stringify({
-            mode: 'PRIVATE',
-            maxPlayers: parseInt(totalPlayers, 10)
-          });
-      
-          // Make the API request to create a new game
-          try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-              throw new Error('No authentication token found');
-            }
-    
-            const response = await api.post(`/dashboard/games/new`, requestBody, {
-              headers: {
-                token: token
-              }
-            });
-            
-            // Assuming the server sends back the game ID
-            const newGameCode = response.data.gameId;
-            setGameCode(newGameCode);
-            localStorage.setItem("gameId", newGameCode);
-          } catch (error) {
-            handleError(error);
-            console.error('Error creating new game:', error);
-          }
-        } else {
-          // If the game is not set to private, we set the game mode to 'PUBLIC'
-          const requestBody = JSON.stringify({
-            mode: 'PUBLIC',
-            maxPlayers: parseInt(totalPlayers, 10)
-          });
-      
-          // Make the API request to create a new game
-          try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-              throw new Error('No authentication token found');
-            }
-    
-            const response = await api.post(`/dashboard/games/new`, requestBody, {
-              headers: {
-                token: token
-              }
-            });
-            
-            // Assuming the server sends back the game ID
-            const newGameCode = response.data.gameId;
-            setGameCode(newGameCode);
-            localStorage.setItem("gameId", newGameCode);
-          } catch (error) {
-            handleError(error);
-            console.error('Error creating new game:', error);
-          }
-        }
-      };
-      
-      fetchPrivateCode();
-    }, [isPrivate]); 
 
   const handleNumberOfPlayersChange = (event) => {
     setTotalPlayers(event.target.value); // Update state based on user input
@@ -300,13 +210,6 @@ const CreateGame: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <PopupNotification
-        open={showTutorialPopup}
-        message="It looks like you have a tutorial available. Would you like to start the tutorial now?"
-        onClose={() => setShowTutorialPopup(false)}
-      />
-
     </Box>
   );
 };

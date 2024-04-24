@@ -18,9 +18,7 @@ import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Button, Divider, IconButton } from "@mui/material";
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-
+import { Divider } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -45,10 +43,6 @@ export default function ClippedDrawer() {
     }
   };
 
-  const handleTutorialClick = () => {
-    navigate("/dashboard/tutorial"); 
-  };
-
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -57,12 +51,9 @@ export default function ClippedDrawer() {
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" noWrap component="div">
             Group 17
           </Typography>
-          <IconButton color="inherit" onClick={handleTutorialClick} sx={{ fontSize: '2rem' }}>
-            <HelpOutlineIcon sx={{ fontSize: '2rem' }} />
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
