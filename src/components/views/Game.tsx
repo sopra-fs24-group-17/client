@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import CardComponent from "components/ui/CardComponent";
-import { Grid, Stack, Paper, Button } from "@mui/material";
+import { Grid, Stack, Typography, Button } from "@mui/material";
 import { cardTypes } from "components/models/cards";
 import "../../styles/Style.css";
 import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
@@ -27,18 +27,42 @@ const Game = () => {
     // Check if the type of the message is 'cards'
     if (gameState.type === 'cards') {
       // Update the player's hand with the received and enhanced cards
-      setPlayerHand(enhanceCardDetails(gameState.cards));
+      setPlayerHand((prevHand) => [...prevHand, ...enhanceCardDetails(gameState.cards)]);
       console.log("Received and enhanced cards:", enhanceCardDetails(gameState.cards));
-    }
-    else if (gameState.type === "startTurn") {
+    } else if (gameState.type === "startTurn") {
       setPlayerTurn(true);
+    } else if (gameState.type === "endTurn") {
+      setPlayerTurn(false);
     }
+    else if (gameState.type === "peekIntoDeck") {
+      peekIntoDeck(gameState.cards);
+    } else if (gameState.type === "gameState") {
+      if (gameState.topCardInternalCode) {
+        handleOpenDeck(gameState.topCardInternalCode);
+      } else {
+
+      }
+    } else if (gameState.type === "endGame") {
+      alert("Game Over! The winner is: " + gameState.winningUser);
+      navigate("/dashboard/join-game");
+    }
+
   }, []);
+
+  const peekIntoDeck = (cards) => {
+    const cardsString = cards.map(card => `${card.internalCode}`).join('\n');
+    alert(`The next 3 cards are:\n${cardsString}`);
+  };
+
+  const handleOpenDeck = (topCardInternalCode) => {
+    const topCard = cardTypes.find(card => card.name === topCardInternalCode);
+    setOpenDeck((prevDeck) => [...prevDeck, topCard]);
+  };
 
   const enhanceCardDetails = (cards) => {
     return cards.map((card) => {
       // Find the matching card type by internalCode
-      const cardType = cardTypes.find((type) => type.internalCode === card.internalCode);
+      const cardType = cardTypes.find((type) => type.name === card.internalCode);
       if (cardType) {
         // Return a new object combining the card info from the server and the cardType details
         return { ...card, ...cardType };
@@ -53,7 +77,7 @@ const Game = () => {
     connectWebSocket().then(client => {
       stompClient = client;
       subscriptionRef.current = subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessage);
-      // subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleGameMessage);
+      subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleIncomingMessage);
     });
   }, []);
 
@@ -65,6 +89,11 @@ const Game = () => {
 
   return (
     <Grid container spacing={2} style={{ height: "100vh", padding: "20px" }}>
+      <Grid item xs={12}>
+        <Typography variant="h4" align="center">
+          {`Your turn: ${playerTurn}`}
+        </Typography>
+      </Grid>
       <Button onClick={startGame}>Start Game</Button>
       {numberOfPlayers <= 2 && (
         <Grid
@@ -271,7 +300,7 @@ const Game = () => {
                   }}
                 >
                   <CardComponent
-                    key={index}
+                    key={`${card.internalCode}-${index}`}
                     text={card.text}
                     description={card.description}
                     image="cards/card_back.png"
@@ -294,11 +323,11 @@ const Game = () => {
         <Stack spacing={1} direction="row">
           {playerHand.map((card, index) => (
             <CardComponent
-              key={card.internalCode}
+              key={`${card.internalCode}-${index}`}
               text={card.text}
               description={card.description}
               image={card.imageUrl}
-              onClick={() => playCard(card.internalCode, playerTurn, playerHand, setPlayerHand, setOpenDeck, openDeck, sendMessage)}
+              onClick={() => playCard(card.internalCode, card.name, card.code, playerTurn, playerHand, setPlayerHand, setOpenDeck, openDeck, sendMessage)}
             />
           ))}
         </Stack>
