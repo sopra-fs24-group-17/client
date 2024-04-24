@@ -6,10 +6,10 @@
     "@date-io/date-fns": "^3.0.0",
     "@date-io/dayjs": "^3.0.0",
     "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
+    "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.14",
     "@mui/lab": "^5.0.0-alpha.169",
-    "@mui/material": "^5.15.15",
+    "@mui/material": "^5.15.14",
     "@mui/x-date-pickers": "^7.1.0",
     "@stomp/stompjs": "^7.0.0",
     "axios": "^1.6.7",
@@ -25,12 +25,13 @@
     "react-scripts": "^5.0.1",
     "react-use-websocket": "^4.8.1",
     "serve": "^14.2.1",
+    "sockjs-client": "^1.6.1",
+    "webstomp-client": "^1.2.6",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",
-    "typescript": "^3.2.1",
-    "webstomp-client": "^1.2.6"
+    "typescript": "^3.2.1"
   },
   "scripts": {
     "dev": "react-scripts start",

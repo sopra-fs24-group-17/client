@@ -31,13 +31,7 @@ const Login = () => {
 
       // Login successfully worked --> navigate to the route /dashboard
       setLoginFailed(false);
-      if (response.data.tutorialflag === "FALSE") {
-        navigate("/dashboard/create-game");
-      } else {
-        navigate("/dashboard/tutorial");
-      }
-      console.log(response)
-
+      navigate("/dashboard/create-game");
     } catch (error) {
       alert(`Something went wrong during the login: \n${handleError(error)}`);
       setLoginFailed(true);

@@ -26,7 +26,6 @@ const Register = () => {
   //   };
   // }, [isConnected]);
 
-
   const doRegister = async (event) => {
     event.preventDefault();
 
@@ -59,7 +58,6 @@ const Register = () => {
 
         // Navigate to dashboard after successful registration and WebSocket setup
         navigate("/dashboard/create-game");
-
       }
     } catch (error) {
       alert(
