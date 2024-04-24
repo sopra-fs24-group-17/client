@@ -19,35 +19,43 @@ const Lobby = () => {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
+    console.log("======= USEEFFECT IS BEING CALLED =======")
     const fetchGameData = async () => {
       const token = localStorage.getItem("token");
       try {
         const response = await api.get(`dashboard/games`, {
           headers: { 'token': token } 
         });
-console.log(response.data)
-    if (response.data && response.data.length > 0) {
-      const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
-      if (game && game.maxPlayers !== undefined) {
-        setTotalPlayersRequired(game.maxPlayers);
-      } else {
-        console.error("Game with specified ID not found or lacks 'maxPlayers' data");
-      }
-    } else {
-      console.error("Invalid or empty response data");
-    }
+
+        if (response.data && response.data.length > 0) {
+          const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
+          if (game && game.maxPlayers !== undefined) {
+            setTotalPlayersRequired(game.maxPlayers);
+          } else {
+            console.error("Game with specified ID not found or lacks 'maxPlayers' data");
+          }
+        } else {
+          console.error("Invalid or empty response data");
+        }
+
+
+        // Initialize WebSocket connection using @stomp/stompjs
+        const initialiseWebsocketConnection = async () => {
+          await connectWebSocket();
+        };
+        await initialiseWebsocketConnection();
+        await handleSubcribe();
+        try {
+          await handleJoinGame();
+        } catch {
+          console.error("Error joining game, did you try to join game with the initiator?")
+        }
+
       } catch (error) {
         console.error("Failed to fetch game data:", error);
       }
     };
-
-    // Initialize WebSocket connection using @stomp/stompjs
-    const initialiseWebsocketConnection = async () => {
-      await connectWebSocket();
-    };
-
     fetchGameData();
-    initialiseWebsocketConnection();
 
     return () => {
       disconnectWebSocket();
@@ -85,6 +93,7 @@ console.log(response.data)
         }
       );
       console.log("Joined left successfully", response.data);
+      navigate(-1);
     } catch (error) {
       console.error(
         "Error leaving game:",
@@ -93,7 +102,7 @@ console.log(response.data)
     }
   };
 
-  const handleSubcribe = () => {
+  const handleSubcribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
       (message) => {
@@ -177,21 +186,13 @@ console.log(response.data)
       </div>
       {/* Adding a Join Game button */}
       <Button
-        onClick={handleJoinGame}
-        disabled={joinButtonDisabled}
-        variant="outlined"
-      >
-        Join Game
-      </Button>
-      <Button
         onClick={handleLeaveGame}
         disabled={leaveButtonDisabled}
-        variant="outlined"
+        variant="contained"
+        color="error"
+        sx={{ mt: 2 }}
       >
         Leave Game
-      </Button>
-      <Button onClick={handleSubcribe} variant="outlined">
-        Subscribe to Game Channel
       </Button>
     </div>
   );
