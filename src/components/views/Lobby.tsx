@@ -1,13 +1,12 @@
-import PropTypes from "prop-types";
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import PropTypes from 'prop-types';
+import React, { useEffect, useState , useRef } from "react";
+import { useNavigate, useParams, useLocation  } from "react-router-dom";
 import { api, handleError } from "helpers/api";
 import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
 } from "./WebsocketConnection";
-import { mergeDateAndTime } from "@mui/x-date-pickers/internals";
 import { Button } from "@mui/material";
 
 const Lobby = () => {
@@ -15,17 +14,39 @@ const Lobby = () => {
   const navigate = useNavigate();
   const [joinButtonDisabled, setJoinButtonDisabled] = useState(false);
   const [leaveButtonDisabled, setLeaveButtonDisabled] = useState(false);
-  const [totalPlayersRequired, setTotalPlayersRequired] = useState(
-    parseInt(localStorage.getItem("totalPlayersRequired") || "2", 10)
-  );
+  const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
+    const fetchGameData = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await api.get(`dashboard/games`, {
+          headers: { 'token': token } 
+        });
+console.log(response.data)
+    if (response.data && response.data.length > 0) {
+      const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
+      if (game && game.maxPlayers !== undefined) {
+        setTotalPlayersRequired(game.maxPlayers);
+      } else {
+        console.error("Game with specified ID not found or lacks 'maxPlayers' data");
+      }
+    } else {
+      console.error("Invalid or empty response data");
+    }
+      } catch (error) {
+        console.error("Failed to fetch game data:", error);
+      }
+    };
+
     // Initialize WebSocket connection using @stomp/stompjs
     const initialiseWebsocketConnection = async () => {
       await connectWebSocket();
     };
+
+    fetchGameData();
     initialiseWebsocketConnection();
 
     return () => {
