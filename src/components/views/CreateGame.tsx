@@ -23,29 +23,21 @@ import { Typography } from "@mui/material";
 import PopupNotification from "components/ui/TutorialPopup";
 
 
-const CreateGame: React.FC= () => {
-
+const CreateGame: React.FC = () => {
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [totalPlayers, setTotalPlayers] = useState(localStorage.getItem('totalPlayersRequired') || '2');
-  const [gameCode, setGameCode] = useState('');
+  const [totalPlayers, setTotalPlayers] = useState('2');
+  const [gameCode, setGameCode] = useState("");
   const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
   const [mode, setMode] = useState('PUBLIC') //public or private
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
 
+  const [gameCreated, setGameCreated] = useState(false);
 
-  const handlePrivateToggle = (event) => {
+  const handlePrivateToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsPrivate(event.target.checked);
-    // Logic to handle when switch is toggled
-    // Set game code and open dialog
-  };
 
-  const handleNumberOfPlayersChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const value = Number(event.target.value);
-    if ([2, 3, 4, 5].includes(value)) {
-      localStorage.setItem('totalPlayersRequired', value.toString());
-    }
   };
     
     useEffect(() => {
@@ -134,14 +126,43 @@ const CreateGame: React.FC= () => {
       fetchPrivateCode();
     }, [isPrivate]); 
 
-    const handleCreateGame = async () => {
-      navigate(`/dashboard/lobby/${gameCode}`);
+  const handleNumberOfPlayersChange = (event) => {
+    setTotalPlayers(event.target.value); // Update state based on user input
+};
+  const createGame = async () => {
+    const mode = isPrivate ? "PRIVATE" : "PUBLIC";
+    const requestBody = JSON.stringify({
+      mode: mode,
+      maxPlayers: parseInt(totalPlayers, 10),
+    });
 
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await api.post(`/dashboard/games/new`, requestBody, {
+        headers: {
+          'token': token
+        },
+      });
+
+      const newGameCode = response.data.gameId;
+      setGameCode(newGameCode);
+      localStorage.setItem("gameId", newGameCode);
+      setGameCreated(true);
+    } catch (error) {
+      handleError(error);
+      console.error("Error creating new game:", error);
+    }
+    };
+
+    const startGame = () => {
+      // navigate(`/dashboard/lobby/${gameCode}`, { state: { totalPlayersRequired: totalPlayers, from: 'CreateGame' } });
+      navigate(`/dashboard/lobby/${gameCode}`)
     };
   
-  // const handleCreateGame = () => {
-  //    navigate('/dashboard/lobby')};
-
   return (
     <Box
       sx={{
@@ -180,7 +201,7 @@ const CreateGame: React.FC= () => {
         <TextField
           fullWidth
           variant="outlined"
-          value={`${gameCode ? gameCode : "Waiting for code..."}\n${"Give this code to your friends to allow them to join your private game"}`} // Using a template string to combine game code and additional text
+          value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`} // Using a template string to combine game code and additional text
           multiline // Allows the text field to accommodate multiple lines
           rows={2} // Sets the number of lines the text field initially presents
           InputProps={{
@@ -206,11 +227,8 @@ const CreateGame: React.FC= () => {
         <TextField
           select
           id="number-of-players"
-          value={totalPlayers} // Use local state initialized from local storage
-          onChange={(event) => {
-            handleNumberOfPlayersChange(event);
-            setTotalPlayers(event.target.value as string); // Also update local state for re-render
-          }} // Parse to int and call the parent's function
+          value={totalPlayers}
+          onChange={handleNumberOfPlayersChange}
           variant="outlined"
           sx={{ mb: 2 }}
           helperText="This is a description"
@@ -260,8 +278,11 @@ const CreateGame: React.FC= () => {
         </RadioGroup>
       </FormControl>
 
-      <Button variant="contained" onClick={handleCreateGame} sx={{ mb: 2 }}>
+      <Button variant="contained" onClick={createGame} sx={{ mb: 2 }}>
         Create Game
+      </Button>
+      <Button variant="contained" onClick={startGame} disabled={!gameCreated} sx={{ mb: 2 }}>
+        Start Game
       </Button>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>

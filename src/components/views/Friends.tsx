@@ -41,32 +41,34 @@ import {
 // ];
 
 const FriendsList = () => {
-    const navigate = useNavigate();
-    const { userId } = useParams();
-    // State for the search query
-    const [searchQuery, setSearchQuery] = useState('');
-    const [friends, setFriends] = useState([]);
-    // State for the filtered list of friends
-    const [filteredFriends, setFilteredFriends] = useState([]);
-  
-    // Function to handle search query change
-    const handleSearchChange = (event) => {
-      const query = event.target.value.toLowerCase();
-      setSearchQuery(query);
-  
-      const filtered = friends.filter(friend =>
+  const navigate = useNavigate();
+  const { userId } = useParams();
+  // State for the search query
+  const [searchQuery, setSearchQuery] = useState("");
+  const [friends, setFriends] = useState([]);
+  // State for the filtered list of friends
+  const [filteredFriends, setFilteredFriends] = useState([]);
+
+  // Function to handle search query change
+  const handleSearchChange = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = friends.filter(
+      (friend) =>
         friend.username.toLowerCase().includes(query) ||
         friend.status.toLowerCase().includes(query) ||
         friend.email.toLowerCase().includes(query)
-      );
-      setFilteredFriends(filtered);
-    };
+    );
+    setFilteredFriends(filtered);
+  };
 
       useEffect(() => {
         const fetchFriends = async () => {
           try {
             // Assuming the token is stored in local storage or context
             const token = localStorage.getItem("token") 
+            const userId = localStorage.getItem("id")
             
             const response = await api.get(`dashboard/${userId}/friends`, {
               headers: {
@@ -90,10 +92,9 @@ const FriendsList = () => {
       }, [userId]);
 
 
-      const handleFriendClick = (userid) => {
-        navigate(`../users/${userid}`);
-      }
-
+  const handleFriendClick = (userid) => {
+    navigate(`../users/${userid}`);
+  };
 
   return (
     <Container maxWidth={false} sx={{ mt: 2 }}>
@@ -127,7 +128,7 @@ const FriendsList = () => {
             </TableHead>
             <TableBody>
               {filteredFriends.map((friend) => (
-                <TableRow 
+                <TableRow
                   key={friend.username}
                   hover
                   onClick={() => handleFriendClick(friend.userid)}

@@ -15,6 +15,7 @@ import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
 import Lobby from "../../views/Lobby";
+import JoinGame from "../../views/JoinGame";
 import GameJoinTestView from "../../views/GameJoinTestView";
 import AllPlayers from "../../views/AllPlayers";
 import Tutorial from "../../views/Tutorial";
@@ -50,7 +51,7 @@ const AppRouter = () => {
 
         <Route path="/dashboard/*" element={<DashboardGuard />}>
           <Route index element={<Drawer />} />
-          <Route path="join-game" element={<CreateGame />} />
+          <Route path="join-game" element={<JoinGame />} />
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
