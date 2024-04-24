@@ -20,6 +20,7 @@ import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
+import PopupNotification from "components/ui/TutorialPopup";
 
 const CreateGame: React.FC = () => {
   const navigate = useNavigate();
@@ -30,6 +31,26 @@ const CreateGame: React.FC = () => {
   const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
   const [mode, setMode] = useState('PUBLIC') //public or private
   const [gameCreated, setGameCreated] = useState(false);
+  const [showTutorialPopup, setShowTutorialPopup] = useState(false);
+
+
+  useEffect(() => {
+    console.log("fetching user")
+
+    const fetchUser = async () => {
+      const response = await api.get(`/dashboard/${localStorage.getItem('id')}/profile`, {
+        headers: { token: localStorage.getItem("token") },
+      });
+      console.log(response.data)
+      if (response.data.tutorialflag === "TRUE") {
+        setShowTutorialPopup(true);
+      } else {
+        setShowTutorialPopup(false);
+      }
+    };
+    fetchUser();
+
+  }, []);
 
   const handlePrivateToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsPrivate(event.target.checked);
@@ -211,6 +232,13 @@ const CreateGame: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      
+      <PopupNotification
+        open={showTutorialPopup}
+        message="It looks like you have a tutorial available. Would you like to start the tutorial now?"
+        onClose={() => setShowTutorialPopup(false)}
+      />
+
     </Box>
   );
 };

@@ -19,6 +19,8 @@ import JoinGame from "../../views/JoinGame";
 import GameJoinTestView from "../../views/GameJoinTestView";
 import AllPlayers from "../../views/AllPlayers";
 import { LobbyGuard } from "../routeProtectors/LobbyGuard";
+import Tutorial from "../../views/Tutorial";
+
 
 /**
  * Main router of your application.
@@ -60,6 +62,8 @@ const AppRouter = () => {
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
           <Route path="all-players" element={<AllPlayers />} />
+          <Route path="tutorial" element={<Tutorial />} />
+
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />
