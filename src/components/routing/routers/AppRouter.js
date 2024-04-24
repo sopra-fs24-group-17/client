@@ -18,6 +18,7 @@ import Lobby from "../../views/Lobby";
 import JoinGame from "../../views/JoinGame";
 import GameJoinTestView from "../../views/GameJoinTestView";
 import AllPlayers from "../../views/AllPlayers";
+import { LobbyGuard } from "../routeProtectors/LobbyGuard";
 
 /**
  * Main router of your application.
@@ -48,6 +49,10 @@ const AppRouter = () => {
           <Route index element={<Game />} />
         </Route>
 
+        <Route path="/lobby/:gameId"  element={<LobbyGuard />}>
+          <Route index element={<Lobby />} />
+        </Route>
+
         <Route path="/dashboard/*" element={<DashboardGuard />}>
           <Route index element={<Drawer />} />
           <Route path="join-game" element={<JoinGame />} />
@@ -55,7 +60,6 @@ const AppRouter = () => {
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
           <Route path="all-players" element={<AllPlayers />} />
-          <Route path="lobby/:gameId" element={<Lobby />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />

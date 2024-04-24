@@ -69,8 +69,7 @@ const CreateGame: React.FC = () => {
     };
 
     const startGame = () => {
-      // navigate(`/dashboard/lobby/${gameCode}`, { state: { totalPlayersRequired: totalPlayers, from: 'CreateGame' } });
-      navigate(`/dashboard/lobby/${gameCode}`)
+      navigate(`/lobby/${gameCode}`)
     };
   
   return (
@@ -78,50 +77,52 @@ const CreateGame: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-start", // Aligns items to the start of the cross-axis (left side)
-        width: "50%", // Set the width of the box to half of its parent
-        marginRight: "auto", // Pushes the box to the left side
-        maxWidth: "800px", // Optional: Ensure the box doesn't get too wide on large screens
-        minHeight: "100vh", // Ensures the box takes up at least the full height of the viewport
-        // Adjust the padding or margin here as needed to align with your design
+        alignItems: "flex-start", 
+        width: "50%", 
+        marginRight: "auto", 
+        maxWidth: "800px", 
+        minHeight: "100vh", 
+        
       }}
     >
       <Typography
-        variant="h6" // You can choose the variant that fits your design best
+        variant="h6" 
         sx={{
-          fontWeight: "900", // Heaviest common weight
-          color: "black", // Very dark text
+          fontWeight: "900", 
+          color: "black", 
           alignSelf: "flex-start",
           marginLeft: "1rem",
-          fontSize: "1.25rem", // Or any other size that suits your needs
+          fontSize: "1.25rem", 
         }}
       >
         Play a new game
       </Typography>
+      
       <FormGroup sx={{ mb: 2 }}>
         <FormControlLabel
           control={
-            <Switch checked={isPrivate} onChange={handlePrivateToggle} />
+            <Switch checked={isPrivate} disabled={gameCreated} onChange={handlePrivateToggle} />
           }
           label="Private Game"
           sx={{ alignSelf: "flex-start", ml: "1rem" }}
         />
       </FormGroup>
+
       {isPrivate && (
         <TextField
           fullWidth
           variant="outlined"
-          value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`} // Using a template string to combine game code and additional text
-          multiline // Allows the text field to accommodate multiple lines
-          rows={2} // Sets the number of lines the text field initially presents
+          value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`} 
+          multiline 
+          rows={2} 
           InputProps={{
-            readOnly: true, // Makes the text field read-only if the code shouldn't be edited
+            readOnly: true,
             startAdornment: (
               <InputAdornment position="start">
-                <InfoIcon /> {/* Replace with the icon you want */}
+                <InfoIcon /> {}
               </InputAdornment>
             ),
-            // Style the input to visually separate the game code from the additional text
+            
             style: { lineHeight: "normal", whiteSpace: "pre-line" },
           }}
           sx={{ mb: 2 }}
@@ -189,10 +190,10 @@ const CreateGame: React.FC = () => {
       </FormControl>
 
       <Button variant="contained" onClick={createGame} sx={{ mb: 2 }}>
-        Create Game
+        Setup Game
       </Button>
       <Button variant="contained" onClick={startGame} disabled={!gameCreated} sx={{ mb: 2 }}>
-        Start Game
+        Start Lobby
       </Button>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>

@@ -24,7 +24,6 @@ const JoinGame = () => {
         if (!token) {
           throw new Error('No authentication token found');
         }
-        // Fetch only public games if not looking for a private game
         if (!isPrivate) {
           const response = await api.get('dashboard/games', {
             headers: { token }
@@ -41,7 +40,7 @@ const JoinGame = () => {
   }, [isPrivate]);
 
   const handleJoinGame = async (gameId) => {
-    navigate(`/dashboard/lobby/${gameId}`);
+    navigate(`/lobby/${gameId}`);
   };
 
 
@@ -77,10 +76,10 @@ const JoinGame = () => {
             onClick={() => handleJoinGame(game.gameId)}
             sx={{
               mb: 1,
-              color: 'white', // Set text color to white
-              bgcolor: 'black', // Set background color to black
+              color: 'white', 
+              bgcolor: 'black', 
               '&:hover': {
-                bgcolor: 'darkgrey' // Darken the button a bit when hovered for a visual effect
+                bgcolor: 'darkgrey' 
               }
             }}
           >

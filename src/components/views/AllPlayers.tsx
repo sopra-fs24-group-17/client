@@ -25,10 +25,15 @@ const AllPlayers = () => {
     const [players, setPlayers] = useState([]);
     const [filteredPlayers, setFilteredPlayers] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
+    const [shouldReload, setShouldReload] = useState(false);
 
-    const generateUniqueRequestId = () => {
-        return new Date().getTime().toString();
-    };
+
+    useEffect(() => {
+        if (shouldReload) {
+          window.location.reload();
+        }
+      }, [shouldReload]);
+
 
     const handleSearchChange = (event) => {
         const query = event.target.value.toLowerCase();
@@ -49,15 +54,12 @@ const AllPlayers = () => {
 
         subscribeToChannel(`/friendshiprequest/received/${userId}`, (message) => {
             console.log('Friendship request received:', message);
-            // const newRequest = JSON.parse(message.body);
             const newRequest = {
-                // Assuming the request object requires an `id` and `username`
-                // requestId: generateUniqueRequestId(), // Replace with actual unique ID if available
                 requestingUserUsername: message.body
-                // Add other necessary fields if required
+
             };
-            console.log('PPPPPPPPPAAANOOOOOOOSSSSSS',newRequest)
             setFriendRequests(prev => [...prev, newRequest]);
+            setShouldReload(true);
         });
 
         try {
@@ -79,7 +81,7 @@ const AllPlayers = () => {
           const response = await api.get(`/dashboard/${userId}/friends/requests`, {
               headers: { 'token': token }
           });
-          setFriendRequests(response.data);  // Assuming you have a state to hold these
+          setFriendRequests(response.data);  
           console.log('Friend requests fetched successfully.', friendRequests);
       } catch (error) {
           console.error('Error fetching friend requests:', error);
@@ -90,7 +92,7 @@ const AllPlayers = () => {
 
         const setup = async () => {
             if (isActive) {
-                await fetchFriendRequests(); // Ensure this runs after WebSocket setup or independently
+                await fetchFriendRequests(); 
                 await setupWebSocketAndFetchData();
                 
             }
@@ -117,7 +119,7 @@ const AllPlayers = () => {
     };
     const handleAcceptFriendRequest = async (requestId) => {
       const token = localStorage.getItem('token');
-      const userId = localStorage.getItem('id');  // Assuming user's ID is stored in local storage
+      const userId = localStorage.getItem('id');  
       try {
           await api.put(`/dashboard/${userId}/friends/requests/${requestId}`, { status: "ACCEPTED" }, {
               headers: { 'token': token }
@@ -126,7 +128,7 @@ const AllPlayers = () => {
             prevRequests.filter(request => request.requestId !== requestId)
         );
           console.log('Friend request accepted.');
-          // Optionally update UI or state here
+          
       } catch (error) {
           console.error('Failed to accept friend request:', error);
       }
@@ -143,7 +145,7 @@ const AllPlayers = () => {
             prevRequests.filter(request => request.requestId !== requestId)
         )
           console.log('Friend request rejected.');
-          // Optionally update UI or state here
+          
       } catch (error) {
           console.error('Failed to reject friend request:', error);
       }
