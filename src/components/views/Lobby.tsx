@@ -6,6 +6,7 @@ import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
+  sendMessage,
 } from "./WebsocketConnection";
 import { Button, Box } from "@mui/material";
 
@@ -113,10 +114,19 @@ const Lobby = () => {
         } else if (messageBody.type === "leave") {
           setCurrentPlayers((prevPlayers) => prevPlayers - 1);
         }
+
+        if (messageBody === "lets all start together guys") {
+          navigate(`/game`); 
+        }
       },
       { id: `sub-${gameId}` }
     );
   };
+
+
+  const handleStartGame = async () => {
+    sendMessage(`/game/${gameId}`, "lets all start together guys");
+  }
 
   // Annotate style objects with React.CSSProperties
   const lobbyContainerStyle: React.CSSProperties = {
@@ -185,7 +195,7 @@ const Lobby = () => {
       </div>
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>  
         <Button
-          onClick={() => {navigate("/game");}}  
+          onClick={handleStartGame}  
           disabled={joinButtonDisabled}  
           variant="contained"
           color="success"

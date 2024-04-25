@@ -40,6 +40,7 @@ const JoinGame = () => {
   }, [isPrivate]);
 
   const handleJoinGame = async (gameId) => {
+    localStorage.setItem("gameId", gameId);
     navigate(`/lobby/${gameId}`);
   };
 
