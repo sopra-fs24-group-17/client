@@ -16,7 +16,6 @@ import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
 import Lobby from "../../views/Lobby";
 import JoinGame from "../../views/JoinGame";
-import GameJoinTestView from "../../views/GameJoinTestView";
 import AllPlayers from "../../views/AllPlayers";
 import { LobbyGuard } from "../routeProtectors/LobbyGuard";
 import Tutorial from "../../views/Tutorial";
@@ -68,7 +67,6 @@ const AppRouter = () => {
 
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route path="/gameroom" element={<GameJoinTestView />} />
       </Routes>
     </BrowserRouter>
   );
