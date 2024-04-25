@@ -7,7 +7,7 @@ import {
   disconnectWebSocket,
   subscribeToChannel,
 } from "./WebsocketConnection";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
@@ -19,7 +19,6 @@ const Lobby = () => {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    console.log("======= USEEFFECT IS BEING CALLED =======")
     const fetchGameData = async () => {
       const token = localStorage.getItem("token");
       try {
@@ -184,16 +183,24 @@ const Lobby = () => {
           <li style={hintListItemStyle}>You can also do this.</li>
         </ul>
       </div>
-      {/* Adding a Join Game button */}
-      <Button
-        onClick={handleLeaveGame}
-        disabled={leaveButtonDisabled}
-        variant="contained"
-        color="error"
-        sx={{ mt: 2 }}
-      >
-        Leave Game
-      </Button>
+      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>  
+        <Button
+          onClick={() => {navigate("/game");}}  
+          disabled={joinButtonDisabled}  
+          variant="contained"
+          color="success"
+        >
+          Start Game
+        </Button>
+        <Button
+          onClick={handleLeaveGame}
+          disabled={leaveButtonDisabled}
+          variant="contained"
+          color="error"
+        >
+          Leave Lobby
+        </Button>
+      </Box>
     </div>
   );
 };

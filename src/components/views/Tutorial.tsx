@@ -32,7 +32,7 @@ const Tutorial = () => {
                         { src: "/cards/chicken.png", alt: "explosion", text: "If you draw this card, you are out! The only way to counteract this is by playing a defuse card (see below)." },
                         { src: "/cards/defuse-1.png", alt: "defuse-1", text: "Play a defuse card to stop yourself from exploding upon drawing an explosion card. These cards are extremely valuable. After playing a defuse card, the explosion card must be placed back anywhere in the deck. Playing this card instantly ends a player's turn." },
                         { src: "/cards/nope.png", alt: "nope", text: "Playing a nope card will stop any action (exceptions are explosion cards and defuse cards, which cannot be noped)." },
-                        { src: "/cards/reverse-1.png", alt: "reverse-1", text: "This card reverses the order of play (if you were going clockwise before, now go around anticlockwise). It also instantly ends your turn without having to draw a card."},
+                        // { src: "/cards/reverse-1.png", alt: "reverse-1", text: "This card reverses the order of play (if you were going clockwise before, now go around anticlockwise). It also instantly ends your turn without having to draw a card."},
                         { src: "/cards/seethefuture-1.png", alt: "seethefuture-1", text: "Play this card to peek at the top two cards from the deck." },
                         { src: "/cards/shuffle-1.png", alt: "shuffle-1", text: "The shuffle card simply shuffles the deck once." },
                         { src: "/cards/skip-1.png", alt: "skip-1", text: "This card instantly ends your turn without having to draw a card. Other than that, it has no additional functionality." },
