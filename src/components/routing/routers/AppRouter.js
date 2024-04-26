@@ -15,7 +15,11 @@ import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
 import Lobby from "../../views/Lobby";
-import GameJoinTestView from "../../views/GameJoinTestView";
+import JoinGame from "../../views/JoinGame";
+import AllPlayers from "../../views/AllPlayers";
+import { LobbyGuard } from "../routeProtectors/LobbyGuard";
+import Tutorial from "../../views/Tutorial";
+
 
 /**
  * Main router of your application.
@@ -42,18 +46,26 @@ const AppRouter = () => {
           <Route path="/forgot-password" element={<PasswordForgotten />} />
         </Route>
 
+        <Route path="/game/*" element={<GameGuard />}>
+          <Route index element={<Game />} />
+        </Route>
+
+        <Route path="/lobby/:gameId"  element={<LobbyGuard />}>
+          <Route index element={<Lobby />} />
+        </Route>
+
         <Route path="/dashboard/*" element={<DashboardGuard />}>
           <Route index element={<Drawer />} />
-          <Route path="join-game" element={<Game />} />
+          <Route path="join-game" element={<JoinGame />} />
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
           <Route path="friends" element={<FriendsList />} />
-          <Route path="lobby/:gameId" element={<Lobby />} />
+          <Route path="all-players" element={<AllPlayers />} />
+          <Route path="tutorial" element={<Tutorial />} />
+
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />
-
-        <Route path="/gameroom" element={<GameJoinTestView />} />
 
       </Routes>
     </BrowserRouter>

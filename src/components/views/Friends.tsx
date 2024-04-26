@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, handleError } from "helpers/api";
 import {
@@ -16,8 +16,8 @@ import {
   Container,
   Grid,
   Paper,
-  TableContainer
-} from '@mui/material';
+  TableContainer,
+} from "@mui/material";
 
 // Sample data
 // const friends = [
@@ -41,30 +41,34 @@ import {
 // ];
 
 const FriendsList = () => {
-    const { userId } = useParams();
-    // State for the search query
-    const [searchQuery, setSearchQuery] = useState('');
-    const [friends, setFriends] = useState([]);
-    // State for the filtered list of friends
-    const [filteredFriends, setFilteredFriends] = useState([]);
-  
-    // Function to handle search query change
-    const handleSearchChange = (event) => {
-      const query = event.target.value.toLowerCase();
-      setSearchQuery(query);
-  
-      const filtered = friends.filter(friend =>
+  const navigate = useNavigate();
+  const { userId } = useParams();
+  // State for the search query
+  const [searchQuery, setSearchQuery] = useState("");
+  const [friends, setFriends] = useState([]);
+  // State for the filtered list of friends
+  const [filteredFriends, setFilteredFriends] = useState([]);
+
+  // Function to handle search query change
+  const handleSearchChange = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = friends.filter(
+      (friend) =>
         friend.username.toLowerCase().includes(query) ||
         friend.status.toLowerCase().includes(query) ||
         friend.email.toLowerCase().includes(query)
-      );
-      setFilteredFriends(filtered);
-    };
+    );
+    setFilteredFriends(filtered);
+  };
+
       useEffect(() => {
         const fetchFriends = async () => {
           try {
             // Assuming the token is stored in local storage or context
             const token = localStorage.getItem("token") 
+            const userId = localStorage.getItem("id")
             
             const response = await api.get(`dashboard/${userId}/friends`, {
               headers: {
@@ -86,6 +90,12 @@ const FriendsList = () => {
         
         fetchFriends(); // Call the async function
       }, [userId]);
+
+
+  const handleFriendClick = (userid) => {
+    navigate(`../users/${userid}`);
+  };
+
   return (
     <Container maxWidth={false} sx={{ mt: 2 }}>
       <Grid container justifyContent="space-between" alignItems="flex-start">
@@ -106,7 +116,7 @@ const FriendsList = () => {
           />
         </Grid>
       </Grid>
-      <Paper sx={{ width: '100%', mb: 2, overflowX: 'auto' }}>
+      <Paper sx={{ width: "100%", mb: 2, overflowX: "auto" }}>
         <TableContainer>
           <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
             <TableHead>
@@ -118,7 +128,11 @@ const FriendsList = () => {
             </TableHead>
             <TableBody>
               {filteredFriends.map((friend) => (
-                <TableRow key={friend.username}>
+                <TableRow
+                  key={friend.username}
+                  hover
+                  onClick={() => handleFriendClick(friend.userid)}
+                >
                   <TableCell>{friend.username}</TableCell>
                   <TableCell>{friend.status}</TableCell>
                   <TableCell>

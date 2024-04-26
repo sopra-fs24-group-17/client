@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import AppBar from "@mui/material/AppBar";
@@ -18,7 +18,8 @@ import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Divider } from "@mui/material";
+import { Button, Divider, IconButton } from "@mui/material";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const drawerWidth = 240;
 
@@ -43,6 +44,11 @@ export default function ClippedDrawer() {
     }
   };
 
+
+  const handleTutorialClick = () => {
+    navigate("/dashboard/tutorial"); 
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -51,9 +57,12 @@ export default function ClippedDrawer() {
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Group 17
           </Typography>
+          <IconButton color="inherit" onClick={handleTutorialClick} sx={{ fontSize: '2rem' }}>
+            <HelpOutlineIcon sx={{ fontSize: '2rem' }} />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -68,22 +77,29 @@ export default function ClippedDrawer() {
         }}
       >
         <Toolbar />
-        <Box sx={{ overflow: "auto", display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <Box
+          sx={{
+            overflow: "auto",
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+          }}
+        >
           <List sx={{ flexGrow: 1 }}>
             <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNestedListToggle('Game')}>
+              <ListItemButton onClick={() => handleNestedListToggle("Game")}>
                 <ListItemIcon>
                   <VideogameAssetIcon />
                 </ListItemIcon>
                 <ListItemText primary="Game" />
               </ListItemButton>
             </ListItem>
-            {openNestedList === 'Game' && (
+            {openNestedList === "Game" && (
               <List disablePadding>
                 <ListItem sx={{ paddingLeft: 4 }}>
                   <ListItemButton
-                    selected={isActive('/dashboard/join-game')}
-                    onClick={() => navigate('/dashboard/join-game')}
+                    selected={isActive("/dashboard/join-game")}
+                    onClick={() => navigate("/dashboard/join-game")}
                   >
                     <ListItemIcon>
                       <GroupIcon />
@@ -93,8 +109,8 @@ export default function ClippedDrawer() {
                 </ListItem>
                 <ListItem sx={{ paddingLeft: 4 }}>
                   <ListItemButton
-                    selected={isActive('/dashboard/create-game')}
-                    onClick={() => navigate('/dashboard/create-game')}
+                    selected={isActive("/dashboard/create-game")}
+                    onClick={() => navigate("/dashboard/create-game")}
                   >
                     <ListItemIcon>
                       <GamesIcon />
@@ -106,19 +122,21 @@ export default function ClippedDrawer() {
               </List>
             )}
             <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNestedListToggle('SocialTemp')}>
+              <ListItemButton
+                onClick={() => handleNestedListToggle("SocialTemp")}
+              >
                 <ListItemIcon>
                   <EmojiPeopleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Social" />
               </ListItemButton>
             </ListItem>
-            {openNestedList === 'SocialTemp' && (
+            {openNestedList === "SocialTemp" && (
               <List disablePadding>
                 <ListItem sx={{ paddingLeft: 4 }}>
                   <ListItemButton
-                    selected={isActive('/dashboard/all-players')}
-                    onClick={() => navigate('/dashboard/all-players')}
+                    selected={isActive("/dashboard/all-players")}
+                    onClick={() => navigate("/dashboard/all-players")}
                   >
                     <ListItemIcon>
                       <LeaderboardIcon />
@@ -128,7 +146,7 @@ export default function ClippedDrawer() {
                 </ListItem>
                 <ListItem sx={{ paddingLeft: 4 }}>
                   <ListItemButton
-                    selected={isActive('/dashboard/friends')}
+                    selected={isActive("/dashboard/friends")}
                     onClick={() => navigate("/dashboard/friends")}
                   >
                     <ListItemIcon>
@@ -143,7 +161,11 @@ export default function ClippedDrawer() {
           </List>
           <Box sx={{ marginTop: "auto" }}>
             <Divider />
-            <ListItemButton onClick={() => navigate("/dashboard/users/" + localStorage.getItem("id"))}>
+            <ListItemButton
+              onClick={() =>
+                navigate("/dashboard/users/" + localStorage.getItem("id"))
+              }
+            >
               <ListItemIcon>
                 <AccountCircleIcon />
               </ListItemIcon>

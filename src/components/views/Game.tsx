@@ -1,47 +1,340 @@
-import React from "react";
-import { api, handleError } from "helpers/api";
-import { useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import CardComponent from "components/ui/CardComponent";
+import { Grid, Stack, Typography, Button } from "@mui/material";
+import { cardTypes } from "components/models/cards";
+import "../../styles/Style.css";
+import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
+import { drawCard } from "components/game/drawCard";
+import { playCard } from "components/game/playCard";
 
-const Game: React.FC = () => {
+const Game = () => {
+  const gameId = localStorage.getItem("gameId");
+  const userId = localStorage.getItem("id");
+  const [closedDeck, setClosedDeck] = useState(cardTypes);
+  const [openDeck, setOpenDeck] = useState([]);
+  const [playerHand, setPlayerHand] = useState([]);
+  const [playerTurn, setPlayerTurn] = useState(false);
   const navigate = useNavigate();
+  const numberOfPlayers = 2;
 
-  const doLogout = async () => {
-    try {
-      const id = localStorage.getItem("id");
-      const token = localStorage.getItem("token");
-      api
-        .post(`dashboard/${id}/logout`, null, {
-          headers: { token: token },
-        })
-        .then(() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("id");
-          navigate("/login");
-        })
-        .catch((error) => {
-          console.error("Logout failed: ", error);
-        });
-    } catch (error) {
-      alert(`Something went wrong during the login: \n${handleError(error)}`);
+  const subscriptionRef = useRef(null);
+
+  const handleIncomingMessage = useCallback((message) => {
+    const gameState = JSON.parse(message.body);
+    if (gameState.type === 'cards') {
+      setPlayerHand((prevHand) => [...prevHand, ...enhanceCardDetails(gameState.cards)]);
+      console.log("Received and enhanced cards:", enhanceCardDetails(gameState.cards));
+    } else if (gameState.type === "startTurn") {
+      setPlayerTurn(true);
+    } else if (gameState.type === "endTurn") {
+      setPlayerTurn(false);
+    } else if (gameState.type === "peekIntoDeck") {
+      peekIntoDeck(gameState.cards);
+    } else if (gameState.type === "cardStolen") {
+      cardStolen(gameState.cards);
+    } else if (gameState.type === "explosion") {
+      handleExplosion(gameState.terminatingUser);
+    } else if (gameState.type === "defuseCard") {
+      handleDefuseCard();
+    } else if (gameState.type === "gameState") {
+      if (gameState.topCardInternalCode) {
+        handleOpenDeck(gameState.topCardInternalCode);
+      }
+    } else if (gameState.type === "endGame") {
+      alert("Game Over! The winner is: " + gameState.winningUser);
+      navigate("/dashboard/join-game");
     }
+  }, []);
+
+  const peekIntoDeck = (cards) => {
+    const cardsString = cards.map(card => `${card.internalCode}`).join('\n');
+    alert(`The next 3 cards are:\n${cardsString}`);
   };
 
+  const cardStolen = (cards) => {
+    const stolenCard = cards[0].internalCode;
+    setPlayerHand((prevHand) => prevHand.filter((card) => card.name !== stolenCard));
+  };
+
+  const handleExplosion = (userName) => {
+    alert(`Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`);
+  };
+
+  const handleDefuseCard = () => {
+    setPlayerHand((prevHand) => prevHand.filter((card) => card.name !== "defuse"));
+  };
+
+  const handleOpenDeck = (topCardInternalCode) => {
+    const topCard = cardTypes.find(card => card.name === topCardInternalCode);
+    setOpenDeck((prevDeck) => [...prevDeck, topCard]);
+  };
+
+  const enhanceCardDetails = (cards) => {
+    return cards.map((card) => {
+      const cardType = cardTypes.find((type) => type.name === card.internalCode);
+      if (cardType) {
+        return { ...card, ...cardType };
+      }
+      return card;
+    });
+  };
+
+  useEffect(() => {
+    let stompClient = null;
+    connectWebSocket().then(client => {
+      stompClient = client;
+      subscriptionRef.current = subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessage);
+      subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleIncomingMessage);
+      sendMessage(`/app/start/${gameId}`, {});
+    });
+  }, []);
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}
-    >
-      <h1>Game View Placeholder</h1>
-      <Button variant="contained" color="primary" onClick={doLogout}>
-        Logout
-      </Button>
-    </div>
+    <Grid container spacing={2} style={{ height: "100vh", padding: "20px" }}>
+      <Grid item xs={12}>
+        <Typography variant="h4" align="center">
+          {`Your turn: ${playerTurn}`}
+        </Typography>
+      </Grid>
+      {numberOfPlayers <= 2 && (
+        <Grid
+          item
+          xs={12}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {/* Enemy's Hand 1 */}
+          <div className="card-stack">
+            {playerHand.slice(0, 5).map(
+              (
+                card,
+                index
+              ) => (
+                <div
+                  key={card.id}
+                  className="card"
+                  style={{
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
+                  }}
+                >
+                  <CardComponent
+                    key={index}
+                    text={card.text}
+                    description={card.description}
+                    image="cards/card_back.png"
+                  />
+                </div>
+              ))}
+          </div>
+        </Grid>
+      )}
+      {numberOfPlayers >= 3 && (
+        <>
+          <Grid
+            item
+            xs={6}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            {/* Enemy's Hand 1 */}
+            <div className="card-stack">
+              {playerHand.slice(0, 5).map(
+                (
+                  card,
+                  index
+                ) => (
+                  <div
+                    key={card.id}
+                    className="card"
+                    style={{
+                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
+                    }}
+                  >
+                    <CardComponent
+                      key={index}
+                      text={card.text}
+                      description={card.description}
+                      image="cards/card_back.png"
+                    />
+                  </div>
+                ))}
+            </div>
+          </Grid>
+          <Grid
+            item
+            xs={6}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            {/* Enemy's Hand 1 */}
+            <div className="card-stack">
+              {playerHand.slice(0, 5).map(
+                (
+                  card,
+                  index
+                ) => (
+                  <div
+                    key={card.id}
+                    className="card"
+                    style={{
+                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
+                    }}
+                  >
+                    <CardComponent
+                      key={index}
+                      text={card.text}
+                      description={card.description}
+                      image="cards/card_back.png"
+                    />
+                  </div>
+                ))}
+            </div>
+          </Grid>
+        </>
+
+      )}
+      <Grid
+        item
+        xs={4}
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        {/* Enemy's Hand 2 */}
+        {numberOfPlayers >= 4 && (
+          <div className="card-stack">
+            {playerHand.slice(0, 5).map(
+              (
+                card,
+                index
+              ) => (
+                <div
+                  key={card.id}
+                  className="card"
+                  style={{
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
+                  }}
+                >
+                  <CardComponent
+                    key={index}
+                    text={card.text}
+                    description={card.description}
+                    image="cards/card_back.png"
+                  />
+                </div>
+              ))}
+          </div>
+        )}
+      </Grid>
+      <Grid item xs={2} style={{ display: "flex", justifyContent: "center" }}>
+        {/* Closed Deck */}
+        <div className="card-stack">
+          {closedDeck.slice(0, 5).map(
+            (
+              card,
+              index
+            ) => (
+              <div
+                key={card.id}
+                className="card"
+                style={{
+                  zIndex: closedDeck.length - index,
+                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, 
+                }}
+              >
+                <CardComponent
+                  text=""
+                  description=""
+                  image="cards/card_back.png"
+                  onClick={() => drawCard(playerTurn, closedDeck, playerHand, setPlayerHand, setClosedDeck, setPlayerTurn, sendMessage, navigate)}
+                />
+              </div>
+            )
+          )}
+        </div>
+      </Grid>
+      <Grid item xs={2} style={{ display: "flex", justifyContent: "center" }}>
+        {/* Open Deck */}
+        <div className="card-stack">
+          <Stack spacing={1} direction="column">
+            {openDeck.slice(-5).map((card, index) => (
+              <div
+                key={card.id}
+                className="card"
+                style={{
+                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
+                }}
+              >
+                <CardComponent
+                  key={index}
+                  text={card.text}
+                  description={card.description}
+                  image={card.imageUrl}
+                />
+              </div>
+            ))}
+          </Stack>
+        </div>
+      </Grid>
+      {/* Enemy's Hand 3 */}
+      <Grid
+        item
+        xs={4}
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        {numberOfPlayers >= 5 && (
+          <div className="card-stack">
+            {playerHand.slice(0, 5).map(
+              (
+                card,
+                index
+              ) => (
+                <div
+                  key={card.id}
+                  className="card"
+                  style={{
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
+                  }}
+                >
+                  <CardComponent
+                    key={`${card.internalCode}-${index}`}
+                    text={card.text}
+                    description={card.description}
+                    image="cards/card_back.png"
+                  />
+                </div>
+              ))}
+          </div>
+        )}
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {/* Player's Hand */}
+        <Stack spacing={1} direction="row">
+          {playerHand.map((card, index) => (
+            <CardComponent
+              key={`${card.internalCode}-${index}`}
+              text={card.text}
+              description={card.description}
+              image={card.imageUrl}
+              onClick={() => playCard(card.internalCode, card.name, card.code, playerTurn, playerHand, setPlayerHand, setOpenDeck, openDeck, sendMessage)}
+            />
+          ))}
+        </Stack>
+      </Grid>
+    </Grid >
   );
 };
 

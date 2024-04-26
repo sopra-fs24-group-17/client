@@ -10,7 +10,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <Grid container style={{ height: "100vh" }}>
       <Grid item xs={12} md={6}>
         <img
-          src="kitten.webp"
+          src="chicken.png"
           alt="description"
           style={{ width: "100%", height: "100vh", objectFit: "cover" }}
         />

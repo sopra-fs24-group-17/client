@@ -20,153 +20,130 @@ import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
+import PopupNotification from "components/ui/TutorialPopup";
 
-const CreateGame: React.FC= () => {
-
+const CreateGame: React.FC = () => {
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [totalPlayers, setTotalPlayers] = useState(localStorage.getItem('totalPlayersRequired') || '2');
-  const [gameCode, setGameCode] = useState('');
+  const [totalPlayers, setTotalPlayers] = useState('2');
+  const [gameCode, setGameCode] = useState("");
   const [gameMode, setGameMode] = useState('');//option 1 or option2 .....
   const [mode, setMode] = useState('PUBLIC') //public or private
+  const [gameCreated, setGameCreated] = useState(false);
+  const [showTutorialPopup, setShowTutorialPopup] = useState(false);
 
-  const handlePrivateToggle = (event) => {
+
+  useEffect(() => {
+    console.log("fetching user")
+
+    const fetchUser = async () => {
+      const response = await api.get(`/dashboard/${localStorage.getItem('id')}/profile`, {
+        headers: { token: localStorage.getItem("token") },
+      });
+      console.log(response.data)
+      if (response.data.tutorialflag === "TRUE") {
+        setShowTutorialPopup(true);
+      } else {
+        setShowTutorialPopup(false);
+      }
+    };
+    fetchUser();
+
+  }, []);
+
+  const handlePrivateToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsPrivate(event.target.checked);
-    // Logic to handle when switch is toggled
-    // Set game code and open dialog
+
   };
 
-  const handleNumberOfPlayersChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const value = Number(event.target.value);
-    if ([2, 3, 4, 5].includes(value)) {
-      localStorage.setItem('totalPlayersRequired', value.toString());
+  const handleNumberOfPlayersChange = (event) => {
+    setTotalPlayers(event.target.value); // Update state based on user input
+};
+  const createGame = async () => {
+    const mode = isPrivate ? "PRIVATE" : "PUBLIC";
+    const requestBody = JSON.stringify({
+      mode: mode,
+      maxPlayers: parseInt(totalPlayers, 10),
+    });
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await api.post(`/dashboard/games/new`, requestBody, {
+        headers: {
+          'token': token
+        },
+      });
+
+      const newGameCode = response.data.gameId;
+      setGameCode(newGameCode);
+      localStorage.setItem("gameId", newGameCode);
+      setGameCreated(true);
+    } catch (error) {
+      handleError(error);
+      console.error("Error creating new game:", error);
     }
-  };
-    // ... (existing state and functions)
-    useEffect(() => {
-      const fetchPrivateCode = async () => {
-        if (isPrivate) {
-          // If the game is set to private, we set the game mode to 'PRIVATE'
-          setMode('PRIVATE');
-          
-          const requestBody = JSON.stringify({
-            mode: 'PRIVATE',
-            maxPlayers: parseInt(totalPlayers, 10)
-          });
-      
-          // Make the API request to create a new game
-          try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-              throw new Error('No authentication token found');
-            }
-    
-            const response = await api.post(`/dashboard/games/new`, requestBody, {
-              headers: {
-                token: token
-              }
-            });
-            
-            // Assuming the server sends back the game ID
-            const newGameCode = response.data.gameId;
-            setGameCode(newGameCode);
-            localStorage.setItem("gameId", newGameCode);
-          } catch (error) {
-            handleError(error);
-            console.error('Error creating new game:', error);
-          }
-        } else {
-          // If the game is not set to private, we set the game mode to 'PUBLIC'
-          const requestBody = JSON.stringify({
-            mode: 'PUBLIC',
-            maxPlayers: parseInt(totalPlayers, 10)
-          });
-      
-          // Make the API request to create a new game
-          try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-              throw new Error('No authentication token found');
-            }
-    
-            const response = await api.post(`/dashboard/games/new`, requestBody, {
-              headers: {
-                token: token
-              }
-            });
-            
-            // Assuming the server sends back the game ID
-            const newGameCode = response.data.gameId;
-            setGameCode(newGameCode);
-            localStorage.setItem("gameId", newGameCode);
-          } catch (error) {
-            handleError(error);
-            console.error('Error creating new game:', error);
-          }
-        }
-      };
-      
-      fetchPrivateCode();
-    }, [isPrivate]); 
+    };
 
-    const handleCreateGame = async () => {
-      navigate(`/dashboard/lobby/${gameCode}`);
-
+    const startGame = () => {
+      navigate(`/lobby/${gameCode}`)
     };
   
-  // const handleCreateGame = () => {
-  //    navigate('/dashboard/lobby')};
-
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-start", // Aligns items to the start of the cross-axis (left side)
-        width: "50%", // Set the width of the box to half of its parent
-        marginRight: "auto", // Pushes the box to the left side
-        maxWidth: "800px", // Optional: Ensure the box doesn't get too wide on large screens
-        minHeight: "100vh", // Ensures the box takes up at least the full height of the viewport
-        // Adjust the padding or margin here as needed to align with your design
+        alignItems: "flex-start", 
+        width: "50%", 
+        marginRight: "auto", 
+        maxWidth: "800px", 
+        minHeight: "100vh", 
+        
       }}
     >
       <Typography
-        variant="h6" // You can choose the variant that fits your design best
+        variant="h6" 
         sx={{
-          fontWeight: "900", // Heaviest common weight
-          color: "black", // Very dark text
+          fontWeight: "900", 
+          color: "black", 
           alignSelf: "flex-start",
           marginLeft: "1rem",
-          fontSize: "1.25rem", // Or any other size that suits your needs
+          fontSize: "1.25rem", 
         }}
       >
         Play a new game
       </Typography>
+      
       <FormGroup sx={{ mb: 2 }}>
         <FormControlLabel
           control={
-            <Switch checked={isPrivate} onChange={handlePrivateToggle} />
+            <Switch checked={isPrivate} disabled={gameCreated} onChange={handlePrivateToggle} />
           }
           label="Private Game"
           sx={{ alignSelf: "flex-start", ml: "1rem" }}
         />
       </FormGroup>
+
       {isPrivate && (
         <TextField
           fullWidth
           variant="outlined"
-          value={`${gameCode ? gameCode : "Waiting for code..."}\n${"Give this code to your friends to allow them to join your private game"}`} // Using a template string to combine game code and additional text
-          multiline // Allows the text field to accommodate multiple lines
-          rows={2} // Sets the number of lines the text field initially presents
+          value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`} 
+          multiline 
+          rows={2} 
           InputProps={{
-            readOnly: true, // Makes the text field read-only if the code shouldn't be edited
+            readOnly: true,
             startAdornment: (
               <InputAdornment position="start">
-                <InfoIcon /> {/* Replace with the icon you want */}
+                <InfoIcon /> {}
               </InputAdornment>
             ),
-            // Style the input to visually separate the game code from the additional text
+            
             style: { lineHeight: "normal", whiteSpace: "pre-line" },
           }}
           sx={{ mb: 2 }}
@@ -182,11 +159,8 @@ const CreateGame: React.FC= () => {
         <TextField
           select
           id="number-of-players"
-          value={totalPlayers} // Use local state initialized from local storage
-          onChange={(event) => {
-            handleNumberOfPlayersChange(event);
-            setTotalPlayers(event.target.value as string); // Also update local state for re-render
-          }} // Parse to int and call the parent's function
+          value={totalPlayers}
+          onChange={handleNumberOfPlayersChange}
           variant="outlined"
           sx={{ mb: 2 }}
           helperText="This is a description"
@@ -236,8 +210,11 @@ const CreateGame: React.FC= () => {
         </RadioGroup>
       </FormControl>
 
-      <Button variant="contained" onClick={handleCreateGame} sx={{ mb: 2 }}>
-        Create Game
+      <Button variant="contained" onClick={createGame} sx={{ mb: 2 }}>
+        Setup Game
+      </Button>
+      <Button variant="contained" onClick={startGame} disabled={!gameCreated} sx={{ mb: 2 }}>
+        Start Lobby
       </Button>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
@@ -255,6 +232,13 @@ const CreateGame: React.FC= () => {
           </Button>
         </DialogActions>
       </Dialog>
+      
+      <PopupNotification
+        open={showTutorialPopup}
+        message="It looks like you have a tutorial available. Would you like to start the tutorial now?"
+        onClose={() => setShowTutorialPopup(false)}
+      />
+
     </Box>
   );
 };
