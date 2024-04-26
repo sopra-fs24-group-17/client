@@ -8,6 +8,10 @@ import { connectWebSocket, subscribeToChannel, sendMessage } from "components/vi
 import { drawCard } from "components/game/drawCard";
 import { playCard } from "components/game/playCard";
 
+import card_back from 'components/game/cards/card_back.png';
+
+
+
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
   const userId = localStorage.getItem("id");
@@ -124,7 +128,7 @@ const Game = () => {
                     key={index}
                     text={card.text}
                     description={card.description}
-                    image="cards/card_back.png"
+                    image={card_back}
                   />
                 </div>
               ))}
@@ -159,7 +163,7 @@ const Game = () => {
                       key={index}
                       text={card.text}
                       description={card.description}
-                      image="cards/card_back.png"
+                      image={card_back}
                     />
                   </div>
                 ))}
@@ -191,7 +195,7 @@ const Game = () => {
                       key={index}
                       text={card.text}
                       description={card.description}
-                      image="cards/card_back.png"
+                      image={card_back}
                     />
                   </div>
                 ))}
@@ -224,7 +228,7 @@ const Game = () => {
                     key={index}
                     text={card.text}
                     description={card.description}
-                    image="cards/card_back.png"
+                    image={card_back}
                   />
                 </div>
               ))}
@@ -250,7 +254,7 @@ const Game = () => {
                 <CardComponent
                   text=""
                   description=""
-                  image="cards/card_back.png"
+                  image={card_back}
                   onClick={() => drawCard(playerTurn, closedDeck, playerHand, setPlayerHand, setClosedDeck, setPlayerTurn, sendMessage, navigate)}
                 />
               </div>
@@ -305,7 +309,7 @@ const Game = () => {
                     key={`${card.internalCode}-${index}`}
                     text={card.text}
                     description={card.description}
-                    image="cards/card_back.png"
+                    image={card_back}
                   />
                 </div>
               ))}

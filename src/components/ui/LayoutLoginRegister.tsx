@@ -1,5 +1,8 @@
 import { Grid, Paper, Box } from "@mui/material";
 import React from "react";
+import chickenImage from 'components/game/chicken.png';
+
+// Use `chickenImage` in your code
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <Grid container style={{ height: "100vh" }}>
       <Grid item xs={12} md={6}>
         <img
-          src="chicken.png"
+          src={chickenImage}
           alt="description"
           style={{ width: "100%", height: "100vh", objectFit: "cover" }}
         />
