@@ -58,7 +58,7 @@ const CreateGame: React.FC = () => {
   };
 
   const handleNumberOfPlayersChange = (event) => {
-    setTotalPlayers(event.target.value); // Update state based on user input
+    setTotalPlayers(event.target.value); 
 };
   const createGame = async () => {
     const mode = isPrivate ? "PRIVATE" : "PUBLIC";
@@ -154,7 +154,7 @@ const CreateGame: React.FC = () => {
           htmlFor="number-of-players"
           sx={{ fontWeight: "900", color: "black" }}
         >
-          Minimum number of players<span style={{ color: "red" }}>*</span>
+          Number of players<span style={{ color: "red" }}>*</span>
         </FormLabel>
         <TextField
           select
