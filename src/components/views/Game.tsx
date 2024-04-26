@@ -1,119 +1,102 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { api, handleError } from "helpers/api";
-import { useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import CardComponent from "components/ui/CardComponent";
-import CardMovement from "components/ui/CardMovement";
-import { Grid, Stack, Paper } from "@mui/material";
-import { motion } from "framer-motion";
+import { Grid, Stack, Typography, Button } from "@mui/material";
 import { cardTypes } from "components/models/cards";
 import "../../styles/Style.css";
-import { connectWebSocket, disconnectWebSocket, subscribeToChannel, unsubscribeFromChannel, sendMessage } from "components/views/WebsocketConnection";
+import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
+import { drawCard } from "components/game/drawCard";
+import { playCard } from "components/game/playCard";
 
 const Game = () => {
-  const [closedDeck, setClosedDeck] = useState(cardTypes); // The deck that players will draw from
-  const [openDeck, setOpenDeck] = useState([]); // The deck that shows the played cards
-  const [playerHand, setPlayerHand] = useState([]); // The current player's hand
-  const numberOfPlayers = 5;
+  const gameId = localStorage.getItem("gameId");
+  const userId = localStorage.getItem("id");
+  const [closedDeck, setClosedDeck] = useState(cardTypes);
+  const [openDeck, setOpenDeck] = useState([]);
+  const [playerHand, setPlayerHand] = useState([]);
+  const [playerTurn, setPlayerTurn] = useState(false);
+  const navigate = useNavigate();
+  const numberOfPlayers = 2;
 
-  // Stomp subscription reference
   const subscriptionRef = useRef(null);
 
   const handleIncomingMessage = useCallback((message) => {
-    // Parse the incoming message and update state accordingly
     const gameState = JSON.parse(message.body);
-    setClosedDeck(gameState.closedDeck);
-    setOpenDeck(gameState.openDeck);
-    setPlayerHand(gameState.playerHand);
+    if (gameState.type === 'cards') {
+      setPlayerHand((prevHand) => [...prevHand, ...enhanceCardDetails(gameState.cards)]);
+      console.log("Received and enhanced cards:", enhanceCardDetails(gameState.cards));
+    } else if (gameState.type === "startTurn") {
+      setPlayerTurn(true);
+    } else if (gameState.type === "endTurn") {
+      setPlayerTurn(false);
+    } else if (gameState.type === "peekIntoDeck") {
+      peekIntoDeck(gameState.cards);
+    } else if (gameState.type === "cardStolen") {
+      cardStolen(gameState.cards);
+    } else if (gameState.type === "explosion") {
+      handleExplosion(gameState.terminatingUser);
+    } else if (gameState.type === "defuseCard") {
+      handleDefuseCard();
+    } else if (gameState.type === "gameState") {
+      if (gameState.topCardInternalCode) {
+        handleOpenDeck(gameState.topCardInternalCode);
+      }
+    } else if (gameState.type === "endGame") {
+      alert("Game Over! The winner is: " + gameState.winningUser);
+      navigate("/dashboard/join-game");
+    }
   }, []);
+
+  const peekIntoDeck = (cards) => {
+    const cardsString = cards.map(card => `${card.internalCode}`).join('\n');
+    alert(`The next 3 cards are:\n${cardsString}`);
+  };
+
+  const cardStolen = (cards) => {
+    const stolenCard = cards[0].internalCode;
+    setPlayerHand((prevHand) => prevHand.filter((card) => card.name !== stolenCard));
+  };
+
+  const handleExplosion = (userName) => {
+    alert(`Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`);
+  };
+
+  const handleDefuseCard = () => {
+    setPlayerHand((prevHand) => prevHand.filter((card) => card.name !== "defuse"));
+  };
+
+  const handleOpenDeck = (topCardInternalCode) => {
+    const topCard = cardTypes.find(card => card.name === topCardInternalCode);
+    setOpenDeck((prevDeck) => [...prevDeck, topCard]);
+  };
+
+  const enhanceCardDetails = (cards) => {
+    return cards.map((card) => {
+      const cardType = cardTypes.find((type) => type.name === card.internalCode);
+      if (cardType) {
+        return { ...card, ...cardType };
+      }
+      return card;
+    });
+  };
 
   useEffect(() => {
     let stompClient = null;
-    const gameId = localStorage.getItem("gameId");
-
-    // Establish the WebSocket connection and subscribe to the channel
     connectWebSocket().then(client => {
       stompClient = client;
+      subscriptionRef.current = subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessage);
       subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleIncomingMessage);
-
-      // Send a message to the server that the game is starting
-      sendMessage(`/app/game/${gameId}/start`, {});
+      sendMessage(`/app/start/${gameId}`, {});
     });
-
-    // Clean up on unmount
-    return () => {
-      if (subscriptionRef.current) {
-        unsubscribeFromChannel(subscriptionRef.current);
-      }
-      disconnectWebSocket();
-    };
-  }, [handleIncomingMessage]);
-
-
-  const drawCard = () => {
-    if (closedDeck.length > 0) {
-      // Remove the top card from the closed deck
-      const drawnCard = closedDeck.shift();
-
-      // If the card is an Exploding Kitten and the player has no defuse card, the player loses
-      if (drawnCard.id === 1 && !playerHand.some((card) => card.id === 2)) {
-        alert(
-          "You drew an Exploding Kitten and have no Defuse card! You lose!"
-        );
-      } else {
-        // Add the drawn card to the player's hand and open deck if necessary
-        setPlayerHand((prevHand) => [...prevHand, drawnCard]);
-
-        // Handle other card effects...
-      }
-
-      // Update the closed deck state
-      setClosedDeck([...closedDeck]);
-    } else {
-      // Handle the situation where there are no more cards to draw, if applicable
-    }
-  };
-
-  const playCard = (cardId) => {
-    // Find the card in the player's hand
-    const cardIndex = playerHand.findIndex((card) => card.id === cardId);
-    if (cardIndex !== -1) {
-      const playedCard = playerHand[cardIndex];
-
-      // Apply the card's effect here (you'll need to flesh this out based on the card's abilities)
-      handleCardEffect(playedCard);
-
-      // Remove the card from the player's hand and add it to the open deck
-      const newPlayerHand = [...playerHand];
-      newPlayerHand.splice(cardIndex, 1); // Remove the card from the player's hand
-      setPlayerHand(newPlayerHand);
-      setOpenDeck([...openDeck, playedCard]); // Add the card to the open deck
-
-      // End the player's turn, move to the next player, etc.
-      // endTurn(); // This is a placeholder for ending the player's turn
-    }
-  };
-
-  const handleCardEffect = (card) => {
-    switch (card.type) {
-      case "attack":
-        // Handle attack card effect
-        break;
-      case "skip":
-        // Handle skip card effect
-        break;
-      case "favor":
-        // Handle favor card effect
-        break;
-      // ... handle other card types
-      default:
-        // Handle default case, if any
-        break;
-    }
-  };
+  }, []);
 
   return (
     <Grid container spacing={2} style={{ height: "100vh", padding: "20px" }}>
+      <Grid item xs={12}>
+        <Typography variant="h4" align="center">
+          {`Your turn: ${playerTurn}`}
+        </Typography>
+      </Grid>
       {numberOfPlayers <= 2 && (
         <Grid
           item
@@ -134,7 +117,7 @@ const Game = () => {
                   key={card.id}
                   className="card"
                   style={{
-                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
                   }}
                 >
                   <CardComponent
@@ -169,7 +152,7 @@ const Game = () => {
                     key={card.id}
                     className="card"
                     style={{
-                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
                     }}
                   >
                     <CardComponent
@@ -201,7 +184,7 @@ const Game = () => {
                     key={card.id}
                     className="card"
                     style={{
-                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
                     }}
                   >
                     <CardComponent
@@ -219,7 +202,7 @@ const Game = () => {
       )}
       <Grid
         item
-        xs={3}
+        xs={4}
         style={{ display: "flex", justifyContent: "center" }}
       >
         {/* Enemy's Hand 2 */}
@@ -234,7 +217,7 @@ const Game = () => {
                   key={card.id}
                   className="card"
                   style={{
-                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
                   }}
                 >
                   <CardComponent
@@ -248,34 +231,34 @@ const Game = () => {
           </div>
         )}
       </Grid>
-      <Grid item xs={3} style={{ display: "flex", justifyContent: "center" }}>
+      <Grid item xs={2} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
         <div className="card-stack">
           {closedDeck.slice(0, 5).map(
             (
               card,
-              index // Display only the top 5 cards for visual effect
+              index
             ) => (
               <div
                 key={card.id}
                 className="card"
                 style={{
-                  zIndex: closedDeck.length - index, // Ensure the top card is clickable
-                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                  zIndex: closedDeck.length - index,
+                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, 
                 }}
               >
                 <CardComponent
                   text=""
                   description=""
                   image="cards/card_back.png"
-                  onClick={drawCard}
+                  onClick={() => drawCard(playerTurn, closedDeck, playerHand, setPlayerHand, setClosedDeck, setPlayerTurn, sendMessage, navigate)}
                 />
               </div>
             )
           )}
         </div>
       </Grid>
-      <Grid item xs={3} style={{ display: "flex", justifyContent: "center" }}>
+      <Grid item xs={2} style={{ display: "flex", justifyContent: "center" }}>
         {/* Open Deck */}
         <div className="card-stack">
           <Stack spacing={1} direction="column">
@@ -284,7 +267,7 @@ const Game = () => {
                 key={card.id}
                 className="card"
                 style={{
-                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
                 }}
               >
                 <CardComponent
@@ -301,7 +284,7 @@ const Game = () => {
       {/* Enemy's Hand 3 */}
       <Grid
         item
-        xs={3}
+        xs={4}
         style={{ display: "flex", justifyContent: "center" }}
       >
         {numberOfPlayers >= 5 && (
@@ -315,11 +298,11 @@ const Game = () => {
                   key={card.id}
                   className="card"
                   style={{
-                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, // Offset each card slightly
+                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
                   }}
                 >
                   <CardComponent
-                    key={index}
+                    key={`${card.internalCode}-${index}`}
                     text={card.text}
                     description={card.description}
                     image="cards/card_back.png"
@@ -342,11 +325,11 @@ const Game = () => {
         <Stack spacing={1} direction="row">
           {playerHand.map((card, index) => (
             <CardComponent
-              key={index}
+              key={`${card.internalCode}-${index}`}
               text={card.text}
               description={card.description}
               image={card.imageUrl}
-              onClick={() => playCard(card.id)}
+              onClick={() => playCard(card.internalCode, card.name, card.code, playerTurn, playerHand, setPlayerHand, setOpenDeck, openDeck, sendMessage)}
             />
           ))}
         </Stack>
