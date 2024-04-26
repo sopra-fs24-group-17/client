@@ -13,11 +13,21 @@ import { Button, Box } from "@mui/material";
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
   const navigate = useNavigate();
-  const [joinButtonDisabled, setJoinButtonDisabled] = useState(false);
+  const [joinButtonDisabled, setJoinButtonDisabled] = useState(true);
   const [leaveButtonDisabled, setLeaveButtonDisabled] = useState(false);
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
+
+
+  useEffect(() => {
+    
+    if (currentPlayers === totalPlayersRequired) {
+      setJoinButtonDisabled(false);
+    } else {
+      setJoinButtonDisabled(true);
+    }
+  }, [currentPlayers, totalPlayersRequired]);
 
   useEffect(() => {
     const fetchGameData = async () => {
@@ -128,7 +138,7 @@ const Lobby = () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
   }
 
-  // Annotate style objects with React.CSSProperties
+  
   const lobbyContainerStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",

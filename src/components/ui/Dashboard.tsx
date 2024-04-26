@@ -20,6 +20,8 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Button, Divider, IconButton } from "@mui/material";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { api, handleError } from "helpers/api";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 const drawerWidth = 240;
 
@@ -38,12 +40,29 @@ export default function ClippedDrawer() {
 
   const handleNestedListToggle = (category) => {
     if (openNestedList === category) {
-      setOpenNestedList(null); // If already open, close it
+      setOpenNestedList(null); 
     } else {
-      setOpenNestedList(category); // Open the clicked category's list
+      setOpenNestedList(category); 
     }
   };
 
+  const handleLogout = async () => {
+    const userId = localStorage.getItem("id")
+    const token = localStorage.getItem("token")
+    try {
+      const response = await api.post(`/dashboard/${userId}/logout`,{}, {
+        headers: {
+          'token': token
+        },
+      });
+
+        localStorage.removeItem("id"); 
+        localStorage.removeItem("token")
+        navigate("/login"); 
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  };
 
   const handleTutorialClick = () => {
     navigate("/dashboard/tutorial"); 
@@ -161,6 +180,12 @@ export default function ClippedDrawer() {
           </List>
           <Box sx={{ marginTop: "auto" }}>
             <Divider />
+            <ListItemButton onClick={handleLogout}>
+            <ListItemIcon>
+                <ExitToAppIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
             <ListItemButton
               onClick={() =>
                 navigate("/dashboard/users/" + localStorage.getItem("id"))
