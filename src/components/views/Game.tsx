@@ -7,8 +7,8 @@ import "../../styles/Style.css";
 import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
 import { playCard } from "components/game/playCard";
-import { GameAlert } from "components/ui/GameAlert";
-import card_back from 'components/game/cards/card_back.png';
+import GameAlert from "components/ui/GameAlert";
+import card_back from "components/game/cards/card_back.png";
 
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
@@ -17,8 +17,14 @@ const Game = () => {
   const [openDeck, setOpenDeck] = useState([]);
   const [playerHand, setPlayerHand] = useState([]);
   const [playerTurn, setPlayerTurn] = useState(false);
+  const [gameAlertOpen, setGameAlertOpen] = useState(false);
+  const [gameAlertTitle, setGameAlertTitle] = useState("");
+  const [gameAlertDescription, setGameAlertDescription] = useState("");
+  const [postAlertAction, setPostAlertAction] = useState(null);
+
+
   const navigate = useNavigate();
-  const numberOfPlayers = 2;
+  const numberOfPlayers = 2; // TODO: Get number of players from the server
 
   const subscriptionRef = useRef(null);
 
@@ -46,9 +52,6 @@ const Game = () => {
       if (gameState.topCardInternalCode) {
         handleOpenDeck(gameState.topCardInternalCode);
       }
-    } else if (gameState.type === "endGame") {
-      alert("Game Over! The winner is: " + gameState.winningUser);
-      navigate("/dashboard/join-game");
     }
   }, []);
 
@@ -61,14 +64,14 @@ const Game = () => {
         handleOpenDeck(gameState.topCardInternalCode);
       }
     } else if (gameState.type === "endGame") {
-      alert("Game Over! The winner is: " + gameState.winningUser);
-      navigate("/dashboard/join-game");
+      gameAlertHandleOpen("Game Over!", "Game Over! The winner is: " + gameState.winningUser);
+      setPostAlertAction(() => () => navigate("/dashboard/join-game"));
     }
   }, []);
 
   const peekIntoDeck = (cards) => {
     const cardsString = cards.map(card => `${card.internalCode}`).join('\n');
-    GameAlert("Peek into Deck", "The next 3 cards in the deck are:\n" + cardsString);
+    gameAlertHandleOpen("See the Future", "The next 3 cards in the deck are:\n" + cardsString);
   };
 
   const cardStolen = (cards) => {
@@ -77,13 +80,14 @@ const Game = () => {
   };
 
   const handleExplosion = (userName) => {
-    alert(`Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`);
+    gameAlertHandleOpen("EXPLOSION!!", `Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`);
   };
 
   const handleDefuseCard = () => {
     setPlayerHand(prevHand => {
       console.log("Player Hand: " + JSON.stringify(prevHand, null, 2));
       const indexOfFirstDefuse = prevHand.findIndex((card) => card.name === "defuse");
+      console.log("Index of first defuse: " + indexOfFirstDefuse)
       if (indexOfFirstDefuse !== -1) {
         const newPlayerHand = [...prevHand];
         newPlayerHand.splice(indexOfFirstDefuse, 1);
@@ -108,6 +112,20 @@ const Game = () => {
     });
   };
 
+  const gameAlertHandleOpen = (title, description) => {
+    setGameAlertTitle(title);
+    setGameAlertDescription(description);
+    setGameAlertOpen(true);
+  };
+
+  const gameAlertHandleClose = () => {
+    setGameAlertOpen(false);
+    if (postAlertAction) {
+      postAlertAction();
+      setPostAlertAction(null);
+    }
+  };
+
   useEffect(() => {
     console.log("Player Hand updated: " + JSON.stringify(playerHand, null, 2));
   }, [playerHand]);
@@ -124,6 +142,12 @@ const Game = () => {
 
   return (
     <Grid container spacing={2} style={{ height: "100vh", padding: "20px" }}>
+      <GameAlert
+        open={gameAlertOpen}
+        handleClose={gameAlertHandleClose}
+        title={gameAlertTitle}
+        description={gameAlertDescription}
+      />
       <Grid item xs={12}>
         <Typography variant="h4" align="center">
           {`Your turn: ${playerTurn}`}
