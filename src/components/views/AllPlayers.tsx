@@ -64,7 +64,7 @@ const AllPlayers = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await api.get(`/dashboard/420/profile/stats`, {
+            const response = await api.get(`/dashboard/420/profile/stats`, { // just use any userid, doesn't matter
                 headers: { 'token': token }
             });
             console.log(response);
@@ -151,6 +151,7 @@ const AllPlayers = () => {
       }
   };
     const handlePlayerClick = (userid) => {
+        console.log(userid)
         navigate(`../users/${userid}`);
     };
 

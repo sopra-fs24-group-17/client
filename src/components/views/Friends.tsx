@@ -75,6 +75,7 @@ const FriendsList = () => {
                 'token': token // Include the token in request headers
               }
             }); 
+            console.log(response);
             const transformedFriends = response.data.map(friend => ({
               ...friend,
               username: friend.friendName, // Assuming the friendName is the username
@@ -93,6 +94,7 @@ const FriendsList = () => {
 
 
   const handleFriendClick = (userid) => {
+    console.log(userid)
     navigate(`../users/${userid}`);
   };
 
@@ -131,7 +133,8 @@ const FriendsList = () => {
                 <TableRow
                   key={friend.username}
                   hover
-                  onClick={() => handleFriendClick(friend.userid)}
+                  onClick={() => handleFriendClick(friend.friendId)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <TableCell>{friend.username}</TableCell>
                   <TableCell>{friend.status}</TableCell>
