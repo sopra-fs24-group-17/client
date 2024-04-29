@@ -69,7 +69,6 @@ export const sendMessage = (destination, body, headers = {}) => {
       headers,
       body: JSON.stringify(body),
     });
-    console.log(`Message published to ${destination}:`, body);
   } else {
     console.log("WebSocket is not connected. Unable to send message.");
   }

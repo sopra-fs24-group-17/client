@@ -20,7 +20,6 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
 
         if (["hairypotatocat", "tacocat", "beardcat", "cattermelon"].includes(cardName)) {
             // If the card is a palindrome card, check if the player has another card of the same type
-            console.log(cardId, cardName, cardCode, playerHand)
             const otherCardIndex = playerHand.findIndex((card) => card.internalCode === cardId && card.code !== cardCode);
             if (otherCardIndex === -1) {
                 alert("You need two cards of the same type to play this card.");
