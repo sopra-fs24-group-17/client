@@ -7,10 +7,8 @@ import "../../styles/Style.css";
 import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
 import { playCard } from "components/game/playCard";
-
+import { GameAlert } from "components/ui/GameAlert";
 import card_back from 'components/game/cards/card_back.png';
-
-
 
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
@@ -24,11 +22,12 @@ const Game = () => {
 
   const subscriptionRef = useRef(null);
 
-  const handleIncomingMessage = useCallback((message) => {
+  const handleIncomingMessageUser = useCallback((message) => {
     const gameState = JSON.parse(message.body);
     if (gameState.type === 'cards') {
       setPlayerHand((prevHand) => [...prevHand, ...enhanceCardDetails(gameState.cards)]);
       console.log("Received and enhanced cards:", enhanceCardDetails(gameState.cards));
+      console.log("Player Hand: " + JSON.stringify(playerHand, null, 2));
     } else if (gameState.type === "startTurn") {
       setPlayerTurn(true);
     } else if (gameState.type === "endTurn") {
@@ -37,10 +36,26 @@ const Game = () => {
       peekIntoDeck(gameState.cards);
     } else if (gameState.type === "cardStolen") {
       cardStolen(gameState.cards);
-    } else if (gameState.type === "explosion") {
-      handleExplosion(gameState.terminatingUser);
-    } else if (gameState.type === "defuseCard") {
+    }
+    // else if (gameState.type === "explosion") {
+    //   handleExplosion(gameState.terminatingUser);
+    // } 
+    else if (gameState.type === "defuseCard") {
       handleDefuseCard();
+    } else if (gameState.type === "gameState") {
+      if (gameState.topCardInternalCode) {
+        handleOpenDeck(gameState.topCardInternalCode);
+      }
+    } else if (gameState.type === "endGame") {
+      alert("Game Over! The winner is: " + gameState.winningUser);
+      navigate("/dashboard/join-game");
+    }
+  }, []);
+
+  const handleIncomingMessageGame = useCallback((message) => {
+    const gameState = JSON.parse(message.body);
+    if (gameState.type === "explosion" && gameState.terminatingUser !== userId) {
+      handleExplosion(gameState.terminatingUser);
     } else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
         handleOpenDeck(gameState.topCardInternalCode);
@@ -53,7 +68,7 @@ const Game = () => {
 
   const peekIntoDeck = (cards) => {
     const cardsString = cards.map(card => `${card.internalCode}`).join('\n');
-    alert(`The next 3 cards are:\n${cardsString}`);
+    GameAlert("Peek into Deck", "The next 3 cards in the deck are:\n" + cardsString);
   };
 
   const cardStolen = (cards) => {
@@ -66,7 +81,16 @@ const Game = () => {
   };
 
   const handleDefuseCard = () => {
-    setPlayerHand((prevHand) => prevHand.filter((card) => card.name !== "defuse"));
+    setPlayerHand(prevHand => {
+      console.log("Player Hand: " + JSON.stringify(prevHand, null, 2));
+      const indexOfFirstDefuse = prevHand.findIndex((card) => card.name === "defuse");
+      if (indexOfFirstDefuse !== -1) {
+        const newPlayerHand = [...prevHand];
+        newPlayerHand.splice(indexOfFirstDefuse, 1);
+        return newPlayerHand;
+      }
+      return prevHand;
+    });
   };
 
   const handleOpenDeck = (topCardInternalCode) => {
@@ -85,11 +109,15 @@ const Game = () => {
   };
 
   useEffect(() => {
+    console.log("Player Hand updated: " + JSON.stringify(playerHand, null, 2));
+  }, [playerHand]);
+
+  useEffect(() => {
     let stompClient = null;
     connectWebSocket().then(client => {
       stompClient = client;
-      subscriptionRef.current = subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessage);
-      subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleIncomingMessage);
+      subscriptionRef.current = subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessageUser);
+      subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleIncomingMessageGame);
       sendMessage(`/app/start/${gameId}`, {});
     });
   }, []);
@@ -248,7 +276,7 @@ const Game = () => {
                 className="card"
                 style={{
                   zIndex: closedDeck.length - index,
-                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`, 
+                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
                 }}
               >
                 <CardComponent
