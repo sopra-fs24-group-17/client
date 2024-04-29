@@ -22,6 +22,8 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import EditProfile from "./EditProfile";
 import BlockIcon from "@mui/icons-material/Block";
 import ChangePassword from "./ChangePassword";
+import placeholder from 'components/game/profile_image_placeholder.webp';
+
 
 interface ProfileProps {
   userId: string;
@@ -182,7 +184,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                 image={
                   avatarPath
                     ? domain + avatarPath
-                    : "/profile_image_placeholder.webp"
+                    : placeholder
                 }
                 title="profile"
               />

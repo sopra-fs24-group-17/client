@@ -14,12 +14,10 @@ import {
 } from "@mui/material";
 import Profile from "./Profile";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DateField } from "@mui/x-date-pickers/DateField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import { isCallChain } from "typescript";
+import placeholder from 'components/game/profile_image_placeholder.webp';
 
 const EditProfile = () => {
   const { userId } = useParams();
@@ -36,7 +34,7 @@ const EditProfile = () => {
   const [countryoforigin, setCountry] = useState(null);
 
   const [avatarPlaceholder, setAvatarPlaceholder] = useState(
-    "/profile_image_placeholder.webp"
+    placeholder
   );
   const [avatarPath, setAvatarPath] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
