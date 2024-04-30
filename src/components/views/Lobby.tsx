@@ -136,6 +136,7 @@ const Lobby = () => {
 
   const handleStartGame = async () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
+    sendMessage(`/app/start/${gameId}`, {});
   }
 
   

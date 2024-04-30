@@ -136,7 +136,7 @@ const Game = () => {
       stompClient = client;
       subscriptionRef.current = subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessageUser);
       subscriptionRef.current = subscribeToChannel(`/game/${gameId}`, handleIncomingMessageGame);
-      sendMessage(`/app/start/${gameId}`, {});
+      // sendMessage(`/app/start/${gameId}`, {});
     });
   }, []);
 
