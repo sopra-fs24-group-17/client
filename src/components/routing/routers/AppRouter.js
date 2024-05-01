@@ -19,7 +19,7 @@ import JoinGame from "../../views/JoinGame";
 import AllPlayers from "../../views/AllPlayers";
 import { LobbyGuard } from "../routeProtectors/LobbyGuard";
 import Tutorial from "../../views/Tutorial";
-
+import WebSocketChat from "../../views/chat";
 
 /**
  * Main router of your application.
@@ -48,6 +48,7 @@ const AppRouter = () => {
 
         <Route path="/game/*" element={<GameGuard />}>
           <Route index element={<Game />} />
+          <Route path="chat" element={<WebSocketChat />} />
         </Route>
 
         <Route path="/lobby/:gameId"  element={<LobbyGuard />}>

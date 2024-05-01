@@ -43,6 +43,7 @@ const Register = () => {
       if (token) {
         localStorage.setItem("token", token);
         localStorage.setItem("id", response.data.id);
+        localStorage.setItem("username", response.data.username);
 
         // Connect to WebSocket after successful registration
         await connectWebSocket();

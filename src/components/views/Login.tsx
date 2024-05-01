@@ -27,6 +27,7 @@ const Login = () => {
       if (token) {
         localStorage.setItem("token", token);
         localStorage.setItem("id", response.data.id);
+        localStorage.setItem("username", response.data.username)
       }
 
       // Login successfully worked --> navigate to the route /dashboard

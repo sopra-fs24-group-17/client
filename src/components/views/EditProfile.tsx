@@ -17,7 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import placeholder from 'components/game/profile_image_placeholder.webp';
+import placeholder from "components/game/profile_image_placeholder.webp";
 
 const EditProfile = () => {
   const { userId } = useParams();
@@ -158,6 +158,7 @@ const EditProfile = () => {
     // Only add fields to the update object if they are not empty
     if (username && username.trim() !== "") {
       updateData.username = username;
+      localStorage.setItem("username", username);
     }
     if (birthdate) {
       updateData.birthdate = birthdate;
