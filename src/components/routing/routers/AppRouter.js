@@ -50,7 +50,7 @@ const AppRouter = () => {
           <Route index element={<Game />} />
           <Route path="chat" element={<WebSocketChat />} />
         </Route>
-
+s
         <Route path="/lobby/:gameId"  element={<LobbyGuard />}>
           <Route index element={<Lobby />} />
         </Route>

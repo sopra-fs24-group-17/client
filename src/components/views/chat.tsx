@@ -34,6 +34,7 @@ function WebSocketChat() {
           const msgData = JSON.parse(message.body);
           if (msgData.type === "STATE") {
             setActiveUsers(msgData.content.split(","));
+            assignColorsToNewUsers(msgData.content.split(","));
           } else {
             onMessageReceived(msgData);
           }
@@ -84,23 +85,27 @@ function WebSocketChat() {
 
   const onMessageReceived = (message) => {
     setMessages(messages => [...messages, message]);
-    // Assign color to the sender if it's not already assigned
-    if (!userColors[message.sender]) {
-      setUserColors(prevColors => ({
-        ...prevColors,
-        [message.sender]: getUniqueColor()
-      }));
-    }
   };
 
-  const getUniqueColor = () => {
+  const assignColorsToNewUsers = (newUsers) => {
+    setUserColors(prevColors => {
+      const updatedColors = {...prevColors};
+      newUsers.forEach(user => {
+        if (!updatedColors[user]) {
+          updatedColors[user] = getUniqueColor(Object.values(updatedColors));
+        }
+      });
+      return updatedColors;
+    });
+  };
+
+  const getUniqueColor = (usedColors) => {
     let colorIndex = Math.floor(Math.random() * colors.length);
     let color = colors[colorIndex];
-    while (Object.values(userColors).includes(color)) {
+    while (usedColors.includes(color)) {
       colorIndex = (colorIndex + 1) % colors.length;
       color = colors[colorIndex];
     }
-
     return color;
   };
 
