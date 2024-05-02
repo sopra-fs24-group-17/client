@@ -13,6 +13,8 @@ import {
 const Register = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+  const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [isConnected, setIsConnected] = useState(false); // State to track WebSocket connection
@@ -66,6 +68,11 @@ const Register = () => {
     }
   };
 
+  const verifyPassword = (password2) => {
+    setPassword2(password2);
+    setPasswordsMatch(password === password2);
+  }
+
   return (
     <Layout>
       <Container maxWidth="sm">
@@ -110,12 +117,31 @@ const Register = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password2"
+            label="Repeat password"
+            type="password"
+            id="password2"
+            autoComplete="current-password"
+            value={password2}
+            onChange={(e) => verifyPassword(e.target.value)}
+          />
+          {!passwordsMatch && (
+            <Typography variant="body2" color="error">
+              Passwords do not match.
+            </Typography>
+          )}
           <Button
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
             onClick={doRegister}
+            disabled={!passwordsMatch}
           >
             Register
           </Button>
