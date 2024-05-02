@@ -29,6 +29,7 @@ const Lobby = () => {
     }
   }, [currentPlayers, totalPlayersRequired]);
 
+
   useEffect(() => {
     const fetchGameData = async () => {
       const token = localStorage.getItem("token");
@@ -36,18 +37,21 @@ const Lobby = () => {
         const response = await api.get(`dashboard/games`, {
           headers: { 'token': token } 
         });
-
+        // This is to find the game we want from all the slots to take the info we want
         if (response.data && response.data.length > 0) {
           const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
+          
           if (game && game.maxPlayers !== undefined) {
             setTotalPlayersRequired(game.maxPlayers);
+            setCurrentPlayers(game.currentPlayers);
+            
           } else {
             console.error("Game with specified ID not found or lacks 'maxPlayers' data");
           }
         } else {
           console.error("Invalid or empty response data");
         }
-
+        
 
         // Initialize WebSocket connection using @stomp/stompjs
         const initialiseWebsocketConnection = async () => {
@@ -190,7 +194,7 @@ const Lobby = () => {
       <div style={statusContainerStyle}>
         <h2>Waiting for players to join...</h2>
         <div style={playersStatusStyle}>
-          {currentPlayers} out of {totalPlayersRequired} players
+          {currentPlayers} out of {totalPlayersRequired} players 
         </div>
         {currentPlayers === totalPlayersRequired && (
           <div style={checkIconStyle}>✓</div>
