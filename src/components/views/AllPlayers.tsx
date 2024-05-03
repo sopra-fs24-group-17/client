@@ -28,7 +28,29 @@ const AllPlayers = () => {
     const [shouldReload, setShouldReload] = useState(false);
     const [friends, setFriends] = useState([]);
     const [friendRequestStatuses, setFriendRequestStatuses] = useState({});
+    const [sortField, setSortField] = useState('');
+    const [sortDirection, setSortDirection] = useState('asc'); 
+    
 
+    const handleSort = (field) => {
+        const isAsc = sortField === field && sortDirection === 'asc';
+        setSortDirection(isAsc ? 'desc' : 'asc');
+        setSortField(field);
+    };
+
+
+    useEffect(() => {
+        const sortedPlayers = [...players].sort((a, b) => {
+            if (a[sortField] < b[sortField]) {
+                return sortDirection === 'asc' ? -1 : 1;
+            }
+            if (a[sortField] > b[sortField]) {
+                return sortDirection === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+        setFilteredPlayers(sortedPlayers);
+    }, [players, sortField, sortDirection]);
 
 
     const fetchFriends = async () => {
@@ -227,13 +249,23 @@ const AllPlayers = () => {
                     <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>User Id</TableCell>
-                                <TableCell>Username</TableCell>
-                                <TableCell>Games Played</TableCell>
-                                <TableCell>Win-loss Ratio</TableCell>
-                                <TableCell>Achievements Unlocked</TableCell>
-                                <TableCell>Last Played</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell onClick={() => handleSort('userid')}>
+                                    User Id {sortField === 'userid' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('username')}>
+                                    Username {sortField === 'username' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('gamesplayed')}>
+                                    Games Played {sortField === 'gamesplayed' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('winlossratio')}>
+                                    Win-loss Ratio {sortField === 'winlossratio' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('achievementsunlocked')}>
+                                    Achievements Unlocked {sortField === 'achievementsunlocked' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell>Last Played</TableCell>  
+                                <TableCell>Actions</TableCell>  
                             </TableRow>
                         </TableHead>
                         <TableBody>
