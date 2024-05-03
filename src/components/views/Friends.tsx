@@ -49,6 +49,31 @@ const FriendsList = () => {
   // State for the filtered list of friends
   const [filteredFriends, setFilteredFriends] = useState([]);
 
+  const [sortField, setSortField] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc'); 
+
+
+  const handleSort = (field) => {
+    const isAsc = sortField === field && sortDirection === 'asc';
+    setSortDirection(isAsc ? 'desc' : 'asc');
+    setSortField(field);
+  };
+
+
+  useEffect(() => {
+    const sortedFriends = [...filteredFriends].sort((a, b) => {
+        if (a[sortField] < b[sortField]) {
+            return sortDirection === 'asc' ? -1 : 1;
+        }
+        if (a[sortField] > b[sortField]) {
+            return sortDirection === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+    setFilteredFriends(sortedFriends);
+}, [filteredFriends, sortField, sortDirection]);
+
+
   // Function to handle search query change
   const handleSearchChange = (event) => {
     const query = event.target.value.toLowerCase();
@@ -123,8 +148,12 @@ const FriendsList = () => {
           <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
-                <TableCell>Username</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell onClick={() => handleSort('username')}>
+                    Username {sortField === 'username' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                </TableCell>
+                <TableCell onClick={() => handleSort('status')}>
+                    Status {sortField === 'status' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                </TableCell>
                 <TableCell>Avatar</TableCell>
               </TableRow>
             </TableHead>
