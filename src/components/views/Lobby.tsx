@@ -19,6 +19,14 @@ const Lobby = () => {
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
 
+  // for chat
+  const [messages, setMessages] = useState([]); // Stores chat messages
+  const [chatMessage, setChatMessage] = useState(""); // Stores the current message input
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   useEffect(() => {
     
@@ -56,9 +64,12 @@ const Lobby = () => {
         // Initialize WebSocket connection using @stomp/stompjs
         const initialiseWebsocketConnection = async () => {
           await connectWebSocket();
+          const username = localStorage.getItem('username'); 
+        addUserToChat(username);
         };
         await initialiseWebsocketConnection();
         await handleSubcribe();
+        
         try {
           await handleJoinGame();
         } catch {
@@ -76,6 +87,21 @@ const Lobby = () => {
       console.log("Disconnected from WebSocket");
     };
   }, []);
+
+  const sendChatMessage = async (event) => {
+    event.preventDefault();
+    if (chatMessage.trim().length === 0) {
+      console.log("No message to send");
+      return;  // Prevent sending an empty message
+    }
+    const username = localStorage.getItem('username'); // Fetch the username from localStorage or state
+    const msg = { sender: username, content: chatMessage, type: "CHAT" };
+    sendMessage("/chat.sendMessage", JSON.stringify(msg));
+    setChatMessage(""); // Clear input after sending
+  };
+  
+  
+
 
   const handleJoinGame = async () => {
     const token = localStorage.getItem("token");
@@ -115,12 +141,17 @@ const Lobby = () => {
       );
     }
   };
-
+  const addUserToChat = (username) => {
+    const msg = { sender: username, type: "JOIN" };
+    sendMessage("/chat.addUser", JSON.stringify(msg));
+  };
+  
   const handleSubcribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
       (message) => {
         console.log(message);
+        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         setMessage(message);
         const messageBody = JSON.parse(message.body);
         if (messageBody.type === "join") {
@@ -135,6 +166,21 @@ const Lobby = () => {
       },
       { id: `sub-${gameId}` }
     );
+
+    subscribeToChannel("/topic/public", (message) => {
+      console.log("Received public message:", message);
+      try {
+          const chatMsg = JSON.parse(message.body);
+          setMessages(prevMessages => [...prevMessages, chatMsg]);
+          console.log("dssssssssssssssssssssssssssssss", message.body);
+          if (chatMsg.type === "JOIN") {
+              console.log(`${chatMsg.sender} has joined the chat.`);
+          }
+      } catch (error) {
+          console.error("Error parsing message:", error);
+      }
+  });
+  
   };
 
 
@@ -143,7 +189,36 @@ const Lobby = () => {
     sendMessage(`/app/start/${gameId}`, {});
   }
 
+  const chatContainerStyle:  React.CSSProperties =  {
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    padding: '10px',
+    width: '90%',  // Adjust width as needed
+    height: '300px',
+    overflowY: 'auto',
+    margin: '10px auto'
+  };
   
+  const chatMessageStyle:  React.CSSProperties = {
+    backgroundColor: '#f1f1f1',
+    padding: '8px 15px',
+    borderRadius: '12px',
+    margin: '5px',
+    textAlign: 'left',
+    maxWidth: '80%',
+  };
+  
+  const chatFormStyle:  React.CSSProperties ={
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '10px',
+    borderTop: '1px solid #ccc'
+  };
+  
+  const chatInputStyle :  React.CSSProperties ={
+    flexGrow: 1,
+    marginRight: '10px'
+  };
   const lobbyContainerStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -226,7 +301,29 @@ const Lobby = () => {
           Leave Lobby
         </Button>
       </Box>
-    </div>
+        {/* Chat section */}
+<div style={chatContainerStyle}>
+    {messages.map((msg, index) => (
+        <div key={index} style={chatMessageStyle}>
+            <strong>{msg.sender}</strong>: {msg.content}
+        </div>
+    ))}
+    <div ref={messagesEndRef} /> {/* This element is used to scroll into view after new messages are added */}
+</div>
+  <form onSubmit={sendChatMessage} style={chatFormStyle}>
+    <input
+      type="text"
+      value={chatMessage}
+      onChange={(e) => setChatMessage(e.target.value)}
+      style={chatInputStyle}
+      placeholder="Type a message..."
+    />
+    <Button type="submit" variant="contained" color="primary">
+      Send
+    </Button>
+  </form>
+  </div>
+    
   );
 };
 
