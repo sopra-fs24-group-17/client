@@ -3,12 +3,13 @@ import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import CardComponent from "components/ui/CardComponent";
 import { Grid, Stack, Typography, Button } from "@mui/material";
 import { cardTypes } from "components/models/cards";
-import "../../styles/Style.css";
 import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
 import { playCard } from "components/game/playCard";
 import GameAlert from "components/ui/GameAlert";
 import card_back from "components/game/cards/card_back.png";
+import game_background from "components/game/game_background.png";
+import "../../styles/Style.css";
 
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
@@ -21,10 +22,9 @@ const Game = () => {
   const [gameAlertTitle, setGameAlertTitle] = useState("");
   const [gameAlertDescription, setGameAlertDescription] = useState("");
   const [postAlertAction, setPostAlertAction] = useState(null);
-
+  const [numberOfPlayers, setNumberOfPlayers] = useState(2);
 
   const navigate = useNavigate();
-  const numberOfPlayers = 2; // TODO: Get number of players from the server
 
   const subscriptionRef = useRef(null);
 
@@ -42,11 +42,7 @@ const Game = () => {
       peekIntoDeck(gameState.cards);
     } else if (gameState.type === "cardStolen") {
       cardStolen(gameState.cards);
-    }
-    // else if (gameState.type === "explosion") {
-    //   handleExplosion(gameState.terminatingUser);
-    // } 
-    else if (gameState.type === "defuseCard") {
+    } else if (gameState.type === "defuseCard") {
       handleDefuseCard();
     } else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
@@ -62,6 +58,8 @@ const Game = () => {
     } else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
         handleOpenDeck(gameState.topCardInternalCode);
+      } else if (gameState.numberOfPlayers) {
+        setNumberOfPlayers(gameState.numberOfPlayers);
       }
     } else if (gameState.type === "endGame") {
       gameAlertHandleOpen("Game Over!", "Game Over! The winner is: " + gameState.winningUser);
@@ -140,7 +138,14 @@ const Game = () => {
   }, []);
 
   return (
-    <Grid container spacing={2} style={{ height: "100vh", padding: "20px" }}>
+    <Grid container spacing={2} style={{
+      height: "100vh",
+      padding: "20px",
+      backgroundImage: `url(${game_background})`,
+      backgroundSize: 'cover', 
+      backgroundPosition: 'center', 
+      backgroundRepeat: 'no-repeat' 
+    }}>
       <GameAlert
         open={gameAlertOpen}
         handleClose={gameAlertHandleClose}
