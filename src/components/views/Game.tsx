@@ -7,6 +7,8 @@ import { connectWebSocket, subscribeToChannel, sendMessage } from "components/vi
 import { drawCard } from "components/game/drawCard";
 import { playCard } from "components/game/playCard";
 import GameAlert from "components/ui/GameAlert";
+import EnemyPlayers from "components/views/EnemyPlayers";
+import FilledAlert from "./Alert";
 import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import "../../styles/Style.css";
@@ -23,6 +25,7 @@ const Game = () => {
   const [gameAlertDescription, setGameAlertDescription] = useState("");
   const [postAlertAction, setPostAlertAction] = useState(null);
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
+  const [piles, setPiles] = useState([]);
 
   const navigate = useNavigate();
 
@@ -44,10 +47,6 @@ const Game = () => {
       cardStolen(gameState.cards);
     } else if (gameState.type === "defuseCard") {
       handleDefuseCard();
-    } else if (gameState.type === "gameState") {
-      if (gameState.topCardInternalCode) {
-        handleOpenDeck(gameState.topCardInternalCode);
-      }
     }
   }, []);
 
@@ -58,8 +57,12 @@ const Game = () => {
     } else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
         handleOpenDeck(gameState.topCardInternalCode);
-      } else if (gameState.numberOfPlayers) {
+      }
+      if (gameState.numberOfPlayers) {
         setNumberOfPlayers(gameState.numberOfPlayers);
+      }
+      if (gameState.piles) {
+        setPiles(gameState.piles);
       }
     } else if (gameState.type === "endGame") {
       gameAlertHandleOpen("Game Over!", "Game Over! The winner is: " + gameState.winningUser);
@@ -139,159 +142,24 @@ const Game = () => {
 
   return (
     <Grid container spacing={2} style={{
-      height: "100vh",
-      padding: "20px",
+      minHeight: "100vh",
       backgroundImage: `url(${game_background})`,
-      backgroundSize: 'cover', 
-      backgroundPosition: 'center', 
-      backgroundRepeat: 'no-repeat' 
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      marginTop: 0,
     }}>
+      {playerTurn && <FilledAlert />}
       <GameAlert
         open={gameAlertOpen}
         handleClose={gameAlertHandleClose}
         title={gameAlertTitle}
         description={gameAlertDescription}
       />
-      <Grid item xs={12}>
-        <Typography variant="h4" align="center">
-          {`Your turn: ${playerTurn}`}
-        </Typography>
+      <Grid item xs={12} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <EnemyPlayers piles={piles} />
       </Grid>
-      {numberOfPlayers <= 2 && (
-        <Grid
-          item
-          xs={12}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          {/* Enemy's Hand 1 */}
-          <div className="card-stack">
-            {playerHand.slice(0, 5).map(
-              (
-                card,
-                index
-              ) => (
-                <div
-                  key={card.id}
-                  className="card"
-                  style={{
-                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
-                  }}
-                >
-                  <CardComponent
-                    key={index}
-                    text={card.text}
-                    description={card.description}
-                    image={card_back}
-                  />
-                </div>
-              ))}
-          </div>
-        </Grid>
-      )}
-      {numberOfPlayers >= 3 && (
-        <>
-          <Grid
-            item
-            xs={6}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            {/* Enemy's Hand 1 */}
-            <div className="card-stack">
-              {playerHand.slice(0, 5).map(
-                (
-                  card,
-                  index
-                ) => (
-                  <div
-                    key={card.id}
-                    className="card"
-                    style={{
-                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
-                    }}
-                  >
-                    <CardComponent
-                      key={index}
-                      text={card.text}
-                      description={card.description}
-                      image={card_back}
-                    />
-                  </div>
-                ))}
-            </div>
-          </Grid>
-          <Grid
-            item
-            xs={6}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            {/* Enemy's Hand 1 */}
-            <div className="card-stack">
-              {playerHand.slice(0, 5).map(
-                (
-                  card,
-                  index
-                ) => (
-                  <div
-                    key={card.id}
-                    className="card"
-                    style={{
-                      transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
-                    }}
-                  >
-                    <CardComponent
-                      key={index}
-                      text={card.text}
-                      description={card.description}
-                      image={card_back}
-                    />
-                  </div>
-                ))}
-            </div>
-          </Grid>
-        </>
-
-      )}
-      <Grid
-        item
-        xs={4}
-        style={{ display: "flex", justifyContent: "center" }}
-      >
-        {/* Enemy's Hand 2 */}
-        {numberOfPlayers >= 4 && (
-          <div className="card-stack">
-            {playerHand.slice(0, 5).map(
-              (
-                card,
-                index
-              ) => (
-                <div
-                  key={card.id}
-                  className="card"
-                  style={{
-                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
-                  }}
-                >
-                  <CardComponent
-                    key={index}
-                    text={card.text}
-                    description={card.description}
-                    image={card_back}
-                  />
-                </div>
-              ))}
-          </div>
-        )}
-      </Grid>
-      <Grid item xs={2} style={{ display: "flex", justifyContent: "center" }}>
+      <Grid item xs={6} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
         <div className="card-stack">
           {closedDeck.slice(0, 5).map(
@@ -302,10 +170,6 @@ const Game = () => {
               <div
                 key={card.id}
                 className="card"
-                style={{
-                  zIndex: closedDeck.length - index,
-                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
-                }}
               >
                 <CardComponent
                   text=""
@@ -318,17 +182,14 @@ const Game = () => {
           )}
         </div>
       </Grid>
-      <Grid item xs={2} style={{ display: "flex", justifyContent: "center" }}>
+      <Grid item xs={6} style={{ display: "flex", justifyContent: "center" }}>
         {/* Open Deck */}
         <div className="card-stack">
           <Stack spacing={1} direction="column">
-            {openDeck.slice(-5).map((card, index) => (
+            {openDeck.slice(-1).map((card, index) => (
               <div
                 key={card.id}
                 className="card"
-                style={{
-                  transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
-                }}
               >
                 <CardComponent
                   key={index}
@@ -341,46 +202,7 @@ const Game = () => {
           </Stack>
         </div>
       </Grid>
-      {/* Enemy's Hand 3 */}
-      <Grid
-        item
-        xs={4}
-        style={{ display: "flex", justifyContent: "center" }}
-      >
-        {numberOfPlayers >= 5 && (
-          <div className="card-stack">
-            {playerHand.slice(0, 5).map(
-              (
-                card,
-                index
-              ) => (
-                <div
-                  key={card.id}
-                  className="card"
-                  style={{
-                    transform: `translateX(${index * 2}px) translateY(${index * -2}px)`,
-                  }}
-                >
-                  <CardComponent
-                    key={`${card.internalCode}-${index}`}
-                    text={card.text}
-                    description={card.description}
-                    image={card_back}
-                  />
-                </div>
-              ))}
-          </div>
-        )}
-      </Grid>
-      <Grid
-        item
-        xs={12}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <Grid item xs={12} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         {/* Player's Hand */}
         <Stack spacing={1} direction="row">
           {playerHand.map((card, index) => (
