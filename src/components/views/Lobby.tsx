@@ -63,7 +63,6 @@ const Lobby = () => {
         };
         await initialiseWebsocketConnection();
         await handleSubcribe();
-        
         try {
           await handleJoinGame();
         } catch {
