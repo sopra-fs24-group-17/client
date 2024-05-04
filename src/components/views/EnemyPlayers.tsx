@@ -16,7 +16,7 @@ export default function EnemyPlayers({ piles }: EnemyPlayersProps) {
         .map(([_, value]) => value);
 
     return (
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} marginBottom={"100px"}>
             {pile.map((count, i) => (
                 <Badge badgeContent={count} color="error" key={i}>
                     <Avatar alt={`EnemyCards${i + 1}`} src={placeholder} />

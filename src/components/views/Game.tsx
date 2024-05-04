@@ -13,6 +13,18 @@ import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import "../../styles/Style.css";
 
+/* 
+TODO: 
+  Fix bugs:
+    - certain random chickens not both are taken away when playing a palindrome card
+    - wrong alert is shown when not your turn
+    - if i play favor and click on cancel, the card is still removed from my hand
+  
+  Features: 
+    - If I play defuse, I want to be able to choose where to put the explosion card
+
+*/
+
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
   const userId = localStorage.getItem("id");
