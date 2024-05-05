@@ -20,7 +20,7 @@ const Lobby = () => {
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
-  const [currentHint, setCurrentHint] = useState('');
+  const [currentHint, setCurrentHint] = useState(getRandomHint());
 
 
 
@@ -149,23 +149,33 @@ const Lobby = () => {
   }
 
 
-  useEffect(() => {
-    let lastHint = currentHint; 
   
-    const intervalId = setInterval(() => {
+  useEffect(() => {
+    let lastHint = currentHint; // Initialize lastHint with the first random hint already set
+  
+    // Function to update the hint
+    const updateHint = () => {
       let newHint = getRandomHint();
-      let attemptCount = 0; 
+      let attemptCount = 0;
   
       while (newHint === lastHint && attemptCount < 10) {
         newHint = getRandomHint();
         attemptCount++;
       }
-      setCurrentHint(newHint); 
-      lastHint = newHint; 
   
-    }, 10000); 
-    
-    return () => clearInterval(intervalId); 
+      setCurrentHint(newHint); 
+      console.log(newHint);
+      lastHint = newHint; // Update lastHint for the next interval
+    };
+  
+    // Immediately update to a new hint when component mounts
+    updateHint();
+  
+    // Set up the interval to update hints every 10 seconds
+    const intervalId = setInterval(updateHint, 10000);
+  
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, []);
   
 
