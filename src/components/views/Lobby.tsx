@@ -9,6 +9,8 @@ import {
   sendMessage,
 } from "./WebsocketConnection";
 import { Button, Box } from "@mui/material";
+import { hints, getRandomHint } from "components/lobby/hints.js";
+
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
@@ -18,6 +20,8 @@ const Lobby = () => {
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
+  const [currentHint, setCurrentHint] = useState('');
+
 
 
   useEffect(() => {
@@ -76,6 +80,7 @@ const Lobby = () => {
       console.log("Disconnected from WebSocket");
     };
   }, []);
+  
 
   const handleJoinGame = async () => {
     const token = localStorage.getItem("token");
@@ -143,6 +148,27 @@ const Lobby = () => {
     sendMessage(`/app/start/${gameId}`, {});
   }
 
+
+  useEffect(() => {
+    let lastHint = currentHint; 
+  
+    const intervalId = setInterval(() => {
+      let newHint = getRandomHint();
+      let attemptCount = 0; 
+  
+      while (newHint === lastHint && attemptCount < 10) {
+        newHint = getRandomHint();
+        attemptCount++;
+      }
+      setCurrentHint(newHint); 
+      lastHint = newHint; 
+  
+    }, 10000); 
+    
+    return () => clearInterval(intervalId); 
+  }, []);
+  
+
   
   const lobbyContainerStyle: React.CSSProperties = {
     display: "flex",
@@ -168,25 +194,30 @@ const Lobby = () => {
     marginTop: "10px",
   };
 
-  const hintContainerStyle: React.CSSProperties = {
+  const hintContainerStyle = {
     backgroundColor: "#f0f0f0",
     padding: "20px",
-    width: "300px",
+    width: "600px",
     borderRadius: "8px",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    textAlign: "left",
+    display: "flex",  
+    flexDirection: "column",  
+    alignItems: "center",  
+    justifyContent: "center",     
+    textAlign: "center",  
   };
 
-  const hintTitleStyle: React.CSSProperties = {
-    marginBottom: "10px",
+
+  const hintListStyle = {
+    listStyleType: "none",  
+    padding: 0,  
+    margin: 0,  
+    width: "100%",  
   };
 
-  const hintListStyle: React.CSSProperties = {
-    paddingLeft: "20px",
-  };
-
-  const hintListItemStyle: React.CSSProperties = {
+  const hintListItemStyle = {
     marginBottom: "5px",
+    textAlign: "center", 
   };
 
   return (
@@ -201,11 +232,8 @@ const Lobby = () => {
         )}
       </div>
       <div style={hintContainerStyle}>
-        <h3 style={hintTitleStyle}>Hint</h3>
-        <p>In this game mode, the rules are...</p>
         <ul style={hintListStyle}>
-          <li style={hintListItemStyle}>Try to do this.</li>
-          <li style={hintListItemStyle}>You can also do this.</li>
+          {currentHint}
         </ul>
       </div>
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>  
