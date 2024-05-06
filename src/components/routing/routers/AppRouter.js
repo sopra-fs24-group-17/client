@@ -48,7 +48,7 @@ const AppRouter = () => {
 
         <Route path="/game/*" element={<GameGuard />}>
           <Route index element={<Game />} />
-          <Route path="chat" element={<WebSocketChat />} />
+          <Route path="chat/:gameId" element={<WebSocketChat />} />
         </Route>
 s
         <Route path="/lobby/:gameId"  element={<LobbyGuard />}>

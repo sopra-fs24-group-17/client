@@ -31,6 +31,7 @@
 .primary {
     background-color: #4CAF50;
     color: white;
+    height: 45px;
 }
 
 .accent {
@@ -114,7 +115,7 @@
 }
 
 .activeUsers {
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     padding: 10px;
     background-color: #f4f4f4;
     border-radius: 8px;
@@ -124,6 +125,39 @@
     gap: 10px;
 }
 
+.messageContent {
+    display: flex;
+    align-items: center;
+}
+
+.userAvatar {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.avatarLetter {
+    color: white;
+    font-weight: bold;
+}
+
+
+.activeUserContainer {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.userName {
+    margin-left: 8px;
+    color: #333;
+    font-size: 14px;
+}
+
 .userTag {
     background-color: #2196F3;
     color: white;
@@ -131,4 +165,83 @@
     padding: 5px 10px;
     font-size: 14px;
     white-space: nowrap;
+}
+
+.messageForm {
+    display: flex;
+    padding: 10px;
+    background: #f4f4f8;
+    border-top: 1px solid #e0e0e0;
+}
+
+.formControl {
+    flex-grow: 1;
+    margin-right: 8px;
+    padding: 8px;
+    border: 2px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+}
+
+.primary {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.primary:hover {
+    background-color: #45a045;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.messageList li {
+    animation: fadeIn 0.5s ease-out;
+    margin-bottom: 10px;
+}
+
+.messageList {
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.myMessage {
+    align-self: flex-end;
+    background-color: #dcf8c6;
+    border-radius: 15px;
+    padding: 5px 10px;
+    margin: 4px 0;
+}
+
+.otherMessage {
+    align-self: flex-start;
+    background-color: #f2f2f2;
+    border-radius: 15px;
+    padding: 5px 10px;
+    margin: 4px 0;
+}
+
+.eventMessage {
+    text-align: center;
+    color: #888;
+    margin: 10px 0;
+}
+
+.chatRoomHeader {
+    background-color: white;
+    border: 1px black;
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+.chatRoomTitle {
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
 }
