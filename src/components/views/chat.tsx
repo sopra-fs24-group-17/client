@@ -18,19 +18,21 @@ const colors = [
 function WebSocketChat() {
   const storedUsername = localStorage.getItem("username");
   const [username, setUsername] = useState(storedUsername || "");
+  const storedgameId = localStorage.getItem("gameId");
+  const [roomId, setRoomId] = useState(storedgameId || "");
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [activeUsers, setActiveUsers] = useState([]);
   const [messageContent, setMessageContent] = useState("");
   const [subscription, setSubscription] = useState(null);
-  const [userColors, setUserColors] = useState({}); // Dictionary to store user colors
+  const [userColors, setUserColors] = useState({});
   const messagesEndRef = useRef(null);
+  const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
     if (username && !connected) {
       setConnected(true);
       connectWebSocket().then(client => {
-        const sub = subscribeToChannel("/topic/public", (message) => {
+        const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
           const msgData = JSON.parse(message.body);
           if (msgData.type === "STATE") {
             setActiveUsers(msgData.content.split(","));
@@ -40,7 +42,7 @@ function WebSocketChat() {
           }
         });
         setSubscription(sub);
-        sendMessage("/app/chat.addUser", { sender: username, type: "JOIN" });
+        sendMessage(`/app/chat/${roomId}/addUser`, { sender: username, type: "JOIN" });
       }).catch(error => {
         console.error("Connection failed: ", error);
         setConnected(false);
@@ -55,14 +57,14 @@ function WebSocketChat() {
         }
       }
     };
-  }, [username, connected]);
+  }, [username, connected, roomId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleDisconnect = () => {
-    sendMessage("/app/chat.addUser", { sender: username, type: "LEAVE" });
+    sendMessage(`/app/chat/${roomId}/addUser`, { sender: username, type: "LEAVE" });
     setConnected(false);
     disconnectWebSocket();
     if (subscription) {
@@ -78,7 +80,7 @@ function WebSocketChat() {
         content: messageContent,
         type: "CHAT"
       };
-      sendMessage("/app/chat.sendMessage", chatMessage);
+      sendMessage(`/app/chat/${roomId}/sendMessage`, chatMessage);
       setMessageContent("");
     }
   };
@@ -95,6 +97,7 @@ function WebSocketChat() {
           updatedColors[user] = getUniqueColor(Object.values(updatedColors));
         }
       });
+
       return updatedColors;
     });
   };
@@ -106,6 +109,7 @@ function WebSocketChat() {
       colorIndex = (colorIndex + 1) % colors.length;
       color = colors[colorIndex];
     }
+
     return color;
   };
 
@@ -113,21 +117,32 @@ function WebSocketChat() {
     <div className={styles.chatContainer}>
       {connected ? (
         <div>
-          <div className={styles.activeUsers}>
-            {activeUsers.map((user, index) => (
-              <span key={index} className={styles.userTag}>{user}</span>
-            ))}
+          <div className={styles.chatRoomHeader}>
+            <h2 className={styles.chatRoomTitle}>Gameroom - {roomId}</h2>
+            <div className={styles.activeUsers}>
+              {Object.keys(userColors).map((user, index) => (
+                <div key={index} className={styles.activeUserContainer}>
+                  <div className={styles.userAvatar} style={{ backgroundColor: userColors[user] }}>
+                    <span className={styles.avatarLetter}>{user.charAt(0)}</span>
+                  </div>
+                  <span className={styles.userName}>{user}</span> {/* Display username */}
+                </div>
+              ))}
+            </div>
           </div>
-          <button onClick={handleDisconnect} className={styles.accent}>Disconnect</button>
           <ul className={styles.messageList}>
             {messages.map((msg, i) => (
               <li key={i}
-                  className={msg.type === "JOIN" || msg.type === "LEAVE" ? styles.eventMessage : msg.sender === username ? styles.myMessage : styles.otherMessage}
-                  style={{ color: userColors[msg.sender] }}>
+                className={msg.type === "JOIN" || msg.type === "LEAVE" ? styles.eventMessage : msg.sender === username ? styles.myMessage : styles.otherMessage}>
                 {msg.type === "JOIN" || msg.type === "LEAVE" ? (
-                  <span>{msg.sender} {msg.type === "JOIN" ? "joined" : "left"}</span>
+                  `${msg.sender} ${msg.type === "JOIN" ? "joined" : "left"}`
                 ) : (
-                  <span>[{msg.time}] <strong>{msg.sender}</strong>: {msg.content}</span>
+                  <div className={styles.messageContent}>
+                    <div className={styles.userAvatar} style={{ backgroundColor: userColors[msg.sender] }}>
+                      <span className={styles.avatarLetter}>{msg.sender.charAt(0)}</span>
+                    </div>
+                    <span style={{ color: userColors[msg.sender] }}>{msg.content}</span>
+                  </div>
                 )}
               </li>
             ))}
