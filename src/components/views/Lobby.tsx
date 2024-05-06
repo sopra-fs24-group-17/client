@@ -9,7 +9,7 @@ import {
   sendMessage,
 } from "./WebsocketConnection";
 import {Grid, Button, Box } from "@mui/material";
-import WebSocketChat from './chat'; // Adjust path as necessary
+import WebSocketChat from './chat'; 
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
@@ -70,13 +70,13 @@ const Lobby = () => {
         console.error("Failed to fetch game data:", error);
       }
     };
-    fetchGameData();
+    fetchGameData(); 
 
     return () => {
       disconnectWebSocket();
       console.log("Disconnected from WebSocket");
     };
-  }, []);
+  }, [ currentPlayers]);
 
   const handleJoinGame = async () => {
     const token = localStorage.getItem("token");
