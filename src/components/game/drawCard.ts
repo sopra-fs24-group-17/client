@@ -10,7 +10,6 @@ export const drawCard = (playerTurn: boolean, closedDeck, playerHand, setPlayerH
 
     // Remove the top card from the closed deck
     sendMessage(`/app/terminateMove/${gameId}/${playerId}`, {});
-    setPlayerTurn(false);
     // const drawnCard = closedDeck.shift();
 
     // // If the card is an Exploding Kitten and the player has no defuse card, the player loses
