@@ -20,7 +20,7 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
             targetUserId = prompt("Enter the ID of the player you want to target:");
         }
 
-        if (["hairypotatocat", "tacocat", "beardcat", "cattermelon"].includes(cardName)) {
+        else if (["hairypotatocat", "tacocat", "beardcat", "cattermelon"].includes(cardName)) {
             // If the card is a palindrome card, check if the player has another card of the same type
             const otherCardIndex = playerHand.findIndex((card, index) => card.internalCode === cardId && card.code !== cardCode && index!==cardIndex );
             if (otherCardIndex === -1) {
@@ -31,6 +31,9 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
                 cardIncidesToRemove.push(otherCardIndex);
             }
         }
+
+        else if (cardName === "nope") {}
+        
 
         // Remove the card from the player's hand and add it to the open deck
         console.log(cardIndex)
@@ -43,7 +46,8 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
             "gameId": gameId,
             "userId": userId,
             "cardIds": cardCodes,
-            "targetUserId": targetUserId
+            "targetUserId": targetUserId,
+            "negationUsers": ""
         });
     }
 };

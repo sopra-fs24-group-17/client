@@ -2,6 +2,7 @@
 export const drawCard = (playerTurn: boolean, sendMessage, setGameAlertOpen, setGameAlertTitle, setGameAlertDescription) => {
     const gameId = localStorage.getItem("gameId");
     const playerId = localStorage.getItem("id");
+    let payload = null;
 
     if (!playerTurn) {
         setGameAlertTitle("It's not your turn!");

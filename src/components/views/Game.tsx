@@ -24,6 +24,7 @@ TODO:
     
   Features: 
     - If I play defuse, I want to be able to choose where to put the explosion card
+    - Nope
 
 */
 
