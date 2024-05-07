@@ -176,8 +176,7 @@ const Game = () => {
         <div className="card-stack">
           {closedDeck.slice(0, 5).map(
             (
-              card,
-              index
+              card
             ) => (
               <div
                 key={card.id}
@@ -187,7 +186,7 @@ const Game = () => {
                   text=""
                   description=""
                   image={card_back}
-                  onClick={() => drawCard(playerTurn, closedDeck, playerHand, setPlayerHand, setClosedDeck, setPlayerTurn, sendMessage, navigate)}
+                  onClick={() => drawCard(playerTurn, sendMessage, setGameAlertOpen, setGameAlertTitle, setGameAlertDescription)}
                 />
               </div>
             )
@@ -223,7 +222,7 @@ const Game = () => {
               text={card.text}
               description={card.description}
               image={card.imageUrl}
-              onClick={() => playCard(card.internalCode, card.name, card.code, playerTurn, playerHand, setPlayerHand, setOpenDeck, openDeck, sendMessage)}
+              onClick={() => playCard(card.internalCode, card.name, card.code, playerTurn, playerHand, setPlayerHand, sendMessage, setGameAlertOpen, setGameAlertTitle, setGameAlertDescription)}
             />
           ))}
         </Stack>

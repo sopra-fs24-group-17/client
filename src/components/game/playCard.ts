@@ -1,4 +1,4 @@
-export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, setPlayerHand, setOpenDeck, openDeck, sendMessage) => {
+export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, setPlayerHand, sendMessage, setGameAlertOpen, setGameAlertTitle, setGameAlertDescription) => {
     const gameId = localStorage.getItem("gameId");
     const userId = localStorage.getItem("id");
     let targetUserId = userId;
@@ -6,7 +6,9 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
     let cardIncidesToRemove = []
 
     if (!playerTurn) {
-        alert("It's not your turn!");
+        setGameAlertTitle("It's not your turn!");
+        setGameAlertDescription("You can only play a card when it's your turn. You can see that it is your turn by the alert at the top of the screen.");
+        setGameAlertOpen(true);
         return;
     }
     // Find the card in the player's hand
