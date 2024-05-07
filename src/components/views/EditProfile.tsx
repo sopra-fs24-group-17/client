@@ -11,13 +11,22 @@ import {
   Button,
   ToggleButton,
   Container,
+  Modal, 
+  Box, 
+  Typography, 
+  IconButton
 } from "@mui/material";
 import Profile from "./Profile";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import {getDomain} from '../../helpers/getDomain'
 import placeholder from "components/game/profile_image_placeholder.webp";
+import avatar1 from 'components/avatars/avatar1.webp'
+import avatar2 from 'components/avatars/avatar2.webp'
+
+
 
 const EditProfile = () => {
   const { userId } = useParams();
@@ -36,9 +45,17 @@ const EditProfile = () => {
   const [avatarPlaceholder, setAvatarPlaceholder] = useState(
     placeholder
   );
-  const [avatarPath, setAvatarPath] = useState(null);
-  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [isChanging, setIsChanging] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+  const predefinedAvatars = [
+    avatar1,
+    avatar2,
+  ]
 
   const [domain, setDomain] = useState(null);
 
@@ -63,10 +80,7 @@ const EditProfile = () => {
         const fetchedUser = response.data;
 
         setUser(fetchedUser);
-        if (fetchedUser.avatar && fetchedUser.avatar !== "") {
-          const path = `/images/avatars/${fetchedUser.avatar.split("/").pop()}`;
-          setAvatarPath(path);
-        }
+        setAvatar(fetchedUser.avatar);
 
         const visibility =
           fetchedUser.profilevisibility === "TRUE"
@@ -105,16 +119,20 @@ const EditProfile = () => {
     }
   };
 
-  const handleAvatarChange = async (event) => {
+  const handleAvatarChange = (fullPath) => {
     setIsChanging(true);
+    const filenameWithExt = fullPath.split('/').pop();
+    const baseName = filenameWithExt.split('.')[0];
+    import(`../../components/avatars/${baseName}.webp`)
+    .then(image => {
+      setAvatarPlaceholder(image.default);
+      setAvatar(image.default);
+      console.log(avatar)
+    })
+    .catch(e => console.error("Failed to load image:", e));
 
-    if (event.target.files[0]) {
-      const imageUrl = URL.createObjectURL(event.target.files[0]);
-      setAvatarPlaceholder(imageUrl);
-
-      setAvatarFile(event.target.files[0]);
-    }
   };
+  
 
   interface UpdateData {
     username?: string;
@@ -130,32 +148,12 @@ const EditProfile = () => {
     const token = localStorage.getItem("token");
     const updateData: UpdateData = {};
 
-    if (avatarFile) {
-      console.log("file exists");
-      // Create a FormData object and append the file
-      const formData = new FormData();
-      formData.append("avatar", avatarFile);
-
-      try {
-        // Make the API call using FormData
-        const response = await api.post(
-          `/dashboard/${userId}/profile/uploadAvatar`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              token: token,
-            },
-          }
-        );
-        navigate(`/users/${userId}`);
-        updateData.avatar = response.data;
-      } catch (error) {
-        alert(`Uploading avatar failed: ${error.message || "Unknown error"}`);
-      }
+    // Only add fields to the update object if they are not empty
+    if (avatar) {
+      console.log("yes we have an avatar: ", avatar)
+      updateData.avatar = avatar;
     }
 
-    // Only add fields to the update object if they are not empty
     if (username && username.trim() !== "") {
       updateData.username = username;
       localStorage.setItem("username", username);
@@ -174,9 +172,8 @@ const EditProfile = () => {
         ? ProfileVisibility.TRUE
         : ProfileVisibility.FALSE;
 
-    console.log(updateData);
     try {
-      const profileResponse = await api.put(
+      await api.put(
         `dashboard/${userId}/profile`,
         JSON.stringify(updateData),
         {
@@ -191,9 +188,11 @@ const EditProfile = () => {
     }
   };
 
+
   if (!isEditing) {
     return <Profile userId={localStorage.getItem("id")} />;
   }
+
 
   if (user) {
     return (
@@ -211,19 +210,38 @@ const EditProfile = () => {
                 marginRight: "20px",
                 position: "relative",
               }}
-              onClick={() =>
-                fileInputRef.current && fileInputRef.current.click()
-              }
             >
               <CardMedia
                 sx={{ height: 300, width: 300 }}
                 image={
-                  isChanging || avatarPath === null
+                  isChanging || avatar === null
                     ? avatarPlaceholder
-                    : domain + avatarPath
+                    : avatar
                 }
                 title="profile"
+                onClick={handleOpenModal}
               />
+
+                <Modal
+                  open={openModal}
+                  onClose={handleCloseModal}
+                  aria-labelledby="avatar-selection-modal"
+                  aria-describedby="select-predefined-avatar"
+                >
+                  <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                      Select an Avatar
+                    </Typography>
+                    <div style={{ display: 'flex', justifyContent: 'space-around', padding: '20px' }}>
+                      {predefinedAvatars.map((avatar, index) => (
+                        <IconButton key={index} onClick={() => { handleAvatarChange(avatar); handleCloseModal(); }}>
+                          <img src={avatar} alt={`Avatar ${index + 1}`} style={{ width: 70, height: 70 }} />
+                        </IconButton>
+                      ))}
+                    </div>
+                  </Box>
+                </Modal>
+
               <input
                 type="file"
                 accept="image/*"
@@ -285,23 +303,6 @@ const EditProfile = () => {
                     />
                   </Grid>
                 </Grid>
-
-                {/*<LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DatePicker
-                                        label="Birthday"
-                                        inputFormat="yyyy-MM-dd"
-                                        value={birthdate ? new Date(birthdate) : new Date(user.birthdate)}
-                                        onChange={handleBirthdateChange}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                onFocus={(event) => event.target.select()}
-                                                InputLabelProps={{ shrink: true }}
-                                                sx={{ width: '500px', marginBottom: '10px' }}
-                                            />
-                                        )}
-                                    />
-                                </LocalizationProvider> */}
 
                 {/* Birthdate Field */}
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
