@@ -12,7 +12,7 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
         return;
     }
     // Find the card in the player's hand
-    const cardIndex = playerHand.findIndex((card) => card.internalCode === cardId);
+    const cardIndex = playerHand.findIndex((card) => card.code === cardCode);
     cardIncidesToRemove.push(cardIndex)
     if (cardIndex !== -1) {
         if (cardName === "favor") {
@@ -22,7 +22,7 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
 
         if (["hairypotatocat", "tacocat", "beardcat", "cattermelon"].includes(cardName)) {
             // If the card is a palindrome card, check if the player has another card of the same type
-            const otherCardIndex = playerHand.findIndex((card) => card.internalCode === cardId && card.code !== cardCode);
+            const otherCardIndex = playerHand.findIndex((card, index) => card.internalCode === cardId && card.code !== cardCode && index!==cardIndex );
             if (otherCardIndex === -1) {
                 alert("You need two cards of the same type to play this card.");
                 return;
