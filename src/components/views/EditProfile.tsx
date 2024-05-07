@@ -25,6 +25,12 @@ import {getDomain} from '../../helpers/getDomain'
 import placeholder from "components/game/profile_image_placeholder.webp";
 import avatar1 from 'components/avatars/avatar1.webp'
 import avatar2 from 'components/avatars/avatar2.webp'
+import avatar3 from 'components/avatars/avatar3.webp'
+import avatar4 from 'components/avatars/avatar4.webp'
+import avatar5 from 'components/avatars/avatar5.webp'
+import avatar6 from 'components/avatars/avatar6.webp'
+import avatar7 from 'components/avatars/avatar7.webp'
+import avatar8 from 'components/avatars/avatar8.webp'
 
 
 
@@ -55,6 +61,12 @@ const EditProfile = () => {
   const predefinedAvatars = [
     avatar1,
     avatar2,
+    avatar3,
+    avatar4,
+    avatar5,
+    avatar6,
+    avatar7,
+    avatar8
   ]
 
   const [domain, setDomain] = useState(null);
@@ -228,19 +240,38 @@ const EditProfile = () => {
                   aria-labelledby="avatar-selection-modal"
                   aria-describedby="select-predefined-avatar"
                 >
-                  <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                      Select an Avatar
+                  <Box sx={{
+                    position: 'absolute', 
+                    top: '50%', 
+                    left: '50%', 
+                    transform: 'translate(-50%, -50%)', 
+                    width: { xs: 300, sm: 400, md: 600 }, // Responsive width
+                    bgcolor: 'background.paper', 
+                    boxShadow: 24, 
+                    p: 4
+                  }}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ textAlign: 'center' }}> 
+                      Select an avatar!
                     </Typography>
-                    <div style={{ display: 'flex', justifyContent: 'space-around', padding: '20px' }}>
+                    <Box sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))', // Creates a responsive grid
+                      gap: 2, // Adjusts spacing between avatars
+                      padding: 2
+                    }}>
                       {predefinedAvatars.map((avatar, index) => (
-                        <IconButton key={index} onClick={() => { handleAvatarChange(avatar); handleCloseModal(); }}>
-                          <img src={avatar} alt={`Avatar ${index + 1}`} style={{ width: 70, height: 70 }} />
+                        <IconButton 
+                          key={index} 
+                          onClick={() => { handleAvatarChange(avatar); handleCloseModal(); }}
+                          sx={{ p: 1 }}
+                        >
+                          <img src={avatar} alt={`Avatar ${index + 1}`} style={{ width: '100%', height: 'auto' }} />
                         </IconButton>
                       ))}
-                    </div>
+                    </Box>
                   </Box>
                 </Modal>
+
 
               <input
                 type="file"
