@@ -11,13 +11,28 @@ import {
   Button,
   ToggleButton,
   Container,
+  Modal, 
+  Box, 
+  Typography, 
+  IconButton
 } from "@mui/material";
 import Profile from "./Profile";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import {getDomain} from '../../helpers/getDomain'
 import placeholder from "components/game/profile_image_placeholder.webp";
+import avatar1 from 'components/avatars/avatar1.webp'
+import avatar2 from 'components/avatars/avatar2.webp'
+import avatar3 from 'components/avatars/avatar3.webp'
+import avatar4 from 'components/avatars/avatar4.webp'
+import avatar5 from 'components/avatars/avatar5.webp'
+import avatar6 from 'components/avatars/avatar6.webp'
+import avatar7 from 'components/avatars/avatar7.webp'
+import avatar8 from 'components/avatars/avatar8.webp'
+
+
 
 import Select from "react-select";
 import countryList from "react-select-country-list";
@@ -59,9 +74,23 @@ const EditProfile = () => {
   const [avatarPlaceholder, setAvatarPlaceholder] = useState(
     placeholder
   );
-  const [avatarPath, setAvatarPath] = useState(null);
-  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [isChanging, setIsChanging] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+  const predefinedAvatars = [
+    avatar1,
+    avatar2,
+    avatar3,
+    avatar4,
+    avatar5,
+    avatar6,
+    avatar7,
+    avatar8
+  ]
 
   const [domain, setDomain] = useState(null);
 
@@ -86,10 +115,7 @@ const EditProfile = () => {
         const fetchedUser = response.data;
 
         setUser(fetchedUser);
-        if (fetchedUser.avatar && fetchedUser.avatar !== "") {
-          const path = `/images/avatars/${fetchedUser.avatar.split("/").pop()}`;
-          setAvatarPath(path);
-        }
+        setAvatar(fetchedUser.avatar);
 
         const visibility =
           fetchedUser.profilevisibility === "TRUE"
@@ -136,16 +162,20 @@ const EditProfile = () => {
     }
   };
 
-  const handleAvatarChange = async (event) => {
+  const handleAvatarChange = (fullPath) => {
     setIsChanging(true);
+    const filenameWithExt = fullPath.split('/').pop();
+    const baseName = filenameWithExt.split('.')[0];
+    import(`../../components/avatars/${baseName}.webp`)
+    .then(image => {
+      setAvatarPlaceholder(image.default);
+      setAvatar(image.default);
+      console.log(avatar)
+    })
+    .catch(e => console.error("Failed to load image:", e));
 
-    if (event.target.files[0]) {
-      const imageUrl = URL.createObjectURL(event.target.files[0]);
-      setAvatarPlaceholder(imageUrl);
-
-      setAvatarFile(event.target.files[0]);
-    }
   };
+  
 
   interface UpdateData {
     username?: string;
@@ -161,32 +191,12 @@ const EditProfile = () => {
     const token = localStorage.getItem("token");
     const updateData: UpdateData = {};
 
-    if (avatarFile) {
-      console.log("file exists");
-      // Create a FormData object and append the file
-      const formData = new FormData();
-      formData.append("avatar", avatarFile);
-
-      try {
-        // Make the API call using FormData
-        const response = await api.post(
-          `/dashboard/${userId}/profile/uploadAvatar`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              token: token,
-            },
-          }
-        );
-        navigate(`/users/${userId}`);
-        updateData.avatar = response.data;
-      } catch (error) {
-        alert(`Uploading avatar failed: ${error.message || "Unknown error"}`);
-      }
+    // Only add fields to the update object if they are not empty
+    if (avatar) {
+      console.log("yes we have an avatar: ", avatar)
+      updateData.avatar = avatar;
     }
 
-    // Only add fields to the update object if they are not empty
     if (username && username.trim() !== "") {
       updateData.username = username;
       localStorage.setItem("username", username);
@@ -205,9 +215,8 @@ const EditProfile = () => {
         ? ProfileVisibility.TRUE
         : ProfileVisibility.FALSE;
 
-    console.log(updateData);
     try {
-      const profileResponse = await api.put(
+      await api.put(
         `dashboard/${userId}/profile`,
         JSON.stringify(updateData),
         {
@@ -222,9 +231,11 @@ const EditProfile = () => {
     }
   };
 
+
   if (!isEditing) {
     return <Profile userId={localStorage.getItem("id")} />;
   }
+
 
   if (user) {
     return (
@@ -242,19 +253,57 @@ const EditProfile = () => {
                 marginRight: "20px",
                 position: "relative",
               }}
-              onClick={() =>
-                fileInputRef.current && fileInputRef.current.click()
-              }
             >
               <CardMedia
                 sx={{ height: 300, width: 300 }}
                 image={
-                  isChanging || avatarPath === null
+                  isChanging || avatar === null
                     ? avatarPlaceholder
-                    : domain + avatarPath
+                    : avatar
                 }
                 title="profile"
+                onClick={handleOpenModal}
               />
+
+                <Modal
+                  open={openModal}
+                  onClose={handleCloseModal}
+                  aria-labelledby="avatar-selection-modal"
+                  aria-describedby="select-predefined-avatar"
+                >
+                  <Box sx={{
+                    position: 'absolute', 
+                    top: '50%', 
+                    left: '50%', 
+                    transform: 'translate(-50%, -50%)', 
+                    width: { xs: 300, sm: 400, md: 600 }, // Responsive width
+                    bgcolor: 'background.paper', 
+                    boxShadow: 24, 
+                    p: 4
+                  }}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ textAlign: 'center' }}> 
+                      Select an avatar!
+                    </Typography>
+                    <Box sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))', // Creates a responsive grid
+                      gap: 2, // Adjusts spacing between avatars
+                      padding: 2
+                    }}>
+                      {predefinedAvatars.map((avatar, index) => (
+                        <IconButton 
+                          key={index} 
+                          onClick={() => { handleAvatarChange(avatar); handleCloseModal(); }}
+                          sx={{ p: 1 }}
+                        >
+                          <img src={avatar} alt={`Avatar ${index + 1}`} style={{ width: '100%', height: 'auto' }} />
+                        </IconButton>
+                      ))}
+                    </Box>
+                  </Box>
+                </Modal>
+
+
               <input
                 type="file"
                 accept="image/*"
@@ -316,23 +365,6 @@ const EditProfile = () => {
                     />
                   </Grid>
                 </Grid>
-
-                {/*<LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DatePicker
-                                        label="Birthday"
-                                        inputFormat="yyyy-MM-dd"
-                                        value={birthdate ? new Date(birthdate) : new Date(user.birthdate)}
-                                        onChange={handleBirthdateChange}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                onFocus={(event) => event.target.select()}
-                                                InputLabelProps={{ shrink: true }}
-                                                sx={{ width: '500px', marginBottom: '10px' }}
-                                            />
-                                        )}
-                                    />
-                                </LocalizationProvider> */}
 
                 {/* Birthdate Field */}
                 <LocalizationProvider dateAdapter={AdapterDayjs}>

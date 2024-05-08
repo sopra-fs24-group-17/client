@@ -46,12 +46,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
 
   const [isAuthorizedToView, setIsAuthorizedToView] = useState(true);
 
-  const [domain, setDomain] = useState(null);
-
   const currentUserID = localStorage.getItem("id");
 
   useEffect(() => {
-    setDomain(process.env.REACT_APP_API_URL);
     console.log(process.env.REACT_APP_API_URL);
 
     const fetchUser = async () => {
@@ -63,7 +60,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
         const fetchedUser = response.data;
 
         setUser(fetchedUser);
-        console.log(fetchedUser.avatar);
         setAvatarPath(fetchedUser.avatar);
         const losses = fetchedUser.gamesplayed - fetchedUser.gameswon;
         setLosses(losses);
@@ -179,11 +175,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
             <Card>
               <CardMedia
                 sx={{
-                  height: "20vh",
+                  height: "45vh",
                 }}
                 image={
                   avatarPath
-                    ? domain + avatarPath
+                    ? avatarPath
                     : placeholder
                 }
                 title="profile"
