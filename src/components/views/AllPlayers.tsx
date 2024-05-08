@@ -26,6 +26,52 @@ const AllPlayers = () => {
     const [filteredPlayers, setFilteredPlayers] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
     const [shouldReload, setShouldReload] = useState(false);
+    const [friends, setFriends] = useState([]);
+    const [friendRequestStatuses, setFriendRequestStatuses] = useState({});
+    const [sortField, setSortField] = useState('');
+    const [sortDirection, setSortDirection] = useState('asc'); 
+    
+
+    const handleSort = (field) => {
+        const isAsc = sortField === field && sortDirection === 'asc';
+        setSortDirection(isAsc ? 'desc' : 'asc');
+        setSortField(field);
+    };
+
+
+    useEffect(() => {
+        const sortedPlayers = [...players].sort((a, b) => {
+            if (a[sortField] < b[sortField]) {
+                return sortDirection === 'asc' ? -1 : 1;
+            }
+            if (a[sortField] > b[sortField]) {
+                return sortDirection === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+        setFilteredPlayers(sortedPlayers);
+    }, [players, sortField, sortDirection]);
+
+
+    const fetchFriends = async () => {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('id');
+        try {
+            const response = await api.get(`/dashboard/${userId}/friends`, {
+                headers: { 'token': token }
+            });
+            setFriends(response.data.map(friend => friend.friendId)); 
+            console.log('Friends fetched successfully.', response.data);
+        } catch (error) {
+            console.error('Error fetching friends:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchFriends();
+        setupWebSocketAndFetchData();
+    }, []);
+
 
 
     useEffect(() => {
@@ -64,7 +110,7 @@ const AllPlayers = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await api.get(`/dashboard/420/profile/stats`, {
+            const response = await api.get(`/dashboard/420/profile/stats`, { // just use any userid, doesn't matter
                 headers: { 'token': token }
             });
             console.log(response);
@@ -109,7 +155,11 @@ const AllPlayers = () => {
     const sendFriendRequest = async (recipientUserId) => {
         try {
             const token = localStorage.getItem('token');
-            await api.put(`/dashboard/${recipientUserId}/friends/requests`, {}, {
+            setFriendRequestStatuses(prevStatuses => ({
+                ...prevStatuses,
+                [recipientUserId]: "waiting"  
+            }));
+                await api.put(`/dashboard/${recipientUserId}/friends/requests`, {}, {
                 headers: { 'token': token }
             });
             console.log('Friend request sent successfully to user:', recipientUserId);
@@ -151,14 +201,32 @@ const AllPlayers = () => {
       }
   };
     const handlePlayerClick = (userid) => {
+        console.log(userid)
         navigate(`../users/${userid}`);
     };
 
     return (
         <Container maxWidth={false} sx={{ mt: 2 }}>
-            <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-                All Players
-            </Typography>
+            <Grid container justifyContent="space-between" alignItems="flex-start">
+                <Grid item>
+                    <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+                        All Players
+                    </Typography>
+                </Grid>
+                {/* Search Field and Table */}
+                <Grid item>
+                    <TextField
+                        id="search"
+                        label="Search for a player"
+                        variant="outlined"
+                        size="small"
+                        sx={{ mb: 2 }}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                    />
+                </Grid>
+            </Grid>
+        
         {/* Friend Requests Section */}
         {friendRequests.length > 0 && (
             <List>
@@ -175,32 +243,29 @@ const AllPlayers = () => {
                 ))}
             </List>
         )}
-            {/* Search Field and Table */}
-            <Grid container justifyContent="space-between" alignItems="flex-start">
-                <Grid item>
-                    <TextField
-                        id="search"
-                        label="Search for a player"
-                        variant="outlined"
-                        size="small"
-                        sx={{ mb: 2 }}
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                    />
-                </Grid>
-            </Grid>
+            
             <Paper sx={{ width: '100%', mb: 2, overflowX: 'auto' }}>
                 <TableContainer>
                     <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>User Id</TableCell>
-                                <TableCell>Username</TableCell>
-                                <TableCell>Games Played</TableCell>
-                                <TableCell>Win-loss Ratio</TableCell>
-                                <TableCell>Achievements Unlocked</TableCell>
-                                <TableCell>Last Played</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell onClick={() => handleSort('userid')}>
+                                    User Id {sortField === 'userid' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('username')}>
+                                    Username {sortField === 'username' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('gamesplayed')}>
+                                    Games Played {sortField === 'gamesplayed' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('winlossratio')}>
+                                    Win-loss Ratio {sortField === 'winlossratio' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('achievementsunlocked')}>
+                                    Achievements Unlocked {sortField === 'achievementsunlocked' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell>Last Played</TableCell>  
+                                <TableCell>Actions</TableCell>  
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -226,8 +291,11 @@ const AllPlayers = () => {
                                                 event.stopPropagation();
                                                 sendFriendRequest(player.userid);
                                             }}
+                                            disabled={friends.includes(player.userid) || friendRequestStatuses[player.userid] === "waiting"}
                                         >
-                                            Add Friend
+                                            {friends.includes(player.userid) ? "Already Added" :
+                                            friendRequestStatuses[player.userid] === "waiting" ? "Invitation sent" : "Add Friend"}
+
                                         </Button>
                                     ) : (
                                         <Button

@@ -1,4 +1,4 @@
-export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, setPlayerHand, setOpenDeck, openDeck, sendMessage) => {
+export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, setPlayerHand, sendMessage, setGameAlertOpen, setGameAlertTitle, setGameAlertDescription) => {
     const gameId = localStorage.getItem("gameId");
     const userId = localStorage.getItem("id");
     let targetUserId = userId;
@@ -6,11 +6,13 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
     let cardIncidesToRemove = []
 
     if (!playerTurn) {
-        alert("It's not your turn!");
+        setGameAlertTitle("It's not your turn!");
+        setGameAlertDescription("You can only play a card when it's your turn. You can see that it is your turn by the alert at the top of the screen.");
+        setGameAlertOpen(true);
         return;
     }
     // Find the card in the player's hand
-    const cardIndex = playerHand.findIndex((card) => card.internalCode === cardId);
+    const cardIndex = playerHand.findIndex((card) => card.code === cardCode);
     cardIncidesToRemove.push(cardIndex)
     if (cardIndex !== -1) {
         if (cardName === "favor") {
@@ -20,8 +22,7 @@ export const playCard = (cardId, cardName, cardCode, playerTurn, playerHand, set
 
         if (["hairypotatocat", "tacocat", "beardcat", "cattermelon"].includes(cardName)) {
             // If the card is a palindrome card, check if the player has another card of the same type
-            console.log(cardId, cardName, cardCode, playerHand)
-            const otherCardIndex = playerHand.findIndex((card) => card.internalCode === cardId && card.code !== cardCode);
+            const otherCardIndex = playerHand.findIndex((card, index) => card.internalCode === cardId && card.code !== cardCode && index!==cardIndex );
             if (otherCardIndex === -1) {
                 alert("You need two cards of the same type to play this card.");
                 return;

@@ -8,7 +8,9 @@ import {
   subscribeToChannel,
   sendMessage,
 } from "./WebsocketConnection";
-import { Button, Box } from "@mui/material";
+import {Grid, Button, Box } from "@mui/material";
+import WebSocketChat from './chat'; 
+import { hints, getRandomHint } from "components/lobby/hints.js";
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
@@ -18,6 +20,7 @@ const Lobby = () => {
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
+  const [currentHint, setCurrentHint] = useState(getRandomHint());
 
 
   useEffect(() => {
@@ -29,6 +32,7 @@ const Lobby = () => {
     }
   }, [currentPlayers, totalPlayersRequired]);
 
+
   useEffect(() => {
     const fetchGameData = async () => {
       const token = localStorage.getItem("token");
@@ -36,18 +40,21 @@ const Lobby = () => {
         const response = await api.get(`dashboard/games`, {
           headers: { 'token': token } 
         });
-
+        // This is to find the game we want from all the slots to take the info we want
         if (response.data && response.data.length > 0) {
           const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
+          
           if (game && game.maxPlayers !== undefined) {
             setTotalPlayersRequired(game.maxPlayers);
+            setCurrentPlayers(game.currentPlayers);
+            
           } else {
             console.error("Game with specified ID not found or lacks 'maxPlayers' data");
           }
         } else {
           console.error("Invalid or empty response data");
         }
-
+        
 
         // Initialize WebSocket connection using @stomp/stompjs
         const initialiseWebsocketConnection = async () => {
@@ -65,7 +72,7 @@ const Lobby = () => {
         console.error("Failed to fetch game data:", error);
       }
     };
-    fetchGameData();
+    fetchGameData(); 
 
     return () => {
       disconnectWebSocket();
@@ -111,7 +118,7 @@ const Lobby = () => {
       );
     }
   };
-
+ 
   const handleSubcribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
@@ -131,12 +138,42 @@ const Lobby = () => {
       },
       { id: `sub-${gameId}` }
     );
-  };
-
-
+    };
   const handleStartGame = async () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
+    sendMessage(`/app/start/${gameId}`, {});
   }
+
+
+  
+  useEffect(() => {
+    let lastHint = currentHint; // Initialize lastHint with the first random hint already set
+  
+    // Function to update the hint
+    const updateHint = () => {
+      let newHint = getRandomHint();
+      let attemptCount = 0;
+  
+      while (newHint === lastHint && attemptCount < 10) {
+        newHint = getRandomHint();
+        attemptCount++;
+      }
+  
+      setCurrentHint(newHint); 
+      console.log(newHint);
+      lastHint = newHint; // Update lastHint for the next interval
+    };
+  
+    // Immediately update to a new hint when component mounts
+    updateHint();
+  
+    // Set up the interval to update hints every 10 seconds
+    const intervalId = setInterval(updateHint, 10000);
+  
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
+  
 
   
   const lobbyContainerStyle: React.CSSProperties = {
@@ -163,44 +200,49 @@ const Lobby = () => {
     marginTop: "10px",
   };
 
-  const hintContainerStyle: React.CSSProperties = {
+  const hintContainerStyle: React.CSSProperties= {
     backgroundColor: "#f0f0f0",
     padding: "20px",
-    width: "300px",
+    width: "600px",
     borderRadius: "8px",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    textAlign: "left",
+    display: "flex",  
+    flexDirection: "column",  
+    alignItems: "center",  
+    justifyContent: "center",     
+    textAlign: "center",  
   };
 
-  const hintTitleStyle: React.CSSProperties = {
-    marginBottom: "10px",
+
+  const hintListStyle = {
+    listStyleType: "none",  
+    padding: 0,  
+    margin: 0,  
+    width: "100%",  
   };
 
-  const hintListStyle: React.CSSProperties = {
-    paddingLeft: "20px",
-  };
-
-  const hintListItemStyle: React.CSSProperties = {
+  const hintListItemStyle = {
     marginBottom: "5px",
+    textAlign: "center", 
   };
 
   return (
+    <Box sx={{ flexGrow: 1, height: "100vh" }}>
+    <Grid container spacing={2}>
+      <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}> 
     <div style={lobbyContainerStyle}>
       <div style={statusContainerStyle}>
         <h2>Waiting for players to join...</h2>
         <div style={playersStatusStyle}>
-          {currentPlayers} out of {totalPlayersRequired} players
+          {currentPlayers} out of {totalPlayersRequired} players 
         </div>
         {currentPlayers === totalPlayersRequired && (
           <div style={checkIconStyle}>✓</div>
         )}
       </div>
       <div style={hintContainerStyle}>
-        <h3 style={hintTitleStyle}>Hint</h3>
-        <p>In this game mode, the rules are...</p>
         <ul style={hintListStyle}>
-          <li style={hintListItemStyle}>Try to do this.</li>
-          <li style={hintListItemStyle}>You can also do this.</li>
+          {currentHint}
         </ul>
       </div>
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>  
@@ -222,6 +264,13 @@ const Lobby = () => {
         </Button>
       </Box>
     </div>
+    </Grid>
+      <Grid item xs={4}>
+        <WebSocketChat />  {/* This is where the chat component gets rendered */}
+      </Grid>
+    </Grid>
+  </Box>
+
   );
 };
 
