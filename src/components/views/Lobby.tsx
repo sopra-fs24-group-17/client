@@ -11,8 +11,6 @@ import {
 import {Grid, Button, Box } from "@mui/material";
 import WebSocketChat from './chat'; 
 import { hints, getRandomHint } from "components/lobby/hints.js";
-import WebSocketChat from './chat'
-
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
@@ -80,7 +78,7 @@ const Lobby = () => {
       disconnectWebSocket();
       console.log("Disconnected from WebSocket");
     };
-  }, [ currentPlayers]);
+  }, []);
 
   const handleJoinGame = async () => {
     const token = localStorage.getItem("token");
@@ -272,6 +270,7 @@ const Lobby = () => {
       </Grid>
     </Grid>
   </Box>
+
   );
 };
 
