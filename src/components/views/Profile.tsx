@@ -23,6 +23,10 @@ import EditProfile from "./EditProfile";
 import BlockIcon from "@mui/icons-material/Block";
 import ChangePassword from "./ChangePassword";
 import placeholder from 'components/game/profile_image_placeholder.webp';
+import { FlagIcon } from "react-flag-kit";
+import countryList from "react-select-country-list";
+
+
 
 
 interface ProfileProps {
@@ -115,6 +119,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   if (isChangingPassword) {
     return <ChangePassword />;
   }
+
+  const countryNameToCode = (countryName) => {
+    const country = countryList().getData().find(c => c.label === countryName);
+    return country ? country.value : null;
+  };
 
   if (user) {
     return (
@@ -254,7 +263,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                   marginBottom={2.5}
                 >
                   Country:{" "}
-                  {user.countryoforigin ? user.countryoforigin : "Not set"}
+                  {user.countryoforigin ? 
+                    (<span>
+                      {user.countryoforigin} 
+                      <FlagIcon code={countryNameToCode(user.countryoforigin)} size={16} style={{ marginLeft: 8 }} />
+                    </span>)
+                      : "Not set"}
                 </Typography>
               </CardContent>
               <CardActions sx={{ justifyContent: "center", marginBottom: 2 }}>
