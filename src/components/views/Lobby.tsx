@@ -8,9 +8,9 @@ import {
   subscribeToChannel,
   sendMessage,
 } from "./WebsocketConnection";
-import { Button, Box } from "@mui/material";
+import {Grid, Button, Box } from "@mui/material";
+import WebSocketChat from './chat'; 
 import { hints, getRandomHint } from "components/lobby/hints.js";
-
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
@@ -21,7 +21,6 @@ const Lobby = () => {
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
   const [currentHint, setCurrentHint] = useState(getRandomHint());
-
 
 
   useEffect(() => {
@@ -73,14 +72,13 @@ const Lobby = () => {
         console.error("Failed to fetch game data:", error);
       }
     };
-    fetchGameData();
+    fetchGameData(); 
 
     return () => {
       disconnectWebSocket();
       console.log("Disconnected from WebSocket");
     };
   }, []);
-  
 
   const handleJoinGame = async () => {
     const token = localStorage.getItem("token");
@@ -120,7 +118,7 @@ const Lobby = () => {
       );
     }
   };
-
+ 
   const handleSubcribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
@@ -140,9 +138,7 @@ const Lobby = () => {
       },
       { id: `sub-${gameId}` }
     );
-  };
-
-
+    };
   const handleStartGame = async () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
     sendMessage(`/app/start/${gameId}`, {});
@@ -204,7 +200,7 @@ const Lobby = () => {
     marginTop: "10px",
   };
 
-  const hintContainerStyle = {
+  const hintContainerStyle: React.CSSProperties= {
     backgroundColor: "#f0f0f0",
     padding: "20px",
     width: "600px",
@@ -231,6 +227,9 @@ const Lobby = () => {
   };
 
   return (
+    <Box sx={{ flexGrow: 1, height: "100vh" }}>
+    <Grid container spacing={2}>
+      <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}> 
     <div style={lobbyContainerStyle}>
       <div style={statusContainerStyle}>
         <h2>Waiting for players to join...</h2>
@@ -265,6 +264,13 @@ const Lobby = () => {
         </Button>
       </Box>
     </div>
+    </Grid>
+      <Grid item xs={4}>
+        <WebSocketChat />  {/* This is where the chat component gets rendered */}
+      </Grid>
+    </Grid>
+  </Box>
+
   );
 };
 
