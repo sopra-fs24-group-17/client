@@ -366,6 +366,30 @@ const EditProfile = () => {
                   </Grid>
                 </Grid>
 
+                {/* Country Selector */}
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs>
+                    <Select
+                      options={countryOptions}
+                      value={countryOfOrigin}
+                      onChange={handleCountryChange}
+                      placeholder="Select your country"
+                      styles={{
+                        width: "500px",
+                        container: (base) => ({
+                          ...base,
+                          zIndex: 9999
+                        }),
+                        menu: (base) => ({
+                          ...base,
+                          zIndex: 9999
+                        })
+                      }}
+                    
+                    />
+                  </Grid>
+                </Grid>
+
                 {/* Birthdate Field */}
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
@@ -373,7 +397,7 @@ const EditProfile = () => {
                     format="YYYY-MM-DD"
                     defaultValue={dayjs(user.birthdate)}
                     onChange={handleBirthdateChange}
-                    sx={{ width: "500px", marginBottom: "10px" }}
+                    sx={{ width: "500px", marginBottom: "10px", marginTop: "10px" }}
                   />
                 </LocalizationProvider>
 
@@ -399,18 +423,7 @@ const EditProfile = () => {
                   </Grid>
                 </Grid>
 
-                {/* Country Selector */}
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs>
-                    <Select
-                      options={countryOptions}
-                      value={countryOfOrigin}
-                      onChange={handleCountryChange}
-                      placeholder="Select your country"
-                      styles={{ width: "500px" }}
-                    />
-                  </Grid>
-                </Grid>
+
               </CardContent>
               <CardActions sx={{ justifyContent: "center", marginBottom: 2 }}>
                 <Button variant="outlined" size="small" onClick={toggleEdit}>
