@@ -32,6 +32,7 @@ const CreateGame: React.FC = () => {
   const [mode, setMode] = useState('PUBLIC') //public or private
   const [gameCreated, setGameCreated] = useState(false);
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
+  const [copySuccess, setCopySuccess] = useState('');
 
 
   useEffect(() => {
@@ -60,6 +61,17 @@ const CreateGame: React.FC = () => {
   const handleNumberOfPlayersChange = (event) => {
     setTotalPlayers(event.target.value); 
 };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(gameCode);
+      setCopySuccess('');
+    } catch (error) {
+      setCopySuccess('Failed to copy!');
+      console.error("Could not copy to clipboard: ", error);
+    }
+  };
+
   const createGame = async () => {
     const mode = isPrivate ? "PRIVATE" : "PUBLIC";
     const requestBody = JSON.stringify({
@@ -130,24 +142,29 @@ const CreateGame: React.FC = () => {
       </FormGroup>
 
       {isPrivate && (
-        <TextField
-          fullWidth
-          variant="outlined"
-          value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`} 
-          multiline 
-          rows={2} 
-          InputProps={{
-            readOnly: true,
-            startAdornment: (
-              <InputAdornment position="start">
-                <InfoIcon /> {}
-              </InputAdornment>
-            ),
-            
-            style: { lineHeight: "normal", whiteSpace: "pre-line" },
-          }}
-          sx={{ mb: 2 }}
-        />
+        <>
+          <TextField
+            fullWidth
+            variant="outlined"
+            value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`}
+            multiline
+            rows={2}
+            InputProps={{
+              readOnly: true,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <InfoIcon />
+                </InputAdornment>
+              ),
+              style: { lineHeight: "normal", whiteSpace: "pre-line" },
+            }}
+            sx={{ mb: 2 }}
+          />
+          <Button onClick={copyToClipboard} variant="contained" sx={{ mb: 2 }}>
+            Copy Game Code
+          </Button>
+          {copySuccess && <Typography variant="body2" color="primary">{copySuccess}</Typography>}
+        </>
       )}
       <FormControl fullWidth sx={{ mb: 2 }}>
         <FormLabel
