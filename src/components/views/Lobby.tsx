@@ -147,32 +147,28 @@ const Lobby = () => {
 
   
   useEffect(() => {
-    let lastHint = currentHint; // Initialize lastHint with the first random hint already set
-  
-    // Function to update the hint
+    let lastHint = currentHint.hint; // Change to handle the hint property
+    
     const updateHint = () => {
-      let newHint = getRandomHint();
+      let newHintObject = getRandomHint();
       let attemptCount = 0;
   
-      while (newHint === lastHint && attemptCount < 10) {
-        newHint = getRandomHint();
+      while (newHintObject.hint === lastHint && attemptCount < 10) {
+        newHintObject = getRandomHint();
         attemptCount++;
       }
   
-      setCurrentHint(newHint); 
-      console.log(newHint);
-      lastHint = newHint; // Update lastHint for the next interval
+      setCurrentHint(newHintObject); // This now contains both hint and image
+      console.log(newHintObject.hint);
+      lastHint = newHintObject.hint; // Update lastHint for the next interval
     };
   
-    // Immediately update to a new hint when component mounts
     updateHint();
-  
-    // Set up the interval to update hints every 10 seconds
     const intervalId = setInterval(updateHint, 10000);
   
-    // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
+  
   
 
   
@@ -242,7 +238,8 @@ const Lobby = () => {
       </div>
       <div style={hintContainerStyle}>
         <ul style={hintListStyle}>
-          {currentHint}
+          <li>{currentHint.hint}</li>
+          {currentHint.image ? (<img src={currentHint.image} alt="Card Image" style={{ maxWidth: '100px', marginTop: '10px' }} />) : null }
         </ul>
       </div>
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>  
