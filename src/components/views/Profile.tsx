@@ -193,84 +193,49 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                 }
                 title="profile"
               />
-              <CardContent>
-                <Typography
-                  gutterBottom
-                  variant="h5"
-                  component="div"
-                  align="center"
-                  marginBottom={2.5}
-                >
-                  {user.username}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  {user.status === "ONLINE" ? (
-                    <FiberManualRecordIcon
-                      style={{
-                        fontSize: 14,
-                        color: "green",
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  ) : (
-                    <FiberManualRecordIcon
-                      style={{
-                        fontSize: 14,
-                        color: "red",
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  )}
-                  {user.status}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  Created on: {user.creationdate.slice(0, 10)}
-                </Typography>
 
-                {/* optional fields -> set as optional */}
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  Birthday:{" "}
-                  {user.birthdate ? user.birthdate.slice(0, 10) : "Not set"}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  Email: {user.email}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                  marginBottom={2.5}
-                >
-                  Country:{" "}
-                  {user.countryoforigin ? 
-                    (<span>
-                      {user.countryoforigin} 
-                      <FlagIcon code={countryNameToCode(user.countryoforigin)} size={16} style={{ marginLeft: 8 }} />
-                    </span>)
-                      : "Not set"}
-                </Typography>
-              </CardContent>
+            <CardContent style={{ paddingLeft: '35px', paddingRight: '35px' }}>
+              <Typography gutterBottom variant="h5" color="text.secondary" align="center" marginBottom={2.5}>
+                {user.status === "ONLINE" ? (
+                  <FiberManualRecordIcon style={{ marginRight: 5, fontSize: 20, color: "green", verticalAlign: "-2px" }} />
+                ) : (
+                  <FiberManualRecordIcon style={{ marginRight: 5, fontSize: 20, color: "red", verticalAlign: "-2px" }} />
+                )}
+                {user.username}
+              </Typography>
+
+
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                  {[
+                    { label: 'Created on:', value: user.creationdate.slice(0, 10) },
+                    { label: 'Birthday:', value: user.birthdate ? user.birthdate.slice(0, 10) : "Not set" },
+                    { label: 'Email:', value: user.email },
+                    { label: 'Country:', value: user.countryoforigin ? user.countryoforigin : "Not set", flag: user.countryoforigin },
+                  ].map((item, index) => (
+                    <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '10px' }}>
+                      <span style={{paddingRight: "10px"}}>{item.label}</span>
+                        <span style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 'bold',
+                          overflow: item.label === 'Email:' ? 'hidden' : undefined,
+                          whiteSpace: item.label === 'Email:' ? 'nowrap' : undefined,
+                          textOverflow: item.label === 'Email:' ? 'ellipsis' : undefined,
+                          cursor: 'default' 
+                        }}
+                        title={item.value} 
+                        >                          
+                          {item.value}
+                          {item.flag && (
+                            <FlagIcon code={countryNameToCode(user.countryoforigin)} size={35} style={{ marginLeft: 8, verticalAlign: 'middle' }} />
+                          )}
+                        </span>
+                    </div>
+                  ))}
+                </div>
+            </CardContent>
+
+
               <CardActions sx={{ justifyContent: "center", marginBottom: 2 }}>
                 {currentUserID === userId && (
                   <Button variant="outlined" size="small" onClick={toggleEdit}>
