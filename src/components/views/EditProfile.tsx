@@ -19,6 +19,27 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import placeholder from "components/game/profile_image_placeholder.webp";
 
+import Select from "react-select";
+import countryList from "react-select-country-list";
+import { FlagIcon } from "react-flag-kit";
+
+/*Excluded as these countries do not include a valid svg flag. Let's hope there is no exploding chicken enthusiast in Antarctica, Bonaire or Western Sahara*/
+const excludedCountries = ["AQ", "BQ", "EH"];
+const generateCountryOptions = () => {
+  return countryList()
+    .getData()
+    .filter((country) => !excludedCountries.includes(country.value))
+    .map((country) => ({
+      value: country.label,
+      label: (
+        <>
+          <FlagIcon code={country.value} size={16} style={{ marginRight: 8 }} />
+          {country.label}
+        </>
+      ),
+    }));
+};
+
 const EditProfile = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -31,7 +52,9 @@ const EditProfile = () => {
   const [username, setUsername] = useState(null);
   const [birthdate, setBirthdate] = useState(null);
   const [email, setEmail] = useState("");
-  const [countryoforigin, setCountry] = useState(null);
+
+  const [countryOfOrigin, setCountryOfOrigin] = useState(null);
+  const countryOptions = generateCountryOptions();
 
   const [avatarPlaceholder, setAvatarPlaceholder] = useState(
     placeholder
@@ -73,6 +96,12 @@ const EditProfile = () => {
             ? ProfileVisibility.TRUE
             : ProfileVisibility.FALSE;
         setProfileVisibility(visibility);
+
+        const selectedCountry = countryOptions.find(
+          (country) => country.value === fetchedUser.countryoforigin
+        );
+        setCountryOfOrigin(selectedCountry || null);
+
       } catch (error) {
         console.error(`Failed to fetch user data: ${handleError(error)}`);
       }
@@ -85,7 +114,9 @@ const EditProfile = () => {
 
   const handleEmailChange = (event) => setEmail(event.target.value);
 
-  const handleCountryChange = (event) => setCountry(event.target.value);
+  const handleCountryChange = (selectedOption) => {
+    setCountryOfOrigin(selectedOption);
+  };
 
   const handleBirthdateChange = (newValue) => {
     // Ensure newValue is valid and not null
@@ -166,8 +197,8 @@ const EditProfile = () => {
     if (email && email.trim() !== "") {
       updateData.email = email;
     }
-    if (countryoforigin && countryoforigin.trim() !== "") {
-      updateData.countryoforigin = countryoforigin;
+    if (countryOfOrigin && countryOfOrigin !== "") {
+      updateData.countryoforigin = countryOfOrigin.value;
     }
     updateData.profilevisibility =
       profilevisibility === ProfileVisibility.TRUE
@@ -336,21 +367,15 @@ const EditProfile = () => {
                   </Grid>
                 </Grid>
 
-                {/* Country Field */}
+                {/* Country Selector */}
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
-                    <TextField
-                      fullWidth
-                      label="Country"
-                      value={
-                        countryoforigin ? countryoforigin : user.countryoforigin
-                      }
+                    <Select
+                      options={countryOptions}
+                      value={countryOfOrigin}
                       onChange={handleCountryChange}
-                      onFocus={(event) => event.target.select()}
-                      sx={{ width: "500px" }}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
+                      placeholder="Select your country"
+                      styles={{ width: "500px" }}
                     />
                   </Grid>
                 </Grid>
