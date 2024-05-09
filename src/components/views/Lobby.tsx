@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useState , useRef } from "react";
+import React, { useEffect, useState , useRef, useCallback } from "react";
 import { useNavigate, useParams, useLocation  } from "react-router-dom";
 import { api, handleError } from "helpers/api";
 import {
@@ -21,11 +21,11 @@ const Lobby = () => {
   const { gameId } = useParams();
   const [message, setMessage] = useState(null);
   const [currentHint, setCurrentHint] = useState(getRandomHint());
-
+  const storedUsername = localStorage.getItem("username");
 
   useEffect(() => {
     
-    if (currentPlayers === totalPlayersRequired) {
+    if (currentPlayers === totalPlayersRequired && storedUsername === localStorage.getItem("creator")) {
       setJoinButtonDisabled(false);
     } else {
       setJoinButtonDisabled(true);
@@ -47,6 +47,7 @@ const Lobby = () => {
           if (game && game.maxPlayers !== undefined) {
             setTotalPlayersRequired(game.maxPlayers);
             setCurrentPlayers(game.currentPlayers);
+            localStorage.setItem("creator", game.initiatingUserName);
             
           } else {
             console.error("Game with specified ID not found or lacks 'maxPlayers' data");
@@ -75,17 +76,16 @@ const Lobby = () => {
     fetchGameData(); 
 
     return () => {
-      disconnectWebSocket();
+      disconnectWebSocket();      
       console.log("Disconnected from WebSocket");
     };
+    
   }, []);
 
   const handleJoinGame = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await api.put(
-        `/dashboard/games/join/${gameId}`,
-        {},
+      const response = await api.put(`/dashboard/games/join/${gameId}`,{},
         {
           headers: { token: token },
         }
@@ -109,6 +109,8 @@ const Lobby = () => {
           headers: { token: token },
         }
       );
+      localStorage.removeItem("createflag")
+      localStorage.removeItem("joinGame")
       console.log("Joined left successfully", response.data);
       navigate(-1);
     } catch (error) {
@@ -118,6 +120,7 @@ const Lobby = () => {
       );
     }
   };
+
  
   const handleSubcribe = async () => {
     subscribeToChannel(
@@ -263,7 +266,7 @@ const Lobby = () => {
     </div>
     </Grid>
       <Grid item xs={4}>
-        <WebSocketChat />  {/* This is where the chat component gets rendered */}
+          
       </Grid>
     </Grid>
   </Box>

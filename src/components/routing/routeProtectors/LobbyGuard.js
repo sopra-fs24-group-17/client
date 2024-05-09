@@ -8,14 +8,16 @@ import Lobby from "../../views/Lobby";
  * @param props
  */
 export const LobbyGuard = () => {
-  if (localStorage.getItem("token")) {
+  const joinGame = localStorage.getItem("joinGame");
+  const createflag = localStorage.getItem("createflag")
+  const token  = localStorage.getItem("token")
+  if (token && (joinGame || createflag)) {
     return (
       <>
         <Lobby />
       </>
     );
   }
-
   return <Navigate to="/login" replace />;
 };
 

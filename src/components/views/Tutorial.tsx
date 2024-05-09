@@ -13,9 +13,12 @@ import randchick4 from 'components/game/cards/randchick-4.png';
 import seethefuture from 'components/game/cards/seethefuture-1.png';
 import shuffle from 'components/game/cards/shuffle-1.png';
 import skip from 'components/game/cards/skip-1.png';
+const currentPath = "dashboard/tutorial"
+
 
 
 const Tutorial = () => {
+    localStorage.setItem('previousPath', currentPath);
     return (
         <Container maxWidth={false} sx={{ mt: 2 }}>
             <Grid container direction="column" spacing={2}>
