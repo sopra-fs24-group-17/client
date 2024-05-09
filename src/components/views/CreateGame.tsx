@@ -171,7 +171,7 @@ const CreateGame: React.FC = () => {
           <TextField
             fullWidth
             variant="outlined"
-            disabled={gameCreated}
+            // disabled={gameCreated}
             value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`}
             multiline
             rows={2}
