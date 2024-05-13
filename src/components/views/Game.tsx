@@ -27,6 +27,7 @@ TODO:
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
   const userId = localStorage.getItem("id");
+  const username = localStorage.getItem("username");
   const [closedDeck, setClosedDeck] = useState(cardTypes);
   const [openDeck, setOpenDeck] = useState([]);
   const [playerHand, setPlayerHand] = useState([]);
@@ -40,7 +41,7 @@ const Game = () => {
   const [gameAlertWithInputDescription, setGameAlertWithInputDescription] = useState("");
   const [piles, setPiles] = useState([]);
   const [names, setNames] = useState([]);
-  const [targetUsername, setTargetUsername] = useState(userId);
+  const [targetUsername, setTargetUsername] = useState(username);
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
 
   const navigate = useNavigate();
@@ -198,8 +199,10 @@ const Game = () => {
       "gameId": gameId,
       "userId": userId,
       "cardIds": cardCodes,
-      "targetUserId": targetUsername
+      "targetUserId": userId,
+      "targetUsername": targetUsername
     });
+    setTargetUsername(username);
   }
 
   useEffect(() => {
