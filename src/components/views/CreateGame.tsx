@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api, handleError } from "helpers/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -21,7 +21,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
 import PopupNotification from "components/ui/TutorialPopup";
-
+ 
 const CreateGame: React.FC = () => {
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
@@ -34,10 +34,25 @@ const CreateGame: React.FC = () => {
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
   const [copySuccess, setCopySuccess] = useState('');
 
+  
 
   useEffect(() => {
     console.log("fetching user")
+    const prevpath = localStorage.getItem('previousPath');
+    const gameid = localStorage.getItem('gameId');
+    if (prevpath === "dashboard/tutorial") {
+      const storedGameSetup = localStorage.getItem('gameSetup');
+      if (storedGameSetup) {
+        const { mode, maxPlayers, selectedMode } = JSON.parse(storedGameSetup);
+        setIsPrivate(mode === 'PRIVATE');
+        setTotalPlayers(maxPlayers);
+        setGameMode(selectedMode);
+        setGameCode(gameid)
+        setGameCreated(true);
+        localStorage.removeItem('previousPath');
 
+      }
+    }
     const fetchUser = async () => {
       const response = await api.get(`/dashboard/${localStorage.getItem('id')}/profile`, {
         headers: { token: localStorage.getItem("token") },
@@ -50,8 +65,9 @@ const CreateGame: React.FC = () => {
       }
     };
     fetchUser();
-
   }, []);
+
+
 
   const handlePrivateToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsPrivate(event.target.checked);
@@ -72,7 +88,10 @@ const CreateGame: React.FC = () => {
     }
   };
 
+
+
   const createGame = async () => {
+
     const mode = isPrivate ? "PRIVATE" : "PUBLIC";
     const requestBody = JSON.stringify({
       mode: mode,
@@ -94,7 +113,11 @@ const CreateGame: React.FC = () => {
       const newGameCode = response.data.gameId;
       setGameCode(newGameCode);
       localStorage.setItem("gameId", newGameCode);
+      localStorage.setItem('gameSetup', JSON.stringify({ mode, maxPlayers: totalPlayers }));
       setGameCreated(true);
+      // localStorage.setItem('gameSetup', JSON.stringify({ mode, maxPlayers: totalPlayers, selectedMode: gameMode }));
+      
+
     } catch (error) {
       handleError(error);
       console.error("Error creating new game:", error);
@@ -102,6 +125,8 @@ const CreateGame: React.FC = () => {
     };
 
     const startGame = () => {
+      localStorage.removeItem('gameSetup');
+      localStorage.setItem("createflag", "true");
       navigate(`/lobby/${gameCode}`)
     };
   
@@ -146,6 +171,7 @@ const CreateGame: React.FC = () => {
           <TextField
             fullWidth
             variant="outlined"
+            // disabled={gameCreated}
             value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`}
             multiline
             rows={2}
@@ -177,6 +203,7 @@ const CreateGame: React.FC = () => {
           select
           id="number-of-players"
           value={totalPlayers}
+          disabled={gameCreated}
           onChange={handleNumberOfPlayersChange}
           variant="outlined"
           sx={{ mb: 2 }}

@@ -28,7 +28,7 @@ const JoinGame = () => {
           const response = await api.get('dashboard/games', {
             headers: { token }
           });
-          const publicGames = response.data.filter(game => game.mode === "PUBLIC");
+          const publicGames = response.data.filter(game => game.mode === "PUBLIC"&& game.currentPlayers && game.currentPlayers.length > 0);
           setGames(response.data);  
         }
       } catch (error) {
@@ -41,6 +41,7 @@ const JoinGame = () => {
 
   const handleJoinGame = async (gameId) => {
     localStorage.setItem("gameId", gameId);
+    localStorage.setItem("joinGame", "true");
     navigate(`/lobby/${gameId}`);
   };
 
