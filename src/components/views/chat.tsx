@@ -36,6 +36,10 @@ function WebSocketChat() {
           const msgData = JSON.parse(message.body);
           if (msgData.type === "STATE") {
             setActiveUsers(msgData.content.split(","));
+            const usersArray = msgData.content.split(",");
+            setActiveUsers(usersArray);
+            localStorage.setItem('activeUsersCount', usersArray.length.toString());
+            window.dispatchEvent(new CustomEvent('activeUsersUpdate', { detail: { count: usersArray.length } }));
             assignColorsToNewUsers(msgData.content.split(","));
           } else {
             onMessageReceived(msgData);
