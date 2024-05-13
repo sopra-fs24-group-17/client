@@ -5,21 +5,20 @@ import { Grid, Stack, Typography, Button } from "@mui/material";
 import { cardTypes } from "components/models/cards";
 import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
-import { playCard } from "components/game/playCard";
+// import { playCard } from "components/game/playCard";
 import GameAlert from "components/ui/GameAlert";
+import GameAlertWithInput from "components/ui/GameAlertWithInput";
 import EnemyPlayers from "components/views/EnemyPlayers";
 import FilledAlert from "./Alert";
 import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import "../../styles/Style.css";
+import { set } from "date-fns";
 
 /* 
 TODO: 
   Fix bugs:
-    - certain random chickens not both are taken away when playing a palindrome card
-    - wrong alert is shown when not your turn
-    - if i play favor and click on cancel, the card is still removed from my hand
-  
+    
   Features: 
     - If I play defuse, I want to be able to choose where to put the explosion card
 
@@ -28,6 +27,7 @@ TODO:
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
   const userId = localStorage.getItem("id");
+  const username = localStorage.getItem("username");
   const [closedDeck, setClosedDeck] = useState(cardTypes);
   const [openDeck, setOpenDeck] = useState([]);
   const [playerHand, setPlayerHand] = useState([]);
@@ -36,8 +36,13 @@ const Game = () => {
   const [gameAlertTitle, setGameAlertTitle] = useState("");
   const [gameAlertDescription, setGameAlertDescription] = useState("");
   const [postAlertAction, setPostAlertAction] = useState(null);
-  const [numberOfPlayers, setNumberOfPlayers] = useState(2);
+  const [gameAlertWithInputOpen, setGameAlertWithInputOpen] = useState(false);
+  const [gameAlertWithInputTitle, setGameAlertWithInputTitle] = useState("");
+  const [gameAlertWithInputDescription, setGameAlertWithInputDescription] = useState("");
   const [piles, setPiles] = useState([]);
+  const [names, setNames] = useState([]);
+  const [targetUsername, setTargetUsername] = useState(username);
+  const [cardCodeFavor, setCardCodeFavor] = useState([]);
 
   const navigate = useNavigate();
 
@@ -70,11 +75,12 @@ const Game = () => {
       if (gameState.topCardInternalCode) {
         handleOpenDeck(gameState.topCardInternalCode);
       }
-      if (gameState.numberOfPlayers) {
-        setNumberOfPlayers(gameState.numberOfPlayers);
-      }
       if (gameState.piles) {
         setPiles(gameState.piles);
+      }
+      if (gameState.playerNames) {
+        setNames(gameState.playerNames);
+        console.log(names)
       }
     } else if (gameState.type === "endGame") {
       gameAlertHandleOpen("Game Over!", "Game Over! The winner is: " + gameState.winningUser);
@@ -139,6 +145,71 @@ const Game = () => {
     }
   };
 
+  const gameAlertWithInputHandleOpen = (title, description) => {
+    setGameAlertWithInputTitle(title);
+    setGameAlertWithInputDescription(description);
+    setGameAlertWithInputOpen(true);
+  };
+
+  const gameAlertWithInputHandleClose = () => {
+    setGameAlertWithInputOpen(false);
+  };
+
+  const playCard = (cardId, cardName, cardCode) => {
+    let cardCodes = [cardCode]
+    let cardIncidesToRemove = []
+
+    if (!playerTurn) {
+      setGameAlertTitle("It's not your turn!");
+      setGameAlertDescription("You can only play a card when it's your turn. You can see that it is your turn by the alert at the top of the screen.");
+      setGameAlertOpen(true);
+      return;
+    }
+
+    const cardIndex = playerHand.findIndex((card) => card.code === cardCode);
+    cardIncidesToRemove.push(cardIndex)
+    if (cardIndex !== -1) {
+      if (cardName === "favor") {
+        gameAlertWithInputHandleOpen("Favor", "Choose a player to take a card from.");
+        setCardCodeFavor(cardCode);
+      } else if (["hairypotatocat", "tacocat", "beardcat", "cattermelon"].includes(cardName)) {
+        // If the card is a palindrome card, check if the player has another card of the same type
+        const otherCardIndex = playerHand.findIndex((card, index) => card.internalCode === cardId && card.code !== cardCode && index !== cardIndex);
+        if (otherCardIndex === -1) {
+          setGameAlertTitle("Where is your second card?");
+          setGameAlertDescription("You need two cards of the same type to play this card.");
+          setGameAlertOpen(true);
+          return;
+        } else {
+          cardCodes.push(playerHand[otherCardIndex].code);
+          cardIncidesToRemove.push(otherCardIndex);
+        }
+        sendMessageCardPlayed(cardCodes);
+      } else {
+        sendMessageCardPlayed(cardCodes);
+      }
+
+      const newPlayerHand = playerHand.filter((_, index) => !cardIncidesToRemove.includes(index));
+      setPlayerHand(newPlayerHand);
+    }
+  };
+
+  const sendMessageCardPlayed = (cardCodes) => {
+    sendMessage(`/app/move/cards/${gameId}/${userId}`, {
+      "gameId": gameId,
+      "userId": userId,
+      "cardIds": cardCodes,
+      "targetUserId": userId,
+      "targetUsername": targetUsername
+    });
+    setTargetUsername(username);
+  }
+
+  useEffect(() => {
+    sendMessageCardPlayed([cardCodeFavor]);
+  }, [targetUsername]);
+
+
   useEffect(() => {
     console.log("Player Hand updated: " + JSON.stringify(playerHand, null, 2));
   }, [playerHand]);
@@ -168,8 +239,20 @@ const Game = () => {
         title={gameAlertTitle}
         description={gameAlertDescription}
       />
+      <GameAlertWithInput
+        open={gameAlertWithInputOpen}
+        handleClose={gameAlertWithInputHandleClose}
+        title={gameAlertWithInputTitle}
+        description={gameAlertWithInputDescription}
+        playerNames={names}
+        onSubmit={(value) => {
+          console.log("Submitted value: " + value);
+          setTargetUsername(value);
+          gameAlertHandleClose();
+        }}
+      />
       <Grid item xs={12} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <EnemyPlayers piles={piles} />
+        <EnemyPlayers piles={piles} playerNames={names} />
       </Grid>
       <Grid item xs={6} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
@@ -222,7 +305,7 @@ const Game = () => {
               text={card.text}
               description={card.description}
               image={card.imageUrl}
-              onClick={() => playCard(card.internalCode, card.name, card.code, playerTurn, playerHand, setPlayerHand, sendMessage, setGameAlertOpen, setGameAlertTitle, setGameAlertDescription)}
+              onClick={() => playCard(card.internalCode, card.name, card.code)}
             />
           ))}
         </Stack>
