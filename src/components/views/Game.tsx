@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import CardComponent from "components/ui/CardComponent";
-import { Grid, Stack, Typography, Button } from "@mui/material";
+import { Grid, Stack, Typography, Button, Box } from "@mui/material";
 import { cardTypes } from "components/models/cards";
 import { connectWebSocket, subscribeToChannel, sendMessage } from "components/views/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
@@ -45,7 +45,7 @@ const Game = () => {
   const [gameAlertWithInputDescription, setGameAlertWithInputDescription] = useState("");
   const [piles, setPiles] = useState([]);
   const [names, setNames] = useState([]);
-  const [targetUsername, setTargetUsername] = useState(username);
+  const [targetUsername, setTargetUsername] = useState(null);
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
   const [explode, setExplode] = useState(false);
 
@@ -83,6 +83,9 @@ const Game = () => {
       }
       if (gameState.piles) {
         setPiles(gameState.piles);
+        if (gameState.piles.dealer === 0) {
+          setClosedDeck([]);
+        }
       }
       if (gameState.playerNames) {
         setNames(gameState.playerNames);
@@ -222,10 +225,9 @@ const Game = () => {
       "gameId": gameId,
       "userId": userId,
       "cardIds": cardCodes,
-      "targetUserId": userId,
       "targetUsername": targetUsername
     });
-    setTargetUsername(username);
+    setTargetUsername(null);
   }
 
   useEffect(() => {
@@ -298,7 +300,7 @@ const Game = () => {
       <Grid item xs={6} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
         <div className="card-stack">
-          {closedDeck.slice(0, 5).map(
+          {closedDeck.map(
             (
               card
             ) => (
@@ -339,17 +341,27 @@ const Game = () => {
       </Grid>
       <Grid item xs={12} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         {/* Player's Hand */}
-        <Stack spacing={1} direction="row">
-          {playerHand.map((card, index) => (
-            <CardComponent
-              key={`${card.internalCode}-${index}`}
-              text={card.text}
-              description={card.description}
-              image={card.imageUrl}
-              onClick={() => playCard(card.internalCode, card.name, card.code)}
-            />
-          ))}
-        </Stack>
+        <Box sx={{
+          overflowX: 'auto',
+          whiteSpace: 'nowrap',
+          scrollbarWidth: 'none', // For Firefox
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          margin: "10px",
+        }}>
+          <Stack spacing={1} direction="row" margin={"10px"}>
+            {playerHand.map((card, index) => (
+              <CardComponent
+                key={`${card.internalCode}-${index}`}
+                text={card.text}
+                description={card.description}
+                image={card.imageUrl}
+                onClick={() => playCard(card.internalCode, card.name, card.code)}
+              />
+            ))}
+          </Stack>
+        </Box>
       </Grid>
     </Grid >
   );

@@ -55,6 +55,7 @@ export default function GameAlertWithInput({ open, handleClose, title, descripti
                 <Select
                     value={selectedPlayer}
                     onChange={handleChange}
+                    sx={{ width: '50%', marginTop: '10px'}}
                 >
                     {names.map((name, index) => (
                         <MenuItem value={name} key={index}>
