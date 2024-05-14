@@ -7,6 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { TextField, Typography } from '@mui/material';
 
 interface GameAlertWithInputProps {
     open: boolean;
@@ -15,10 +16,17 @@ interface GameAlertWithInputProps {
     description: string;
     playerNames: string[];
     onSubmit: (value: string) => void;
+    piles?: { [key: string]: number };
 }
 
-export default function GameAlertWithInput({ open, handleClose, title, description, playerNames, onSubmit }: GameAlertWithInputProps) {
-    const [selectedPlayer, setSelectedPlayer] = React.useState('');
+export default function GameAlertWithInput({ open, handleClose, title, description, playerNames, onSubmit, piles }: GameAlertWithInputProps) {
+    const [selectedPlayer, setSelectedPlayer] = React.useState(null);
+    const [placementIndex, setPlacementIndex] = React.useState(null);
+    const [dealerDeckCount, setDealerDeckCount] = React.useState(0);
+
+    if (piles) {
+        setDealerDeckCount(piles["dealer"]);
+    }
 
     const names = playerNames.filter(name => name !== localStorage.getItem('username'));
 
@@ -26,10 +34,19 @@ export default function GameAlertWithInput({ open, handleClose, title, descripti
         setSelectedPlayer(event.target.value as string);
     };
 
+    const handleChangeExplosion = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setPlacementIndex(event.target.value as number);
+    };
+
     const handleSubmit = () => {
         if (selectedPlayer) {
             onSubmit(selectedPlayer);
-            setSelectedPlayer('');
+            setSelectedPlayer(null);
+            handleClose();
+        }
+        else if (placementIndex) {
+            onSubmit(placementIndex.toString());
+            setPlacementIndex(null);
             handleClose();
         }
     };
@@ -52,20 +69,34 @@ export default function GameAlertWithInput({ open, handleClose, title, descripti
                 <DialogContentText id="alert-dialog-description">
                     {description}
                 </DialogContentText>
-                <Select
-                    value={selectedPlayer}
-                    onChange={handleChange}
-                    sx={{ width: '50%', marginTop: '10px'}}
-                >
-                    {names.map((name, index) => (
-                        <MenuItem value={name} key={index}>
-                            {name}
-                        </MenuItem>
-                    ))}
-                </Select>
+                {(title === "Favor" &&
+                    <Select
+                        value={selectedPlayer}
+                        onChange={handleChange}
+                        sx={{ width: '50%', marginTop: '10px' }}
+                    >
+                        {names.map((name, index) => (
+                            <MenuItem value={name} key={index}>
+                                {name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                )}
+                {(title === "Explosion Time" &&
+                    <> 
+                        <Typography variant="body1">
+                            Currently the dealer deck has {dealerDeckCount} cards.
+                        </Typography>
+                        <TextField
+                            type="number"
+                            value={placementIndex}
+                            onChange={handleChangeExplosion}
+                        />
+                    </>
+                )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleSubmit} autoFocus disabled={!selectedPlayer}>
+                <Button onClick={handleSubmit} autoFocus disabled={!placementIndex && !selectedPlayer}>
                     Submit
                 </Button>
             </DialogActions>

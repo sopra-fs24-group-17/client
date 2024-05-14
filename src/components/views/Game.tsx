@@ -46,6 +46,7 @@ const Game = () => {
   const [piles, setPiles] = useState([]);
   const [names, setNames] = useState([]);
   const [targetUsername, setTargetUsername] = useState(null);
+  const [placementIndex, setPlacementIndex] = useState(null);
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
   const [explode, setExplode] = useState(false);
 
@@ -70,6 +71,8 @@ const Game = () => {
       cardStolen(gameState.cards);
     } else if (gameState.type === "defuseCard") {
       handleDefuseCard();
+    } else if (gameState.type === "placementRequest") {
+      handlePlacementRequest();
     }
   }, []);
 
@@ -141,6 +144,10 @@ const Game = () => {
       return prevHand;
     });
   };
+
+  const handlePlacementRequest = () => {
+    gameAlertWithInputHandleOpen("Explosion Time", "Choose where on the dealer deck you want to place the explosion.");
+  }
 
   const handleOpenDeck = (topCardInternalCode) => {
     const topCard = cardTypes.find(card => card.name === topCardInternalCode);
@@ -231,8 +238,16 @@ const Game = () => {
   }
 
   useEffect(() => {
-    sendMessageCardPlayed([cardCodeFavor]);
+    if (targetUsername) {
+      sendMessageCardPlayed([cardCodeFavor]);
+    }
   }, [targetUsername]);
+
+  useEffect(() => {
+    if (placementIndex) {
+      sendMessage(`/app/handleExplosion/${gameId}/${userId}/${placementIndex}`, {});
+    }
+  }, [placementIndex]);
 
 
   useEffect(() => {
@@ -290,7 +305,11 @@ const Game = () => {
         playerNames={names}
         onSubmit={(value) => {
           console.log("Submitted value: " + value);
-          setTargetUsername(value);
+          if (gameAlertWithInputTitle === "Favor") {
+            setTargetUsername(value);
+          } else if (gameAlertWithInputTitle === "Explosion Time") {
+            setPlacementIndex(value);
+          }
           gameAlertHandleClose();
         }}
       />
