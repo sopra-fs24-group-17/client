@@ -72,7 +72,7 @@ const Register = () => {
   const verifyPassword = (password2) => {
     setPassword2(password2);
     setPasswordsMatch(password === password2);
-  }
+  };
 
   return (
     <Layout>

@@ -9,8 +9,8 @@ import Lobby from "../../views/Lobby";
  */
 export const LobbyGuard = () => {
   const joinGame = localStorage.getItem("joinGame");
-  const createflag = localStorage.getItem("createflag")
-  const token  = localStorage.getItem("token")
+  const createflag = localStorage.getItem("createflag");
+  const token = localStorage.getItem("token");
   if (token && (joinGame || createflag)) {
     return (
       <>
