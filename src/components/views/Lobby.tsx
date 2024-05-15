@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import React, { useEffect, useState , useRef, useCallback } from "react";
-import { useNavigate, useParams, useLocation  } from "react-router-dom";
+import PropTypes from "prop-types";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { api, handleError } from "helpers/api";
 import {
   connectWebSocket,
@@ -8,8 +8,8 @@ import {
   subscribeToChannel,
   sendMessage,
 } from "./WebsocketConnection";
-import {Grid, Button, Box } from "@mui/material";
-import WebSocketChat from './chat'; 
+import { Grid, Button, Box } from "@mui/material";
+import WebSocketChat from "./chat";
 import { hints, getRandomHint } from "components/lobby/hints.js";
 
 const Lobby = () => {
@@ -24,38 +24,41 @@ const Lobby = () => {
   const storedUsername = localStorage.getItem("username");
 
   useEffect(() => {
-    
-    if (currentPlayers === totalPlayersRequired && storedUsername === localStorage.getItem("creator")) {
+    if (
+      currentPlayers === totalPlayersRequired &&
+      storedUsername === localStorage.getItem("creator")
+    ) {
       setJoinButtonDisabled(false);
     } else {
       setJoinButtonDisabled(true);
     }
   }, [currentPlayers, totalPlayersRequired]);
 
-
   useEffect(() => {
     const fetchGameData = async () => {
       const token = localStorage.getItem("token");
       try {
         const response = await api.get(`dashboard/games`, {
-          headers: { 'token': token } 
+          headers: { token: token },
         });
         // This is to find the game we want from all the slots to take the info we want
         if (response.data && response.data.length > 0) {
-          const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
-          
+          const game = response.data.find(
+            (game) => game.gameId === parseInt(gameId, 10)
+          );
+
           if (game && game.maxPlayers !== undefined) {
             setTotalPlayersRequired(game.maxPlayers);
             setCurrentPlayers(game.currentPlayers);
             localStorage.setItem("creator", game.initiatingUserName);
-            
           } else {
-            console.error("Game with specified ID not found or lacks 'maxPlayers' data");
+            console.error(
+              "Game with specified ID not found or lacks 'maxPlayers' data"
+            );
           }
         } else {
           console.error("Invalid or empty response data");
         }
-        
 
         // Initialize WebSocket connection using @stomp/stompjs
         const initialiseWebsocketConnection = async () => {
@@ -66,26 +69,28 @@ const Lobby = () => {
         try {
           await handleJoinGame();
         } catch {
-          console.error("Error joining game, did you try to join game with the initiator?")
+          console.error(
+            "Error joining game, did you try to join game with the initiator?"
+          );
         }
-
       } catch (error) {
         console.error("Failed to fetch game data:", error);
       }
     };
-    fetchGameData(); 
+    fetchGameData();
 
     return () => {
-      disconnectWebSocket();      
+      disconnectWebSocket();
       console.log("Disconnected from WebSocket");
     };
-    
   }, []);
 
   const handleJoinGame = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await api.put(`/dashboard/games/join/${gameId}`,{},
+      const response = await api.put(
+        `/dashboard/games/join/${gameId}`,
+        {},
         {
           headers: { token: token },
         }
@@ -109,8 +114,8 @@ const Lobby = () => {
           headers: { token: token },
         }
       );
-      localStorage.removeItem("createflag")
-      localStorage.removeItem("joinGame")
+      localStorage.removeItem("createflag");
+      localStorage.removeItem("joinGame");
       console.log("Joined left successfully", response.data);
       navigate(-1);
     } catch (error) {
@@ -121,7 +126,6 @@ const Lobby = () => {
     }
   };
 
- 
   const handleSubcribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
@@ -136,45 +140,40 @@ const Lobby = () => {
         }
 
         if (messageBody === "lets all start together guys") {
-          navigate(`/game`); 
+          navigate(`/game`);
         }
       },
       { id: `sub-${gameId}` }
     );
-    };
+  };
   const handleStartGame = async () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
     sendMessage(`/app/start/${gameId}`, {});
-  }
+  };
 
-
-  
   useEffect(() => {
     let lastHint = currentHint.hint; // Change to handle the hint property
-    
+
     const updateHint = () => {
       let newHintObject = getRandomHint();
       let attemptCount = 0;
-  
+
       while (newHintObject.hint === lastHint && attemptCount < 10) {
         newHintObject = getRandomHint();
         attemptCount++;
       }
-  
+
       setCurrentHint(newHintObject); // This now contains both hint and image
       console.log(newHintObject.hint);
       lastHint = newHintObject.hint; // Update lastHint for the next interval
     };
-  
+
     updateHint();
     const intervalId = setInterval(updateHint, 10000);
-  
+
     return () => clearInterval(intervalId);
   }, []);
-  
-  
 
-  
   const lobbyContainerStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -199,78 +198,89 @@ const Lobby = () => {
     marginTop: "10px",
   };
 
-  const hintContainerStyle: React.CSSProperties= {
+  const hintContainerStyle: React.CSSProperties = {
     backgroundColor: "#f0f0f0",
     padding: "20px",
     width: "600px",
     borderRadius: "8px",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    display: "flex",  
-    flexDirection: "column",  
-    alignItems: "center",  
-    justifyContent: "center",     
-    textAlign: "center",  
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
   };
 
-
   const hintListStyle = {
-    listStyleType: "none",  
-    padding: 0,  
-    margin: 0,  
-    width: "100%",  
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+    width: "100%",
   };
 
   const hintListItemStyle = {
     marginBottom: "5px",
-    textAlign: "center", 
+    textAlign: "center",
   };
 
   return (
     <Box sx={{ flexGrow: 1, height: "100vh" }}>
-    <Grid container spacing={2}>
-      <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}> 
-    <div style={lobbyContainerStyle}>
-      <div style={statusContainerStyle}>
-        <h2>Waiting for players to join...</h2>
-        <div style={playersStatusStyle}>
-          {currentPlayers} out of {totalPlayersRequired} players 
-        </div>
-        {currentPlayers === totalPlayersRequired && (
-          <div style={checkIconStyle}>✓</div>
-        )}
-      </div>
-      <div style={hintContainerStyle}>
-        <ul style={hintListStyle}>
-          <li>{currentHint.hint}</li>
-          {currentHint.image ? (<img src={currentHint.image} alt="Card Image" style={{ maxWidth: '100px', marginTop: '10px' }} />) : null }
-        </ul>
-      </div>
-      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>  
-        <Button
-          onClick={handleStartGame}  
-          disabled={joinButtonDisabled}  
-          variant="contained"
-          color="success"
+      <Grid container spacing={2}>
+        <Grid
+          item
+          xs={8}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          Start Game
-        </Button>
-        <Button
-          onClick={handleLeaveGame}
-          disabled={leaveButtonDisabled}
-          variant="contained"
-          color="error"
-        >
-          Leave Lobby
-        </Button>
-      </Box>
-    </div>
-    </Grid>
-      <Grid item xs={4}>
-          
+          <div style={lobbyContainerStyle}>
+            <div style={statusContainerStyle}>
+              <h2>Waiting for players to join...</h2>
+              <div style={playersStatusStyle}>
+                {currentPlayers} out of {totalPlayersRequired} players
+              </div>
+              {currentPlayers === totalPlayersRequired && (
+                <div style={checkIconStyle}>✓</div>
+              )}
+            </div>
+            <div style={hintContainerStyle}>
+              <ul style={hintListStyle}>
+                <li>{currentHint.hint}</li>
+                {currentHint.image ? (
+                  <img
+                    src={currentHint.image}
+                    alt="Card Image"
+                    style={{ maxWidth: "100px", marginTop: "10px" }}
+                  />
+                ) : null}
+              </ul>
+            </div>
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <Button
+                onClick={handleStartGame}
+                disabled={joinButtonDisabled}
+                variant="contained"
+                color="success"
+              >
+                Start Game
+              </Button>
+              <Button
+                onClick={handleLeaveGame}
+                disabled={leaveButtonDisabled}
+                variant="contained"
+                color="error"
+              >
+                Leave Lobby
+              </Button>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={4}></Grid>
       </Grid>
-    </Grid>
-  </Box>
-
+    </Box>
   );
 };
 

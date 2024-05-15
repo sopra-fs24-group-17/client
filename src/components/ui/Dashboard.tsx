@@ -19,9 +19,9 @@ import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Button, Divider, IconButton } from "@mui/material";
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { api, handleError } from "helpers/api";
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const drawerWidth = 240;
 
@@ -40,32 +40,36 @@ export default function ClippedDrawer() {
 
   const handleNestedListToggle = (category) => {
     if (openNestedList === category) {
-      setOpenNestedList(null); 
+      setOpenNestedList(null);
     } else {
-      setOpenNestedList(category); 
+      setOpenNestedList(category);
     }
   };
 
   const handleLogout = async () => {
-    const userId = localStorage.getItem("id")
-    const token = localStorage.getItem("token")
+    const userId = localStorage.getItem("id");
+    const token = localStorage.getItem("token");
     try {
-      const response = await api.post(`/dashboard/${userId}/logout`,{}, {
-        headers: {
-          'token': token
-        },
-      });
+      const response = await api.post(
+        `/dashboard/${userId}/logout`,
+        {},
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
 
-        localStorage.removeItem("id"); 
-        localStorage.removeItem("token")
-        navigate("/login"); 
+      localStorage.removeItem("id");
+      localStorage.removeItem("token");
+      navigate("/login");
     } catch (error) {
       console.error("Failed to logout:", error);
     }
   };
 
   const handleTutorialClick = () => {
-    navigate("/dashboard/tutorial"); 
+    navigate("/dashboard/tutorial");
   };
 
   return (
@@ -79,8 +83,12 @@ export default function ClippedDrawer() {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Group 17
           </Typography>
-          <IconButton color="inherit" onClick={handleTutorialClick} sx={{ fontSize: '2rem' }}>
-            <HelpOutlineIcon sx={{ fontSize: '2rem' }} />
+          <IconButton
+            color="inherit"
+            onClick={handleTutorialClick}
+            sx={{ fontSize: "2rem" }}
+          >
+            <HelpOutlineIcon sx={{ fontSize: "2rem" }} />
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -181,7 +189,7 @@ export default function ClippedDrawer() {
           <Box sx={{ marginTop: "auto" }}>
             <Divider />
             <ListItemButton onClick={handleLogout}>
-            <ListItemIcon>
+              <ListItemIcon>
                 <ExitToAppIcon />
               </ListItemIcon>
               <ListItemText primary="Logout" />

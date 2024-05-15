@@ -1,17 +1,16 @@
-import attack from 'components/game/cards/attack-1.png';
-import chicken from 'components/game/cards/chicken.png';
-import defuse from 'components/game/cards/defuse-1.png';
-import favor from 'components/game/cards/favor-1.png';
-import nope from 'components/game/cards/nope.png';
-import randchick1 from 'components/game/cards/randchick-1.png';
-import randchick2 from 'components/game/cards/randchick-2.png';
-import randchick3 from 'components/game/cards/randchick-3.png';
-import randchick4 from 'components/game/cards/randchick-4.png';
-import seethefuture from 'components/game/cards/seethefuture-1.png';
-import shuffle from 'components/game/cards/shuffle-1.png';
-import skip from 'components/game/cards/skip-1.png';
-import lucky from 'components/game/cards/getlucky.png';
-
+import attack from "components/game/cards/attack-1.png";
+import chicken from "components/game/cards/chicken.png";
+import defuse from "components/game/cards/defuse-1.png";
+import favor from "components/game/cards/favor-1.png";
+import nope from "components/game/cards/nope.png";
+import randchick1 from "components/game/cards/randchick-1.png";
+import randchick2 from "components/game/cards/randchick-2.png";
+import randchick3 from "components/game/cards/randchick-3.png";
+import randchick4 from "components/game/cards/randchick-4.png";
+import seethefuture from "components/game/cards/seethefuture-1.png";
+import shuffle from "components/game/cards/shuffle-1.png";
+import skip from "components/game/cards/skip-1.png";
+import lucky from "components/game/cards/getlucky.png";
 
 export const cardTypes = [
   {

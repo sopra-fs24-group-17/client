@@ -11,7 +11,7 @@ interface CardProps {
 const CardComponent: React.FC<CardProps> = ({ text, image, onClick }) => {
   return (
     <motion.div whileHover={{ scale: 1.1 }}>
-      <Card sx={{ width: 125, height: 175 }} onClick={onClick} >
+      <Card sx={{ width: 125, height: 175 }} onClick={onClick}>
         <CardMedia
           component="img"
           height="175" // Adjust height as needed
