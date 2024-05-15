@@ -80,7 +80,8 @@ const Game = () => {
     const gameState = JSON.parse(message.body);
     if (gameState.type === "explosion" && gameState.terminatingUser !== userId) {
       handleExplosion(gameState.terminatingUser);
-    } else if (gameState.type === "gameState") {
+    }
+    else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
         handleOpenDeck(gameState.topCardInternalCode);
       }
@@ -94,11 +95,29 @@ const Game = () => {
         setNames(gameState.playerNames);
         console.log(names)
       }
-    } else if (gameState.type === "endGame") {
+    }
+    else if (gameState.type === "endGame") {
       gameAlertHandleOpen("Game Over!", "Game Over! The winner is: " + gameState.winningUser);
       setPostAlertAction(() => () => navigate("/dashboard/join-game"));
     }
+    else if (gameState.type === "cardPlayed" && gameState.userName === username) {
+      handleCardPlayed(gameState.externalCode)
+    }
   }, []);
+
+  const handleCardPlayed = (externalCode) => {
+    setPlayerHand(prevHand => {
+      console.log("Player Hand: " + JSON.stringify(prevHand, null, 2));
+      const index = prevHand.findIndex((card) => card.code === externalCode);
+      console.log("Index of card played: " + index)
+      if (index !== -1) {
+        const newPlayerHand = [...prevHand];
+        newPlayerHand.splice(index, 1);
+        return newPlayerHand;
+      }
+      return prevHand;
+    });
+  }
 
   const peekIntoDeck = (cards) => {
     const cardsString = cards.map(card => `${card.internalCode}`).join('\n');
@@ -200,7 +219,7 @@ const Game = () => {
     }
 
     const cardIndex = playerHand.findIndex((card) => card.code === cardCode);
-    cardIncidesToRemove.push(cardIndex)
+    // cardIncidesToRemove.push(cardIndex)
     if (cardIndex !== -1) {
       if (cardName === "favor") {
         gameAlertWithInputHandleOpen("Favor", "Choose a player to take a card from.");
@@ -215,15 +234,15 @@ const Game = () => {
           return;
         } else {
           cardCodes.push(playerHand[otherCardIndex].code);
-          cardIncidesToRemove.push(otherCardIndex);
+          // cardIncidesToRemove.push(otherCardIndex);
         }
         sendMessageCardPlayed(cardCodes);
       } else {
         sendMessageCardPlayed(cardCodes);
       }
 
-      const newPlayerHand = playerHand.filter((_, index) => !cardIncidesToRemove.includes(index));
-      setPlayerHand(newPlayerHand);
+      // const newPlayerHand = playerHand.filter((_, index) => !cardIncidesToRemove.includes(index));
+      // setPlayerHand(newPlayerHand);
     }
   };
 
