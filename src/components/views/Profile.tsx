@@ -22,12 +22,9 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import EditProfile from "./EditProfile";
 import BlockIcon from "@mui/icons-material/Block";
 import ChangePassword from "./ChangePassword";
-import placeholder from 'components/game/profile_image_placeholder.webp';
+import placeholder from "components/game/profile_image_placeholder.webp";
 import { FlagIcon } from "react-flag-kit";
 import countryList from "react-select-country-list";
-
-
-
 
 interface ProfileProps {
   userId: string;
@@ -121,7 +118,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   }
 
   const countryNameToCode = (countryName) => {
-    const country = countryList().getData().find(c => c.label === countryName);
+    const country = countryList()
+      .getData()
+      .find((c) => c.label === countryName);
     return country ? country.value : null;
   };
 
@@ -186,55 +185,109 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                 sx={{
                   height: "45vh",
                 }}
-                image={
-                  avatarPath
-                    ? avatarPath
-                    : placeholder
-                }
+                image={avatarPath ? avatarPath : placeholder}
                 title="profile"
               />
 
-            <CardContent style={{ paddingLeft: '35px', paddingRight: '35px' }}>
-              <Typography gutterBottom variant="h5" color="text.secondary" align="center" marginBottom={2.5}>
-                {user.status === "ONLINE" ? (
-                  <FiberManualRecordIcon style={{ marginRight: 5, fontSize: 20, color: "green", verticalAlign: "-2px" }} />
-                ) : (
-                  <FiberManualRecordIcon style={{ marginRight: 5, fontSize: 20, color: "red", verticalAlign: "-2px" }} />
-                )}
-                {user.username}
-              </Typography>
+              <CardContent
+                style={{ paddingLeft: "35px", paddingRight: "35px" }}
+              >
+                <Typography
+                  gutterBottom
+                  variant="h5"
+                  color="text.secondary"
+                  align="center"
+                  marginBottom={2.5}
+                >
+                  {user.status === "ONLINE" ? (
+                    <FiberManualRecordIcon
+                      style={{
+                        marginRight: 5,
+                        fontSize: 20,
+                        color: "green",
+                        verticalAlign: "-2px",
+                      }}
+                    />
+                  ) : (
+                    <FiberManualRecordIcon
+                      style={{
+                        marginRight: 5,
+                        fontSize: 20,
+                        color: "red",
+                        verticalAlign: "-2px",
+                      }}
+                    />
+                  )}
+                  {user.username}
+                </Typography>
 
-
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
                   {[
-                    { label: 'Created on:', value: user.creationdate.slice(0, 10) },
-                    { label: 'Birthday:', value: user.birthdate ? user.birthdate.slice(0, 10) : "Not set" },
-                    { label: 'Email:', value: user.email },
-                    { label: 'Country:', value: user.countryoforigin ? user.countryoforigin : "Not set", flag: user.countryoforigin },
+                    {
+                      label: "Created on:",
+                      value: user.creationdate.slice(0, 10),
+                    },
+                    {
+                      label: "Birthday:",
+                      value: user.birthdate
+                        ? user.birthdate.slice(0, 10)
+                        : "Not set",
+                    },
+                    { label: "Email:", value: user.email },
+                    {
+                      label: "Country:",
+                      value: user.countryoforigin
+                        ? user.countryoforigin
+                        : "Not set",
+                      flag: user.countryoforigin,
+                    },
                   ].map((item, index) => (
-                    <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '10px' }}>
-                      <span style={{paddingRight: "10px"}}>{item.label}</span>
-                        <span style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 'bold',
-                          overflow: item.label === 'Email:' ? 'hidden' : undefined,
-                          whiteSpace: item.label === 'Email:' ? 'nowrap' : undefined,
-                          textOverflow: item.label === 'Email:' ? 'ellipsis' : undefined,
-                          cursor: 'default' 
+                    <div
+                      key={index}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        width: "100%",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <span style={{ paddingRight: "10px" }}>{item.label}</span>
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          fontWeight: "bold",
+                          overflow:
+                            item.label === "Email:" ? "hidden" : undefined,
+                          whiteSpace:
+                            item.label === "Email:" ? "nowrap" : undefined,
+                          textOverflow:
+                            item.label === "Email:" ? "ellipsis" : undefined,
+                          cursor: "default",
                         }}
-                        title={item.value} 
-                        >                          
-                          {item.value}
-                          {item.flag && (
-                            <FlagIcon code={countryNameToCode(user.countryoforigin)} size={35} style={{ marginLeft: 8, verticalAlign: 'middle' }} />
-                          )}
-                        </span>
+                        title={item.value}
+                      >
+                        {item.value}
+                        {item.flag && (
+                          <FlagIcon
+                            code={countryNameToCode(user.countryoforigin)}
+                            size={35}
+                            style={{ marginLeft: 8, verticalAlign: "middle" }}
+                          />
+                        )}
+                      </span>
                     </div>
                   ))}
                 </div>
-            </CardContent>
-
+              </CardContent>
 
               <CardActions sx={{ justifyContent: "center", marginBottom: 2 }}>
                 {currentUserID === userId && (

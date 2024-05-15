@@ -37,24 +37,20 @@ const AppRouter = () => {
         <Route path="/register" element={<RegisterGuard />}>
           <Route path="/register" element={<Register />} />
         </Route>
-
         <Route path="/login" element={<LoginGuard />}>
           <Route path="/login" element={<Login />} />
         </Route>
-
         <Route path="/forgot-password" element={<ForgotPasswordGuard />}>
           <Route path="/forgot-password" element={<PasswordForgotten />} />
         </Route>
-
         <Route path="/game/*" element={<GameGuard />}>
           <Route index element={<Game />} />
           <Route path="chat/:gameId" element={<WebSocketChat />} />
         </Route>
-s
-        <Route path="/lobby/:gameId"  element={<LobbyGuard />}>
+        s
+        <Route path="/lobby/:gameId" element={<LobbyGuard />}>
           <Route index element={<Lobby />} />
         </Route>
-
         <Route path="/dashboard/*" element={<DashboardGuard />}>
           <Route index element={<Drawer />} />
           <Route path="join-game" element={<JoinGame />} />
@@ -63,11 +59,8 @@ s
           <Route path="friends" element={<FriendsList />} />
           <Route path="all-players" element={<AllPlayers />} />
           <Route path="tutorial" element={<Tutorial />} />
-
         </Route>
-
         <Route path="/" element={<Navigate to="/login" replace />} />
-
       </Routes>
     </BrowserRouter>
   );

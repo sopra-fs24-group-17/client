@@ -1,6 +1,6 @@
 import { Grid, Paper, Box } from "@mui/material";
 import React from "react";
-import chickenImage from 'components/game/chicken.png';
+import chickenImage from "components/game/chicken.png";
 
 // Use `chickenImage` in your code
 

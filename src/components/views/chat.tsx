@@ -9,10 +9,20 @@ import {
 } from "components/views/WebsocketConnection";
 
 const colors = [
-  "#2196F3", "#32c787", "#00BCD4", "#ff5652",
-  "#ffc107", "#ff85af", "#FF9800", "#39bbb0",
-  "#4CAF50", "#e91e63", "#795548", "#9c27b0",
-  "#03a9f4", "#4caf50"
+  "#2196F3",
+  "#32c787",
+  "#00BCD4",
+  "#ff5652",
+  "#ffc107",
+  "#ff85af",
+  "#FF9800",
+  "#39bbb0",
+  "#4CAF50",
+  "#e91e63",
+  "#795548",
+  "#9c27b0",
+  "#03a9f4",
+  "#4caf50",
 ];
 
 function WebSocketChat() {
@@ -31,22 +41,27 @@ function WebSocketChat() {
   useEffect(() => {
     if (username && !connected) {
       setConnected(true);
-      connectWebSocket().then(client => {
-        const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
-          const msgData = JSON.parse(message.body);
-          if (msgData.type === "STATE") {
-            setActiveUsers(msgData.content.split(","));
-            assignColorsToNewUsers(msgData.content.split(","));
-          } else {
-            onMessageReceived(msgData);
-          }
+      connectWebSocket()
+        .then((client) => {
+          const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
+            const msgData = JSON.parse(message.body);
+            if (msgData.type === "STATE") {
+              setActiveUsers(msgData.content.split(","));
+              assignColorsToNewUsers(msgData.content.split(","));
+            } else {
+              onMessageReceived(msgData);
+            }
+          });
+          setSubscription(sub);
+          sendMessage(`/app/chat/${roomId}/addUser`, {
+            sender: username,
+            type: "JOIN",
+          });
+        })
+        .catch((error) => {
+          console.error("Connection failed: ", error);
+          setConnected(false);
         });
-        setSubscription(sub);
-        sendMessage(`/app/chat/${roomId}/addUser`, { sender: username, type: "JOIN" });
-      }).catch(error => {
-        console.error("Connection failed: ", error);
-        setConnected(false);
-      });
     }
 
     return () => {
@@ -64,7 +79,10 @@ function WebSocketChat() {
   }, [messages]);
 
   const handleDisconnect = () => {
-    sendMessage(`/app/chat/${roomId}/addUser`, { sender: username, type: "LEAVE" });
+    sendMessage(`/app/chat/${roomId}/addUser`, {
+      sender: username,
+      type: "LEAVE",
+    });
     setConnected(false);
     disconnectWebSocket();
     if (subscription) {
@@ -78,7 +96,7 @@ function WebSocketChat() {
       const chatMessage = {
         sender: username,
         content: messageContent,
-        type: "CHAT"
+        type: "CHAT",
       };
       sendMessage(`/app/chat/${roomId}/sendMessage`, chatMessage);
       setMessageContent("");
@@ -86,13 +104,13 @@ function WebSocketChat() {
   };
 
   const onMessageReceived = (message) => {
-    setMessages(messages => [...messages, message]);
+    setMessages((messages) => [...messages, message]);
   };
 
   const assignColorsToNewUsers = (newUsers) => {
-    setUserColors(prevColors => {
-      const updatedColors = {...prevColors};
-      newUsers.forEach(user => {
+    setUserColors((prevColors) => {
+      const updatedColors = { ...prevColors };
+      newUsers.forEach((user) => {
         if (!updatedColors[user]) {
           updatedColors[user] = getUniqueColor(Object.values(updatedColors));
         }
@@ -122,26 +140,47 @@ function WebSocketChat() {
             <div className={styles.activeUsers}>
               {Object.keys(userColors).map((user, index) => (
                 <div key={index} className={styles.activeUserContainer}>
-                  <div className={styles.userAvatar} style={{ backgroundColor: userColors[user] }}>
-                    <span className={styles.avatarLetter}>{user.charAt(0)}</span>
+                  <div
+                    className={styles.userAvatar}
+                    style={{ backgroundColor: userColors[user] }}
+                  >
+                    <span className={styles.avatarLetter}>
+                      {user.charAt(0)}
+                    </span>
                   </div>
-                  <span className={styles.userName}>{user}</span> {/* Display username */}
+                  <span className={styles.userName}>{user}</span>{" "}
+                  {/* Display username */}
                 </div>
               ))}
             </div>
           </div>
           <ul className={styles.messageList}>
             {messages.map((msg, i) => (
-              <li key={i}
-                className={msg.type === "JOIN" || msg.type === "LEAVE" ? styles.eventMessage : msg.sender === username ? styles.myMessage : styles.otherMessage}>
+              <li
+                key={i}
+                className={
+                  msg.type === "JOIN" || msg.type === "LEAVE"
+                    ? styles.eventMessage
+                    : msg.sender === username
+                      ? styles.myMessage
+                      : styles.otherMessage
+                }
+              >
                 {msg.type === "JOIN" || msg.type === "LEAVE" ? (
                   `${msg.sender} ${msg.type === "JOIN" ? "joined" : "left"}`
                 ) : (
                   <div className={styles.messageContent}>
-                    <div className={styles.userAvatar} style={{ backgroundColor: userColors[msg.sender] }}>
-                      <span className={styles.avatarLetter}>{msg.sender.charAt(0)}</span>
+                    <div
+                      className={styles.userAvatar}
+                      style={{ backgroundColor: userColors[msg.sender] }}
+                    >
+                      <span className={styles.avatarLetter}>
+                        {msg.sender.charAt(0)}
+                      </span>
                     </div>
-                    <span style={{ color: userColors[msg.sender] }}>{msg.content}</span>
+                    <span style={{ color: userColors[msg.sender] }}>
+                      {msg.content}
+                    </span>
                   </div>
                 )}
               </li>
@@ -157,7 +196,9 @@ function WebSocketChat() {
               className={styles.formControl}
               required
             />
-            <button type="submit" className={styles.primary}>Send</button>
+            <button type="submit" className={styles.primary}>
+              Send
+            </button>
           </form>
         </div>
       ) : (

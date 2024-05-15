@@ -49,30 +49,27 @@ const FriendsList = () => {
   // State for the filtered list of friends
   const [filteredFriends, setFilteredFriends] = useState([]);
 
-  const [sortField, setSortField] = useState('');
-  const [sortDirection, setSortDirection] = useState('asc'); 
-
+  const [sortField, setSortField] = useState("");
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const handleSort = (field) => {
-    const isAsc = sortField === field && sortDirection === 'asc';
-    setSortDirection(isAsc ? 'desc' : 'asc');
+    const isAsc = sortField === field && sortDirection === "asc";
+    setSortDirection(isAsc ? "desc" : "asc");
     setSortField(field);
   };
 
-
   useEffect(() => {
     const sortedFriends = [...filteredFriends].sort((a, b) => {
-        if (a[sortField] < b[sortField]) {
-            return sortDirection === 'asc' ? -1 : 1;
-        }
-        if (a[sortField] > b[sortField]) {
-            return sortDirection === 'asc' ? 1 : -1;
-        }
-        return 0;
+      if (a[sortField] < b[sortField]) {
+        return sortDirection === "asc" ? -1 : 1;
+      }
+      if (a[sortField] > b[sortField]) {
+        return sortDirection === "asc" ? 1 : -1;
+      }
+      return 0;
     });
     setFilteredFriends(sortedFriends);
-}, [filteredFriends, sortField, sortDirection]);
-
+  }, [filteredFriends, sortField, sortDirection]);
 
   // Function to handle search query change
   const handleSearchChange = (event) => {
@@ -88,38 +85,37 @@ const FriendsList = () => {
     setFilteredFriends(filtered);
   };
 
-      useEffect(() => {
-        const fetchFriends = async () => {
-          try {
-            // Assuming the token is stored in local storage or context
-            const token = localStorage.getItem("token") 
-            const userId = localStorage.getItem("id")
-            
-            const response = await api.get(`dashboard/${userId}/friends`, {
-              headers: {
-                'token': token // Include the token in request headers
-              }
-            }); 
-            console.log(response);
-            const transformedFriends = response.data.map(friend => ({
-              ...friend,
-              username: friend.friendName, // Assuming the friendName is the username
-              avatar: friend.friendAvatar, // Direct mapping
-              status: friend.status // Assuming status is provided by the backend
-            }));
-            setFriends(transformedFriends);
-            setFilteredFriends(transformedFriends); // Initialize with fetched data
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
-        };
-        
-        fetchFriends(); // Call the async function
-      }, [userId]);
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        // Assuming the token is stored in local storage or context
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("id");
 
+        const response = await api.get(`dashboard/${userId}/friends`, {
+          headers: {
+            token: token, // Include the token in request headers
+          },
+        });
+        console.log(response);
+        const transformedFriends = response.data.map((friend) => ({
+          ...friend,
+          username: friend.friendName, // Assuming the friendName is the username
+          avatar: friend.friendAvatar, // Direct mapping
+          status: friend.status, // Assuming status is provided by the backend
+        }));
+        setFriends(transformedFriends);
+        setFilteredFriends(transformedFriends); // Initialize with fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchFriends(); // Call the async function
+  }, [userId]);
 
   const handleFriendClick = (userid) => {
-    console.log(userid)
+    console.log(userid);
     navigate(`../users/${userid}`);
   };
 
@@ -148,11 +144,21 @@ const FriendsList = () => {
           <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
-                <TableCell onClick={() => handleSort('username')}>
-                    Username {sortField === 'username' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                <TableCell onClick={() => handleSort("username")}>
+                  Username{" "}
+                  {sortField === "username"
+                    ? sortDirection === "asc"
+                      ? "↑"
+                      : "↓"
+                    : ""}
                 </TableCell>
-                <TableCell onClick={() => handleSort('status')}>
-                    Status {sortField === 'status' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                <TableCell onClick={() => handleSort("status")}>
+                  Status{" "}
+                  {sortField === "status"
+                    ? sortDirection === "asc"
+                      ? "↑"
+                      : "↓"
+                    : ""}
                 </TableCell>
                 <TableCell>Avatar</TableCell>
               </TableRow>
@@ -163,7 +169,7 @@ const FriendsList = () => {
                   key={friend.username}
                   hover
                   onClick={() => handleFriendClick(friend.friendId)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <TableCell>{friend.username}</TableCell>
                   <TableCell>{friend.status}</TableCell>
