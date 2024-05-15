@@ -363,10 +363,6 @@ const Game = () => {
         <Box sx={{
           overflowX: 'auto',
           whiteSpace: 'nowrap',
-          scrollbarWidth: 'none', // For Firefox
-          '&::-webkit-scrollbar': {
-            display: 'none'
-          },
           margin: "10px",
         }}>
           <Stack spacing={1} direction="row" margin={"10px"}>

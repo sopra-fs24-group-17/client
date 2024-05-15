@@ -10,6 +10,7 @@ import randchick4 from 'components/game/cards/randchick-4.png';
 import seethefuture from 'components/game/cards/seethefuture-1.png';
 import shuffle from 'components/game/cards/shuffle-1.png';
 import skip from 'components/game/cards/skip-1.png';
+import lucky from 'components/game/cards/getlucky.png';
 
 
 export const cardTypes = [
@@ -92,9 +93,9 @@ export const cardTypes = [
   },
   {
     internalCode: 12,
-    name: "nope",
-    effect: "Deny a move.",
-    imageUrl: nope,
+    name: "lucky",
+    effect: "Pull a random card from the dealer pile",
+    imageUrl: lucky,
     isOpen: true,
   },
 ];
