@@ -49,6 +49,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
 
   const currentUserID = localStorage.getItem("id");
 
+  const [friends, setFriends] = useState([]);
+  const [friendRequestStatuses, setFriendRequestStatuses] = useState({});
+
+
+
   useEffect(() => {
     console.log(process.env.REACT_APP_API_URL);
 
@@ -69,8 +74,46 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
         setIsAuthorizedToView(false);
       }
     };
+
+    const fetchFriends = async () => {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("id");
+      try {
+        const response = await api.get(`/dashboard/${userId}/friends`, {
+          headers: { token: token },
+        });
+        setFriends(response.data.map((friend) => friend.friendId));
+        console.log("Friends fetched successfully.", response.data);
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      }
+    };
+
     fetchUser();
+    fetchFriends();
   }, [userId]);
+
+
+  const sendFriendRequest = async (recipientUserId) => {
+    try {
+      const token = localStorage.getItem("token");
+      setFriendRequestStatuses((prevStatuses) => ({
+        ...prevStatuses,
+        [recipientUserId]: "waiting",
+      }));
+      await api.put(
+        `/dashboard/${recipientUserId}/friends/requests`,
+        {},
+        {
+          headers: { token: token },
+        }
+      );
+      console.log("Friend request sent successfully to user:", recipientUserId);
+    } catch (error) {
+      console.error("Failed to send friend request:", error);
+    }
+  };
+
 
   if (!isAuthorizedToView) {
     return (
@@ -288,6 +331,23 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                   ))}
                 </div>
               </CardContent>
+
+              {user && user.id && localStorage.getItem('id') !== user.id.toString() ? (
+                <CardActions sx={{ justifyContent: "center", marginBottom: 0 }}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      sendFriendRequest(user.id);
+                    }}
+                    disabled={friends.includes(user.id) || friendRequestStatuses[user.id] === "waiting"}
+                  >
+                    {friends.includes(user.id) ? "Already Added" :
+                    friendRequestStatuses[user.id] === "waiting" ? "Invitation sent" : "Add Friend"}
+                  </Button>
+                </CardActions>
+              ) : null }
 
               <CardActions sx={{ justifyContent: "center", marginBottom: 2 }}>
                 {currentUserID === userId && (
