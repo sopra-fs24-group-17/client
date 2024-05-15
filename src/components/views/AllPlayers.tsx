@@ -213,155 +213,117 @@ const AllPlayers = () => {
     navigate(`../users/${userid}`);
   };
 
-  return (
-    <Container maxWidth={false} sx={{ mt: 2 }}>
-      <Grid container justifyContent="space-between" alignItems="flex-start">
-        <Grid item>
-          <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-            All Players
-          </Typography>
-        </Grid>
-        {/* Search Field and Table */}
-        <Grid item>
-          <TextField
-            id="search"
-            label="Search for a player"
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2 }}
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-        </Grid>
-      </Grid>
-
-      {/* Friend Requests Section */}
-      {friendRequests.length > 0 && (
-        <List>
-          {friendRequests.map((request) => (
-            <ListItem key={request.requestId}>
-              <ListItemText
-                primary={`Friend request from ${request.requestingUserUsername}`}
-              />
-              <Button
-                onClick={() => handleAcceptFriendRequest(request.requestId)}
-                color="primary"
-              >
-                Accept
-              </Button>
-              <Button
-                onClick={() => handleRejectFriendRequest(request.requestId)}
-                color="primary"
-              >
-                Reject
-              </Button>
-            </ListItem>
-          ))}
-        </List>
-      )}
-
-      <Paper sx={{ width: "100%", mb: 2, overflowX: "auto" }}>
-        <TableContainer>
-          <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell onClick={() => handleSort("userid")}>
-                  User Id{" "}
-                  {sortField === "userid"
-                    ? sortDirection === "asc"
-                      ? "↑"
-                      : "↓"
-                    : ""}
-                </TableCell>
-                <TableCell onClick={() => handleSort("username")}>
-                  Username{" "}
-                  {sortField === "username"
-                    ? sortDirection === "asc"
-                      ? "↑"
-                      : "↓"
-                    : ""}
-                </TableCell>
-                <TableCell onClick={() => handleSort("gamesplayed")}>
-                  Games Played{" "}
-                  {sortField === "gamesplayed"
-                    ? sortDirection === "asc"
-                      ? "↑"
-                      : "↓"
-                    : ""}
-                </TableCell>
-                <TableCell onClick={() => handleSort("winlossratio")}>
-                  Win-loss Ratio{" "}
-                  {sortField === "winlossratio"
-                    ? sortDirection === "asc"
-                      ? "↑"
-                      : "↓"
-                    : ""}
-                </TableCell>
-                <TableCell onClick={() => handleSort("achievementsunlocked")}>
-                  Achievements Unlocked{" "}
-                  {sortField === "achievementsunlocked"
-                    ? sortDirection === "asc"
-                      ? "↑"
-                      : "↓"
-                    : ""}
-                </TableCell>
-                <TableCell>Last Played</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredPlayers.map((player) => (
-                <TableRow
-                  key={player.userid}
-                  hover
-                  onClick={() => handlePlayerClick(player.userid)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <TableCell>{player.userid}</TableCell>
-                  <TableCell>{player.username}</TableCell>
-                  <TableCell>{player.gamesplayed}</TableCell>
-                  <TableCell>{player.winlossratio}</TableCell>
-                  <TableCell>{player.achievementsunlocked}</TableCell>
-                  <TableCell>{player.lastplayed.slice(0, 10)}</TableCell>
-                  <TableCell>
-                    {localStorage.getItem("id") !== player.userid.toString() ? (
-                      <Button
-                        variant="contained"
+    return (
+        <Container maxWidth={false} sx={{ mt: 2 }}>
+            <Grid container justifyContent="space-between" alignItems="flex-start">
+                <Grid item>
+                    <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+                        All Players
+                    </Typography>
+                </Grid>
+                {/* Search Field and Table */}
+                <Grid item>
+                    <TextField
+                        id="search"
+                        label="Search for a player"
+                        variant="outlined"
                         size="small"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          sendFriendRequest(player.userid);
-                        }}
-                        disabled={
-                          friends.includes(player.userid) ||
-                          friendRequestStatuses[player.userid] === "waiting"
-                        }
-                      >
-                        {friends.includes(player.userid)
-                          ? "Already Added"
-                          : friendRequestStatuses[player.userid] === "waiting"
-                            ? "Invitation sent"
-                            : "Add Friend"}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        size="small"
-                        disabled
-                        style={{ opacity: 0.5 }}
-                      >
-                        Yourself
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </Container>
-  );
+                        sx={{ mb: 2 }}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                    />
+                </Grid>
+            </Grid>
+        
+        {/* Friend Requests Section */}
+        {friendRequests.length > 0 && (
+            <List>
+                {friendRequests.map((request) => (
+                    <ListItem key={request.requestId}>
+                        <ListItemText primary={`Friend request from ${request.requestingUserUsername}`} />
+                        <Button onClick={() => handleAcceptFriendRequest(request.requestId)} color="primary">
+                            Accept
+                        </Button>
+                        <Button onClick={() => handleRejectFriendRequest(request.requestId)} color="primary">
+                            Reject
+                        </Button>
+                    </ListItem>
+                ))}
+            </List>
+        )}
+            
+            <Paper sx={{ width: '100%', mb: 2, overflowX: 'auto' }}>
+                <TableContainer>
+                    <Table stickyHeader aria-label="simple table" sx={{ minWidth: 650 }}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell onClick={() => handleSort('userid')}>
+                                    User Id {sortField === 'userid' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('username')}>
+                                    Username {sortField === 'username' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('gamesplayed')}>
+                                    Games Played {sortField === 'gamesplayed' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('winlossratio')}>
+                                    Win-loss Ratio {sortField === 'winlossratio' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('achievementsunlocked')}>
+                                    Achievements Unlocked {sortField === 'achievementsunlocked' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                </TableCell>
+                                <TableCell>Last Played</TableCell>  
+                                <TableCell>Actions</TableCell>  
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {filteredPlayers.map((player) => (
+                                <TableRow
+                                    key={player.userid}
+                                    hover
+                                    onClick={() => handlePlayerClick(player.userid)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <TableCell>{player.userid}</TableCell>
+                                    <TableCell>{player.username}</TableCell>
+                                    <TableCell>{player.gamesplayed}</TableCell>
+                                    <TableCell>{player.winlossratio}</TableCell>
+                                    <TableCell>{player.achievementsunlocked}</TableCell>
+                                    <TableCell>{player.lastplayed ? player.lastplayed.slice(0, 10) : 'n/a'}</TableCell>
+                                    <TableCell>
+                                    {localStorage.getItem('id') !== player.userid.toString() ? (
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                sendFriendRequest(player.userid);
+                                            }}
+                                            disabled={friends.includes(player.userid) || friendRequestStatuses[player.userid] === "waiting"}
+                                        >
+                                            {friends.includes(player.userid) ? "Already Added" :
+                                            friendRequestStatuses[player.userid] === "waiting" ? "Invitation sent" : "Add Friend"}
+
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            disabled
+                                            style={{ opacity: 0.5 }}
+                                        >
+                                            Yourself
+                                        </Button>
+                                    )}
+                                </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        </Container>
+    );
 };
 
 export default AllPlayers;
