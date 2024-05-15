@@ -41,7 +41,6 @@ const Game = () => {
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
   const [explode, setExplode] = useState(false);
 
-
   const navigate = useNavigate();
 
   const subscriptionRef = useRef(null);
@@ -141,8 +140,11 @@ const Game = () => {
     setExplode(true);
     setTimeout(() => {
       setExplode(false);
-      gameAlertHandleOpen("EXPLOSION!!", `Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`);
-    }, 3000); 
+      gameAlertHandleOpen(
+        "EXPLOSION!!",
+        `Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`
+      );
+    }, 3000);
   };
 
   const explosionAudioRef = useRef(new Audio(explosionSound));
@@ -152,11 +154,10 @@ const Game = () => {
       explosionAudioRef.current.play();
       setTimeout(() => {
         explosionAudioRef.current.pause();
-        explosionAudioRef.current.currentTime = 0; 
+        explosionAudioRef.current.currentTime = 0;
       }, 3000); // Stop the audio after 3 seconds (same as GIF duration)
     }
   }, [explode]);
-  
 
   const handleDefuseCard = () => {
     setPlayerHand((prevHand) => {
@@ -318,30 +319,39 @@ const Game = () => {
     });
   }, []);
 
-
   return (
-    <Grid container spacing={2} style={{
-      minHeight: "100vh",
-      backgroundImage: `url(${game_background})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      marginTop: 0,
-    }}>
+    <Grid
+      container
+      spacing={2}
+      style={{
+        minHeight: "100vh",
+        backgroundImage: `url(${game_background})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        marginTop: 0,
+      }}
+    >
       {explode && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)' 
-        }}>
-          <img src={explosionGif} alt="Explosion" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <img
+            src={explosionGif}
+            alt="Explosion"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
         </div>
       )}
       <audio ref={explosionAudioRef} src={explosionSound} />
