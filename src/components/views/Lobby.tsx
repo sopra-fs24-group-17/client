@@ -9,7 +9,7 @@ import {
   sendMessage,
 } from "./WebsocketConnection";
 import { Grid, Button, Box, Paper, Typography } from "@mui/material";
-import WebSocketChat from './chat'; 
+import WebSocketChat from './chat';
 import { hints, getRandomHint } from "components/lobby/hints.js";
 
 const Lobby = () => {
@@ -24,7 +24,6 @@ const Lobby = () => {
   const storedUsername = localStorage.getItem("username");
 
   useEffect(() => {
-    
     if (currentPlayers === totalPlayersRequired && storedUsername === localStorage.getItem("creator")) {
       setJoinButtonDisabled(false);
     } else {
@@ -32,31 +31,25 @@ const Lobby = () => {
     }
   }, [currentPlayers, totalPlayersRequired]);
 
-
   useEffect(() => {
     const fetchGameData = async () => {
       const token = localStorage.getItem("token");
       try {
         const response = await api.get(`dashboard/games`, {
-          headers: { 'token': token } 
+          headers: { 'token': token }
         });
-        // This is to find the game we want from all the slots to take the info we want
         if (response.data && response.data.length > 0) {
           const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
-          
           if (game && game.maxPlayers !== undefined) {
             setTotalPlayersRequired(game.maxPlayers);
             localStorage.setItem("creator", game.initiatingUserName);
-            
           } else {
             console.error("Game with specified ID not found or lacks 'maxPlayers' data");
           }
         } else {
           console.error("Invalid or empty response data");
         }
-        
 
-        // Initialize WebSocket connection using @stomp/stompjs
         const initialiseWebsocketConnection = async () => {
           await connectWebSocket();
         };
@@ -72,16 +65,15 @@ const Lobby = () => {
         console.error("Failed to fetch game data:", error);
       }
     };
-    fetchGameData(); 
+    fetchGameData();
 
     return () => {
-      disconnectWebSocket();      
+      disconnectWebSocket();
       console.log("Disconnected from WebSocket");
     };
-    
+
   }, []);
 
-  // Listen for changes in localStorage for activeUsersCount (changes are done in chat.tsx)
   useEffect(() => {
     const handleActiveUsersUpdate = (event) => {
       setCurrentPlayers(event.detail.count);
@@ -124,8 +116,8 @@ const Lobby = () => {
           headers: { token: token },
         }
       );
-      localStorage.removeItem("createflag")
-      localStorage.removeItem("joinGame")
+      localStorage.removeItem("createflag");
+      localStorage.removeItem("joinGame");
       console.log("Joined left successfully", response.data);
       navigate(-1);
     } catch (error) {
@@ -136,7 +128,6 @@ const Lobby = () => {
     }
   };
 
- 
   const handleSubcribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
@@ -146,45 +137,40 @@ const Lobby = () => {
         const messageBody = JSON.parse(message.body);
 
         if (messageBody === "lets all start together guys") {
-          navigate(`/game`); 
+          navigate(`/game`);
         }
       },
       { id: `sub-${gameId}` }
     );
-    };
+  };
+
   const handleStartGame = async () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
     sendMessage(`/app/start/${gameId}`, {});
   }
 
-
-  
   useEffect(() => {
-    let lastHint = currentHint.hint; // Change to handle the hint property
-    
+    let lastHint = currentHint.hint;
     const updateHint = () => {
       let newHintObject = getRandomHint();
       let attemptCount = 0;
-  
+
       while (newHintObject.hint === lastHint && attemptCount < 10) {
         newHintObject = getRandomHint();
         attemptCount++;
       }
-  
-      setCurrentHint(newHintObject); // This now contains both hint and image
+
+      setCurrentHint(newHintObject);
       console.log(newHintObject.hint);
-      lastHint = newHintObject.hint; // Update lastHint for the next interval
+      lastHint = newHintObject.hint;
     };
-  
+
     updateHint();
     const intervalId = setInterval(updateHint, 10000);
-  
+
     return () => clearInterval(intervalId);
   }, []);
-  
-  
 
-  
   const lobbyContainerStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -209,30 +195,29 @@ const Lobby = () => {
     marginTop: "10px",
   };
 
-  const hintContainerStyle: React.CSSProperties= {
+  const hintContainerStyle: React.CSSProperties = {
     backgroundColor: "#f0f0f0",
     padding: "20px",
     width: "600px",
     borderRadius: "8px",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    display: "flex",  
-    flexDirection: "column",  
-    alignItems: "center",  
-    justifyContent: "center",     
-    textAlign: "center",  
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
   };
 
-
   const hintListStyle = {
-    listStyleType: "none",  
-    padding: 0,  
-    margin: 0,  
-    width: "100%",  
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+    width: "100%",
   };
 
   const hintListItemStyle = {
     marginBottom: "5px",
-    textAlign: "center", 
+    textAlign: "center",
   };
 
   const paperStyle = {
@@ -278,10 +263,8 @@ const Lobby = () => {
             </Box>
           </div>
         </Grid>
-        <Grid item xs={4}>
-          <Paper elevation={3} style={paperStyle}>
-            <WebSocketChat gameId={gameId} />
-          </Paper>
+        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: "100%", height: "100vh" }}>
+          <WebSocketChat gameId={gameId} />
         </Grid>
       </Grid>
     </Box>

@@ -31,26 +31,29 @@ function WebSocketChat() {
   useEffect(() => {
     if (username && !connected) {
       setConnected(true);
-      connectWebSocket().then(client => {
-        const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
-          const msgData = JSON.parse(message.body);
-          if (msgData.type === "STATE") {
-            setActiveUsers(msgData.content.split(","));
-            const usersArray = msgData.content.split(",");
-            setActiveUsers(usersArray);
-            localStorage.setItem('activeUsersCount', usersArray.length.toString());
-            window.dispatchEvent(new CustomEvent('activeUsersUpdate', { detail: { count: usersArray.length } }));
-            assignColorsToNewUsers(msgData.content.split(","));
-          } else {
-            onMessageReceived(msgData);
-          }
+
+      // Add a delay before executing the rest of the code
+      setTimeout(() => {
+        connectWebSocket().then(client => {
+          const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
+            const msgData = JSON.parse(message.body);
+            if (msgData.type === "STATE") {
+              const usersArray = msgData.content.split(",");
+              setActiveUsers(usersArray);
+              localStorage.setItem('activeUsersCount', usersArray.length.toString());
+              window.dispatchEvent(new CustomEvent('activeUsersUpdate', { detail: { count: usersArray.length } }));
+              assignColorsToNewUsers(usersArray);
+            } else {
+              onMessageReceived(msgData);
+            }
+          });
+          setSubscription(sub);
+          sendMessage(`/app/chat/${roomId}/addUser`, { sender: username, type: "JOIN" });
+        }).catch(error => {
+          console.error("Connection failed: ", error);
+          setConnected(false);
         });
-        setSubscription(sub);
-        sendMessage(`/app/chat/${roomId}/addUser`, { sender: username, type: "JOIN" });
-      }).catch(error => {
-        console.error("Connection failed: ", error);
-        setConnected(false);
-      });
+      }, 500); // 500 milliseconds delay
     }
 
     return () => {
