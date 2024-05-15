@@ -81,11 +81,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
         <Grid
           container
           style={{
-            minHeight: "100vh", // Adjusted to take full viewport height for vertical centering
+            minHeight: "100vh", 
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center", // This centers the children vertically
-            textAlign: "center", // Centers text horizontally
+            justifyContent: "center", 
+            textAlign: "center", 
           }}
         >
           <Grid item xs={12}>
