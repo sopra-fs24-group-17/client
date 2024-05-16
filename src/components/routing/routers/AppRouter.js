@@ -44,7 +44,7 @@ const AppRouter = () => {
           <Route path="/forgot-password" element={<PasswordForgotten />} />
         </Route>
         <Route path="/game/*" element={<GameGuard />}>
-          <Route index element={<Game />} />
+          <Route index path=":gameId" element={<Game />} />
           <Route path="chat/:gameId" element={<WebSocketChat />} />
         </Route>
         s
