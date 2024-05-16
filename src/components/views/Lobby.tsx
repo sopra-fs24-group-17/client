@@ -172,7 +172,7 @@ const Lobby = () => {
         }
 
         if (messageBody === "lets all start together guys") {
-          navigate(`/game`);
+          navigate(`/game/${gameId}`);
         }
       },
       { id: `sub-${gameId}` }

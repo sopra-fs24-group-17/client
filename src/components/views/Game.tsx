@@ -9,7 +9,6 @@ import {
   sendMessage,
 } from "components/views/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
-// import { playCard } from "components/game/playCard";
 import GameAlert from "components/ui/GameAlert";
 import GameAlertWithInput from "components/ui/GameAlertWithInput";
 import EnemyPlayers from "components/views/EnemyPlayers";
@@ -28,6 +27,7 @@ const Game = () => {
   const gameId = localStorage.getItem("gameId");
   const userId = localStorage.getItem("id");
   const username = localStorage.getItem("username");
+
   const [closedDeck, setClosedDeck] = useState(cardTypes);
   const [openDeck, setOpenDeck] = useState([]);
   const [playerHand, setPlayerHand] = useState([]);
@@ -86,8 +86,7 @@ const Game = () => {
   const handleIncomingMessageGame = useCallback((message) => {
     const gameState = JSON.parse(message.body);
     if (
-      gameState.type === "explosion" &&
-      gameState.terminatingUser !== userId
+      gameState.type === "explosion"
     ) {
       handleExplosion(gameState.terminatingUser);
     } else if (gameState.type === "gameState") {
@@ -152,60 +151,58 @@ const Game = () => {
     );
   };
 
-  const handleExplosion = (userName) => {
+  const handleExplosion = (userName: string) => {
     setExplode(true);
     setTimeout(() => {
       setExplode(false);
-      gameAlertHandleOpen(
-        "EXPLOSION!!",
-        `Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`
-      );
+      if (userName !== username) {
+        gameAlertHandleOpen(
+          "EXPLOSION!!",
+          `Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`
+        );
+      }
     }, 3000);
   };
 
-  // exlposion useEffect
   useEffect(() => {
     if (explode) {
       explosionAudioRef.current.play();
       const timer = setTimeout(() => {
-        if (explosionAudioRef.current) { 
+        if (explosionAudioRef.current) {
           explosionAudioRef.current.pause();
           explosionAudioRef.current.currentTime = 0;
         }
-      }, 3000); // Stop the audio after 3 seconds (same as GIF duration)
-  
-      // Clear timeout if component unmounts before timer ends
+      }, 3000);
+
       return () => clearTimeout(timer);
     }
   }, [explode]);
 
 
-  // winner useEffect
   useEffect(() => {
     if (winner) {
       const timer = setTimeout(() => {
         setExplosionCompleted(true);
         console.log("Playing winner sound");
         winnerAudioRef.current.play();
-      }, 3000); // 3-second delay to match the explosion duration
-      return () => clearTimeout(timer); 
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [winner]);
-  
 
-  // winner useEffect
+
   useEffect(() => {
     if (loser) {
       const timer = setTimeout(() => {
         setExplosionCompleted(true);
         console.log("Playing winner sound");
         loserAudioRef.current.play();
-      }, 3000); // 3-second delay to match the explosion duration
-      return () => clearTimeout(timer); 
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [loser]);
-  
-  
+
+
 
   const handleDefuseCard = () => {
     setPlayerHand((prevHand) => {
@@ -224,10 +221,12 @@ const Game = () => {
   };
 
   const handlePlacementRequest = () => {
-    gameAlertWithInputHandleOpen(
-      "Explosion Time",
-      "Choose where on the dealer deck you want to place the explosion."
-    );
+    setTimeout(() => {
+      gameAlertWithInputHandleOpen(
+        "Explosion Time",
+        "Choose where on the dealer deck you want to place the explosion."
+      );
+    }, 3000);
   };
 
   const handleOpenDeck = (topCardInternalCode) => {
@@ -273,7 +272,6 @@ const Game = () => {
 
   const playCard = (cardId, cardName, cardCode) => {
     let cardCodes = [cardCode];
-    let cardIncidesToRemove = [];
 
     if (!playerTurn) {
       setGameAlertTitle("It's not your turn!");
@@ -285,7 +283,6 @@ const Game = () => {
     }
 
     const cardIndex = playerHand.findIndex((card) => card.code === cardCode);
-    // cardIncidesToRemove.push(cardIndex)
     if (cardIndex !== -1) {
       if (cardName === "favor") {
         gameAlertWithInputHandleOpen(
@@ -298,7 +295,6 @@ const Game = () => {
           cardName
         )
       ) {
-        // If the card is a palindrome card, check if the player has another card of the same type
         const otherCardIndex = playerHand.findIndex(
           (card, index) =>
             card.internalCode === cardId &&
@@ -314,15 +310,11 @@ const Game = () => {
           return;
         } else {
           cardCodes.push(playerHand[otherCardIndex].code);
-          // cardIncidesToRemove.push(otherCardIndex);
         }
         sendMessageCardPlayed(cardCodes);
       } else {
         sendMessageCardPlayed(cardCodes);
       }
-
-      // const newPlayerHand = playerHand.filter((_, index) => !cardIncidesToRemove.includes(index));
-      // setPlayerHand(newPlayerHand);
     }
   };
 
@@ -333,20 +325,7 @@ const Game = () => {
       cardIds: cardCodes,
       targetUsername: targetUsername,
     });
-    // setTargetUsername(null);
   };
-
-  // useEffect(() => {
-  //   if (targetUsername) {
-  //     sendMessageCardPlayed([cardCodeFavor]);
-  //   }
-  // }, [targetUsername]);
-
-  // useEffect(() => {
-  //   if (placementIndex) {
-  //     sendMessage(`/app/handleExplosion/${gameId}/${userId}/${placementIndex}`, {});
-  //   }
-  // }, [placementIndex]);
 
   useEffect(() => {
     console.log("Player Hand updated: " + JSON.stringify(playerHand, null, 2));
@@ -403,52 +382,52 @@ const Game = () => {
         </div>
       )}
       {winner && explosionCompleted && (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-        }}
-      >
-        <img
-          src={winnerGif}
-          alt="Winner"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
-      </div>
-    )}
-    {loser && explosionCompleted && (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-        }}
-      >
-        <img
-          src={loserGif}
-          alt="Loser"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
-      </div>
-    )}
-    <audio ref={explosionAudioRef} src={explosionSound} />
-    <audio ref={winnerAudioRef} src={winnerSound} />
-    <audio ref={loserAudioRef} src={loserSound} />
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <img
+            src={winnerGif}
+            alt="Winner"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
+      )}
+      {loser && explosionCompleted && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <img
+            src={loserGif}
+            alt="Loser"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
+      )}
+      <audio ref={explosionAudioRef} src={explosionSound} />
+      <audio ref={winnerAudioRef} src={winnerSound} />
+      <audio ref={loserAudioRef} src={loserSound} />
       {playerTurn && <FilledAlert />}
       <GameAlert
         open={gameAlertOpen}
