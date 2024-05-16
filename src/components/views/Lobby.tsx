@@ -15,13 +15,63 @@ import { hints, getRandomHint } from "components/lobby/hints.js";
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
   const navigate = useNavigate();
+  const { gameId } = useParams();
   const [joinButtonDisabled, setJoinButtonDisabled] = useState(true);
   const [leaveButtonDisabled, setLeaveButtonDisabled] = useState(false);
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
-  const { gameId } = useParams();
   const [message, setMessage] = useState(null);
   const [currentHint, setCurrentHint] = useState(getRandomHint());
   const storedUsername = localStorage.getItem("username");
+  const creatorName = localStorage.getItem("creator");
+
+  const handleLeaveGame = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.put(
+        `/dashboard/games/leave/${gameId}`,
+        {},
+        {
+          headers: { token: token },
+        }
+      );
+      localStorage.removeItem("creatorflag");
+      localStorage.removeItem("joinGame");
+      console.log("Left game successfully", response.data);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(
+        "Error leaving game:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      console.log("Before unload event triggered");
+      handleLeaveGame();
+      event.preventDefault();
+      event.returnValue = ''; // This is necessary for Chrome to trigger the dialog
+    };
+
+    const handlePopState = async () => {
+      console.log("Popstate event triggered");
+      await handleLeaveGame();
+    };
+
+    console.log("Attaching event listeners");
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+    window.history.pushState(null, document.title, window.location.href); 
+    console.log("Event listeners attached");
+
+    return () => {
+      console.log("Removing event listeners");
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+      console.log("Event listeners removed");
+    };
+  }, []);
 
   useEffect(() => {
     if (
@@ -41,7 +91,6 @@ const Lobby = () => {
         const response = await api.get(`dashboard/games`, {
           headers: { token: token },
         });
-        // This is to find the game we want from all the slots to take the info we want
         if (response.data && response.data.length > 0) {
           const game = response.data.find(
             (game) => game.gameId === parseInt(gameId, 10)
@@ -51,6 +100,7 @@ const Lobby = () => {
             setTotalPlayersRequired(game.maxPlayers);
             setCurrentPlayers(game.currentPlayers);
             localStorage.setItem("creator", game.initiatingUserName);
+            console.log("Current players:", game.currentPlayers);
           } else {
             console.error(
               "Game with specified ID not found or lacks 'maxPlayers' data"
@@ -60,12 +110,11 @@ const Lobby = () => {
           console.error("Invalid or empty response data");
         }
 
-        // Initialize WebSocket connection using @stomp/stompjs
         const initialiseWebsocketConnection = async () => {
           await connectWebSocket();
         };
         await initialiseWebsocketConnection();
-        await handleSubcribe();
+        await handleSubscribe();
         try {
           await handleJoinGame();
         } catch {
@@ -104,29 +153,7 @@ const Lobby = () => {
     }
   };
 
-  const handleLeaveGame = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await api.put(
-        `/dashboard/games/leave/${gameId}`,
-        {},
-        {
-          headers: { token: token },
-        }
-      );
-      localStorage.removeItem("createflag");
-      localStorage.removeItem("joinGame");
-      console.log("Joined left successfully", response.data);
-      navigate(-1);
-    } catch (error) {
-      console.error(
-        "Error leaving game:",
-        error.response ? error.response.data : error.message
-      );
-    }
-  };
-
-  const handleSubcribe = async () => {
+  const handleSubscribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
       (message) => {
@@ -137,6 +164,11 @@ const Lobby = () => {
           setCurrentPlayers((prevPlayers) => prevPlayers + 1);
         } else if (messageBody.type === "leave") {
           setCurrentPlayers((prevPlayers) => prevPlayers - 1);
+          if (messageBody.userName === creatorName) {
+            console.log("Creator left the game");
+            handleLeaveGame();
+            navigate("/dashboard");
+          }
         }
 
         if (messageBody === "lets all start together guys") {
@@ -146,13 +178,14 @@ const Lobby = () => {
       { id: `sub-${gameId}` }
     );
   };
+
   const handleStartGame = async () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
     sendMessage(`/app/start/${gameId}`, {});
   };
 
   useEffect(() => {
-    let lastHint = currentHint.hint; // Change to handle the hint property
+    let lastHint = currentHint.hint;
 
     const updateHint = () => {
       let newHintObject = getRandomHint();
@@ -163,9 +196,9 @@ const Lobby = () => {
         attemptCount++;
       }
 
-      setCurrentHint(newHintObject); // This now contains both hint and image
+      setCurrentHint(newHintObject);
       console.log(newHintObject.hint);
-      lastHint = newHintObject.hint; // Update lastHint for the next interval
+      lastHint = newHintObject.hint;
     };
 
     updateHint();
@@ -211,7 +244,7 @@ const Lobby = () => {
     textAlign: "center",
   };
 
-  const hintListStyle = {
+  const hintListStyle: React.CSSProperties = {
     listStyleType: "none",
     padding: 0,
     margin: 0,
