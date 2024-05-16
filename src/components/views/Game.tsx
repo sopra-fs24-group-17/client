@@ -18,6 +18,10 @@ import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import explosionGif from "components/game/explosionGif.gif";
 import explosionSound from "components/game/explosionSound.wav";
+import winnerGif from "components/game/confetti.gif";
+import winnerSound from "components/game/cheer.wav";
+import loserGif from "components/game/rain.gif";
+import loserSound from "components/game/wahwahwah.wav";
 import "../../styles/Style.css";
 
 const Game = () => {
@@ -39,7 +43,14 @@ const Game = () => {
   const [piles, setPiles] = useState([]);
   const [names, setNames] = useState([]);
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
+
   const [explode, setExplode] = useState(false);
+  const [winner, setWinner] = useState(null);
+  const [loser, setLoser] = useState(null);
+  const [explosionCompleted, setExplosionCompleted] = useState(false);
+  const explosionAudioRef = useRef(new Audio(explosionSound));
+  const winnerAudioRef = useRef(new Audio(winnerSound));
+  const loserAudioRef = useRef(new Audio(loserSound));
 
   const navigate = useNavigate();
 
@@ -94,6 +105,11 @@ const Game = () => {
         console.log(names);
       }
     } else if (gameState.type === "endGame") {
+      if (gameState.winningUser === username) {
+        setWinner(true);
+      } else {
+        setLoser(true);
+      }
       gameAlertHandleOpen(
         "Game Over!",
         "Game Over! The winner is: " + gameState.winningUser
@@ -147,17 +163,49 @@ const Game = () => {
     }, 3000);
   };
 
-  const explosionAudioRef = useRef(new Audio(explosionSound));
-
+  // exlposion useEffect
   useEffect(() => {
     if (explode) {
       explosionAudioRef.current.play();
-      setTimeout(() => {
-        explosionAudioRef.current.pause();
-        explosionAudioRef.current.currentTime = 0;
+      const timer = setTimeout(() => {
+        if (explosionAudioRef.current) { 
+          explosionAudioRef.current.pause();
+          explosionAudioRef.current.currentTime = 0;
+        }
       }, 3000); // Stop the audio after 3 seconds (same as GIF duration)
+  
+      // Clear timeout if component unmounts before timer ends
+      return () => clearTimeout(timer);
     }
   }, [explode]);
+
+
+  // winner useEffect
+  useEffect(() => {
+    if (winner) {
+      const timer = setTimeout(() => {
+        setExplosionCompleted(true);
+        console.log("Playing winner sound");
+        winnerAudioRef.current.play();
+      }, 3000); // 3-second delay to match the explosion duration
+      return () => clearTimeout(timer); 
+    }
+  }, [winner]);
+  
+
+  // winner useEffect
+  useEffect(() => {
+    if (loser) {
+      const timer = setTimeout(() => {
+        setExplosionCompleted(true);
+        console.log("Playing winner sound");
+        loserAudioRef.current.play();
+      }, 3000); // 3-second delay to match the explosion duration
+      return () => clearTimeout(timer); 
+    }
+  }, [loser]);
+  
+  
 
   const handleDefuseCard = () => {
     setPlayerHand((prevHand) => {
@@ -354,7 +402,53 @@ const Game = () => {
           />
         </div>
       )}
-      <audio ref={explosionAudioRef} src={explosionSound} />
+      {winner && explosionCompleted && (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      >
+        <img
+          src={winnerGif}
+          alt="Winner"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      </div>
+    )}
+    {loser && explosionCompleted && (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      >
+        <img
+          src={loserGif}
+          alt="Loser"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      </div>
+    )}
+    <audio ref={explosionAudioRef} src={explosionSound} />
+    <audio ref={winnerAudioRef} src={winnerSound} />
+    <audio ref={loserAudioRef} src={loserSound} />
       {playerTurn && <FilledAlert />}
       <GameAlert
         open={gameAlertOpen}
