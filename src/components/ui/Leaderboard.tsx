@@ -1,6 +1,8 @@
-import React from 'react';
-import { Modal, Table, Button } from 'react-bootstrap';
+import React from "react";
+import { Modal, Table, Button } from "react-bootstrap";
 import styles from "../../styles/Leaderboard.module.css";
+import { useNavigate} from "react-router-dom";
+
 
 interface LeaderboardEntry {
   username: string;
@@ -13,10 +15,18 @@ interface LeaderboardProps {
   leaderboard: LeaderboardEntry[];
 }
 
+
+
 const Leaderboard: React.FC<LeaderboardProps> = ({ show, onHide, leaderboard }) => {
+  const navigate = useNavigate();
+
+  const handleGoToJoinGame = () => {
+    navigate("/dashboard/join-game");
+  };
+
   return (
-    <Modal show={show} onHide={onHide} centered>
-      <Modal.Header closeButton>
+    <Modal show={show} onHide={onHide} centered backdrop="static" keyboard={false}>
+      <Modal.Header>
         <Modal.Title>Leaderboard</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -38,8 +48,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ show, onHide, leaderboard }) 
         </Table>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Close</Button>
-        <Button variant="primary" onClick={onHide}>Home</Button>
+        <Button variant="primary" onClick={handleGoToJoinGame}>Home</Button>
       </Modal.Footer>
     </Modal>
   );
