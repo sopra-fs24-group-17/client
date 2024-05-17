@@ -14,7 +14,7 @@ const CardComponent: React.FC<CardProps> = ({ text, image, onClick }) => {
       <Card sx={{ width: 125, height: 175 }} onClick={onClick}>
         <CardMedia
           component="img"
-          height="175" // Adjust height as needed
+          height="175"
           image={image}
           alt={text}
         />

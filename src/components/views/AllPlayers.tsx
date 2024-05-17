@@ -322,7 +322,9 @@ const AllPlayers = () => {
                   <TableCell>{player.gamesplayed}</TableCell>
                   <TableCell>{player.winlossratio}</TableCell>
                   <TableCell>{player.achievementsunlocked}</TableCell>
-                  <TableCell>{player.lastplayed ? player.lastplayed.slice(0, 10) : 'n/a'}</TableCell>
+                  <TableCell>
+                    {player.lastplayed ? player.lastplayed.slice(0, 10) : "n/a"}
+                  </TableCell>
                   <TableCell>
                     {localStorage.getItem("id") !== player.userid.toString() ? (
                       <Button

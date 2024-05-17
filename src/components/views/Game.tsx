@@ -35,6 +35,7 @@ const Game = () => {
   const [gameAlertOpen, setGameAlertOpen] = useState(false);
   const [gameAlertTitle, setGameAlertTitle] = useState("");
   const [gameAlertDescription, setGameAlertDescription] = useState("");
+  const [gameAlertCardDetails, setGameAlertCardDetails] = useState([]);
   const [postAlertAction, setPostAlertAction] = useState(null);
   const [gameAlertWithInputOpen, setGameAlertWithInputOpen] = useState(false);
   const [gameAlertWithInputTitle, setGameAlertWithInputTitle] = useState("");
@@ -137,10 +138,18 @@ const Game = () => {
   };
 
   const peekIntoDeck = (cards) => {
-    const cardsString = cards.map((card) => `${card.internalCode}`).join("\n");
+    const enhancedCards = cards.map((card) => {
+      const cardType = cardTypes.find((type) => type.name === card.internalCode);
+      return {
+        name: cardType.name,
+        imageUrl: cardType.imageUrl,
+      };
+    });
+
     gameAlertHandleOpen(
       "See the Future",
-      "The next 3 cards in the deck are:\n" + cardsString
+      "The next 3 cards in the deck are:",
+      enhancedCards.reverse()
     );
   };
 
@@ -203,7 +212,6 @@ const Game = () => {
   }, [loser]);
 
 
-
   const handleDefuseCard = () => {
     setPlayerHand((prevHand) => {
       console.log("Player Hand: " + JSON.stringify(prevHand, null, 2));
@@ -246,14 +254,16 @@ const Game = () => {
     });
   };
 
-  const gameAlertHandleOpen = (title, description) => {
+  const gameAlertHandleOpen = (title: string, description: string, cardDetails?: Array<string> ) => {
     setGameAlertTitle(title);
     setGameAlertDescription(description);
+    setGameAlertCardDetails(cardDetails)
     setGameAlertOpen(true);
   };
 
   const gameAlertHandleClose = () => {
     setGameAlertOpen(false);
+    setGameAlertCardDetails([]);
     if (postAlertAction) {
       postAlertAction();
       setPostAlertAction(null);
@@ -434,6 +444,7 @@ const Game = () => {
         handleClose={gameAlertHandleClose}
         title={gameAlertTitle}
         description={gameAlertDescription}
+        cardDetails={gameAlertCardDetails}
       />
       <GameAlertWithInput
         open={gameAlertWithInputOpen}
