@@ -1,5 +1,13 @@
 import * as React from "react";
-import { Typography, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText} from "@mui/material";
+import {
+  Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+} from "@mui/material";
 import DialogTitle from "@mui/material/DialogTitle";
 
 interface GameAlertProps {
@@ -7,7 +15,7 @@ interface GameAlertProps {
   handleClose: () => void;
   title: string;
   description: string;
-  cardDetails?: { name: string, imageUrl: string }[];
+  cardDetails?: { name: string; imageUrl: string }[];
 }
 
 export default function GameAlert({
@@ -26,18 +34,22 @@ export default function GameAlert({
     >
       <DialogContent>
         <DialogTitle>{title}</DialogTitle>
-        <Typography paddingLeft={"16px"} variant="body1" id="alert-dialog-description">
+        <Typography
+          paddingLeft={"16px"}
+          variant="body1"
+          id="alert-dialog-description"
+        >
           {description}
         </Typography>
         {cardDetails.length > 0 && (
-          <Box mt={2} display="flex" flexDirection="row" justifyContent="center">
+          <Box
+            mt={2}
+            display="flex"
+            flexDirection="row"
+            justifyContent="center"
+          >
             {cardDetails.map((card, index) => (
-              <Box
-                key={index}
-                display="flex"
-                alignItems="center"
-                mb={2}
-              >
+              <Box key={index} display="flex" alignItems="center" mb={2}>
                 <img
                   src={card.imageUrl}
                   alt={card.name}

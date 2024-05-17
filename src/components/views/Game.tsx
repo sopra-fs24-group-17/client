@@ -86,9 +86,7 @@ const Game = () => {
 
   const handleIncomingMessageGame = useCallback((message) => {
     const gameState = JSON.parse(message.body);
-    if (
-      gameState.type === "explosion"
-    ) {
+    if (gameState.type === "explosion") {
       handleExplosion(gameState.terminatingUser);
     } else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
@@ -139,7 +137,9 @@ const Game = () => {
 
   const peekIntoDeck = (cards) => {
     const enhancedCards = cards.map((card) => {
-      const cardType = cardTypes.find((type) => type.name === card.internalCode);
+      const cardType = cardTypes.find(
+        (type) => type.name === card.internalCode
+      );
       return {
         name: cardType.name,
         imageUrl: cardType.imageUrl,
@@ -187,7 +187,6 @@ const Game = () => {
     }
   }, [explode]);
 
-
   useEffect(() => {
     if (winner) {
       const timer = setTimeout(() => {
@@ -199,7 +198,6 @@ const Game = () => {
     }
   }, [winner]);
 
-
   useEffect(() => {
     if (loser) {
       const timer = setTimeout(() => {
@@ -210,7 +208,6 @@ const Game = () => {
       return () => clearTimeout(timer);
     }
   }, [loser]);
-
 
   const handleDefuseCard = () => {
     setPlayerHand((prevHand) => {
@@ -254,10 +251,14 @@ const Game = () => {
     });
   };
 
-  const gameAlertHandleOpen = (title: string, description: string, cardDetails?: Array<string> ) => {
+  const gameAlertHandleOpen = (
+    title: string,
+    description: string,
+    cardDetails?: Array<string>
+  ) => {
     setGameAlertTitle(title);
     setGameAlertDescription(description);
-    setGameAlertCardDetails(cardDetails)
+    setGameAlertCardDetails(cardDetails);
     setGameAlertOpen(true);
   };
 
