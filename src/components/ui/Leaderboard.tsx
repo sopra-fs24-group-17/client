@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Table, Button } from 'react-bootstrap';
-import styles from './Leaderboard.module.css';
+import styles from "../../styles/Leaderboard.module.css";
 
 interface LeaderboardEntry {
   username: string;
@@ -39,7 +39,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ show, onHide, leaderboard }) 
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Close</Button>
-        <Button variant="primary" onClick={onHide}>Go to Join Game</Button>
+        <Button variant="primary" onClick={onHide}>Home</Button>
       </Modal.Footer>
     </Modal>
   );

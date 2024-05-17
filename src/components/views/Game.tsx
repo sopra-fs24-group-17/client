@@ -460,6 +460,7 @@ const Game = () => {
           }
           gameAlertHandleClose();
         }}
+      />
       <Grid
         item
         xs={12}
