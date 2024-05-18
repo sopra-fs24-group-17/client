@@ -28,6 +28,9 @@ const Game = () => {
   const userId = localStorage.getItem("id");
   const username = localStorage.getItem("username");
 
+  const stompClientRef = useRef(null);
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
+
   const [closedDeck, setClosedDeck] = useState(cardTypes);
   const [openDeck, setOpenDeck] = useState([]);
   const [playerHand, setPlayerHand] = useState([]);
@@ -343,18 +346,32 @@ const Game = () => {
   }, [playerHand]);
 
   useEffect(() => {
-    let stompClient = null;
-    connectWebSocket().then((client) => {
-      stompClient = client;
-      subscriptionRef.current = subscribeToChannel(
-        `/game/${gameId}/${userId}`,
-        handleIncomingMessageUser
-      );
-      subscriptionRef.current = subscribeToChannel(
-        `/game/${gameId}`,
-        handleIncomingMessageGame
-      );
-    });
+    if (isWebSocketConnected) {
+      console.log("trying to send message for relaod")
+      sendMessage(`/app/reload/${gameId}/${userId}`, {});
+    }
+  }, [stompClientRef.current]);
+
+  useEffect(() => {
+    const connectAndSubscribe = async () => {
+      try {
+        const client = await connectWebSocket();
+        stompClientRef.current = client;
+
+        if (stompClientRef.current) {
+          console.log("WebSocket connected.");
+          subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessageUser);
+          subscribeToChannel(`/game/${gameId}`, handleIncomingMessageGame);
+          setIsWebSocketConnected(true);
+        } else {
+          console.error("WebSocket client is not defined.");
+        }
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+      }
+    };
+
+    connectAndSubscribe();
   }, []);
 
   return (
