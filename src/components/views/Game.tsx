@@ -33,6 +33,7 @@ import winnerGif from "components/game/confetti.gif";
 import winnerSound from "components/game/cheer.wav";
 import loserGif from "components/game/rain.gif";
 import loserSound from "components/game/wahwahwah.wav";
+import Leaderboard from "components/ui/Leaderboard";
 import "../../styles/Style.css";
 
 const Game = () => {
@@ -59,6 +60,8 @@ const Game = () => {
   const [piles, setPiles] = useState([]);
   const [names, setNames] = useState([]);
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const [explode, setExplode] = useState(false);
   const [winner, setWinner] = useState(null);
@@ -132,11 +135,14 @@ const Game = () => {
       } else {
         setLoser(true);
       }
+      // obtain leaderboard
+      setLeaderboard(gameState.leaderboard);
+
       gameAlertHandleOpen(
         "Game Over!",
         "Game Over! The winner is: " + gameState.winningUser
       );
-      setPostAlertAction(() => () => navigate("/dashboard/join-game"));
+      setPostAlertAction(() => () => setShowLeaderboard(true));
     } else if (
       gameState.type === "cardPlayed" &&
       gameState.userName === username
@@ -634,6 +640,13 @@ const Game = () => {
           </Stack>
         </Box>
       </Grid>
+    {showLeaderboard && (
+      <Leaderboard
+        show={showLeaderboard}
+        onHide={() => setShowLeaderboard(false)}
+        leaderboard={leaderboard}
+      />
+    )}
     </Grid>
   );
 };

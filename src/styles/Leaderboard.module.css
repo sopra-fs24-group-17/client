@@ -1,0 +1,16 @@
+.modal-header {
+    background-color: #f7f7f7;
+}
+
+.modal-title {
+    color: #333;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.modal-footer .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
