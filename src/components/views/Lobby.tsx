@@ -7,9 +7,9 @@ import {
   disconnectWebSocket,
   subscribeToChannel,
   sendMessage,
-} from "./WebsocketConnection";
+} from "../../helpers/WebsocketConnection";
 import { Grid, Button, Box } from "@mui/material";
-import WebSocketChat from "./chat";
+import WebSocketChat from "./Chat";
 import { hints, getRandomHint } from "components/lobby/hints.js";
 
 const Lobby = () => {
@@ -51,7 +51,7 @@ const Lobby = () => {
       console.log("Before unload event triggered");
       handleLeaveGame();
       event.preventDefault();
-      event.returnValue = ''; // This is necessary for Chrome to trigger the dialog
+      event.returnValue = ""; // This is necessary for Chrome to trigger the dialog
     };
 
     const handlePopState = async () => {
@@ -62,7 +62,7 @@ const Lobby = () => {
     console.log("Attaching event listeners");
     window.addEventListener("beforeunload", handleBeforeUnload);
     window.addEventListener("popstate", handlePopState);
-    window.history.pushState(null, document.title, window.location.href); 
+    window.history.pushState(null, document.title, window.location.href);
     console.log("Event listeners attached");
 
     return () => {

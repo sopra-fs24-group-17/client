@@ -1,18 +1,30 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import CardComponent from "components/ui/CardComponent";
-import { Grid, Stack, Typography, Button, Box } from "@mui/material";
+import {
+  Grid,
+  Stack,
+  Dialog,
+  IconButton,
+  Box,
+  DialogContent,
+  Button,
+  DialogActions,
+} from "@mui/material";
+import { Chat as ChatIcon, Logout as LogoutIcon } from "@mui/icons-material";
 import { cardTypes } from "components/models/cards";
 import {
   connectWebSocket,
+  disconnectWebSocket,
   subscribeToChannel,
   sendMessage,
-} from "components/views/WebsocketConnection";
+} from "helpers/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
 import GameAlert from "components/ui/GameAlert";
 import GameAlertWithInput from "components/ui/GameAlertWithInput";
 import EnemyPlayers from "components/views/EnemyPlayers";
 import FilledAlert from "./Alert";
+import Chat from "./Chat";
 import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import explosionGif from "components/game/explosionGif.gif";
@@ -28,6 +40,9 @@ const Game = () => {
   const userId = localStorage.getItem("id");
   const username = localStorage.getItem("username");
 
+  const stompClientRef = useRef(null);
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
+
   const [closedDeck, setClosedDeck] = useState(cardTypes);
   const [openDeck, setOpenDeck] = useState([]);
   const [playerHand, setPlayerHand] = useState([]);
@@ -35,6 +50,7 @@ const Game = () => {
   const [gameAlertOpen, setGameAlertOpen] = useState(false);
   const [gameAlertTitle, setGameAlertTitle] = useState("");
   const [gameAlertDescription, setGameAlertDescription] = useState("");
+  const [gameAlertCardDetails, setGameAlertCardDetails] = useState([]);
   const [postAlertAction, setPostAlertAction] = useState(null);
   const [gameAlertWithInputOpen, setGameAlertWithInputOpen] = useState(false);
   const [gameAlertWithInputTitle, setGameAlertWithInputTitle] = useState("");
@@ -51,6 +67,15 @@ const Game = () => {
   const explosionAudioRef = useRef(new Audio(explosionSound));
   const winnerAudioRef = useRef(new Audio(winnerSound));
   const loserAudioRef = useRef(new Audio(loserSound));
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [connected, setConnected] = useState(false);
+  const [userColors, setUserColors] = useState({});
+
+  useEffect(() => {
+    console.log("Messages: ", messages);
+  }, [messages]);
 
   const navigate = useNavigate();
 
@@ -85,9 +110,7 @@ const Game = () => {
 
   const handleIncomingMessageGame = useCallback((message) => {
     const gameState = JSON.parse(message.body);
-    if (
-      gameState.type === "explosion"
-    ) {
+    if (gameState.type === "explosion") {
       handleExplosion(gameState.terminatingUser);
     } else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
@@ -137,10 +160,20 @@ const Game = () => {
   };
 
   const peekIntoDeck = (cards) => {
-    const cardsString = cards.map((card) => `${card.internalCode}`).join("\n");
+    const enhancedCards = cards.map((card) => {
+      const cardType = cardTypes.find(
+        (type) => type.name === card.internalCode
+      );
+      return {
+        name: cardType.name,
+        imageUrl: cardType.imageUrl,
+      };
+    });
+
     gameAlertHandleOpen(
       "See the Future",
-      "The next 3 cards in the deck are:\n" + cardsString
+      "The next 3 cards in the deck are:",
+      enhancedCards.reverse()
     );
   };
 
@@ -178,7 +211,6 @@ const Game = () => {
     }
   }, [explode]);
 
-
   useEffect(() => {
     if (winner) {
       const timer = setTimeout(() => {
@@ -190,7 +222,6 @@ const Game = () => {
     }
   }, [winner]);
 
-
   useEffect(() => {
     if (loser) {
       const timer = setTimeout(() => {
@@ -201,8 +232,6 @@ const Game = () => {
       return () => clearTimeout(timer);
     }
   }, [loser]);
-
-
 
   const handleDefuseCard = () => {
     setPlayerHand((prevHand) => {
@@ -246,14 +275,20 @@ const Game = () => {
     });
   };
 
-  const gameAlertHandleOpen = (title, description) => {
+  const gameAlertHandleOpen = (
+    title: string,
+    description: string,
+    cardDetails?: Array<string>
+  ) => {
     setGameAlertTitle(title);
     setGameAlertDescription(description);
+    setGameAlertCardDetails(cardDetails);
     setGameAlertOpen(true);
   };
 
   const gameAlertHandleClose = () => {
     setGameAlertOpen(false);
+    setGameAlertCardDetails([]);
     if (postAlertAction) {
       postAlertAction();
       setPostAlertAction(null);
@@ -332,19 +367,45 @@ const Game = () => {
   }, [playerHand]);
 
   useEffect(() => {
-    let stompClient = null;
-    connectWebSocket().then((client) => {
-      stompClient = client;
-      subscriptionRef.current = subscribeToChannel(
-        `/game/${gameId}/${userId}`,
-        handleIncomingMessageUser
-      );
-      subscriptionRef.current = subscribeToChannel(
-        `/game/${gameId}`,
-        handleIncomingMessageGame
-      );
-    });
+    if (isWebSocketConnected) {
+      console.log("trying to send message for relaod");
+      sendMessage(`/app/reload/${gameId}/${userId}`, {});
+    }
+  }, [stompClientRef.current]);
+
+  useEffect(() => {
+    const connectAndSubscribe = async () => {
+      try {
+        const client = await connectWebSocket();
+        stompClientRef.current = client;
+
+        if (stompClientRef.current) {
+          console.log("WebSocket connected.");
+          subscribeToChannel(
+            `/game/${gameId}/${userId}`,
+            handleIncomingMessageUser
+          );
+          subscribeToChannel(`/game/${gameId}`, handleIncomingMessageGame);
+          setIsWebSocketConnected(true);
+        } else {
+          console.error("WebSocket client is not defined.");
+        }
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+      }
+    };
+
+    connectAndSubscribe();
   }, []);
+
+  const handleLeave = () => {
+    if (stompClientRef.current) {
+      sendMessage(`/app/leaving/${gameId}/${userId}`, {});
+      disconnectWebSocket();
+    }
+    localStorage.removeItem("gameId");
+    navigate("/dashboard/join-game");
+  };
 
   return (
     <Grid
@@ -429,11 +490,46 @@ const Game = () => {
       <audio ref={winnerAudioRef} src={winnerSound} />
       <audio ref={loserAudioRef} src={loserSound} />
       {playerTurn && <FilledAlert />}
+      <IconButton
+        onClick={() => handleLeave()}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        <LogoutIcon />
+      </IconButton>
+      <IconButton
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        style={{ position: "absolute", top: 0, right: 0 }}
+      >
+        <ChatIcon />
+      </IconButton>
+      <Dialog
+        open={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        PaperProps={{
+          style: { minWidth: "600px" },
+        }}
+      >
+        <DialogContent>
+          <Chat
+            stompClientRef={stompClientRef}
+            messages={messages}
+            setMessages={setMessages}
+            connected={connected}
+            setConnected={setConnected}
+            userColors={userColors}
+            setUserColors={setUserColors}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsChatOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
       <GameAlert
         open={gameAlertOpen}
         handleClose={gameAlertHandleClose}
         title={gameAlertTitle}
         description={gameAlertDescription}
+        cardDetails={gameAlertCardDetails}
       />
       <GameAlertWithInput
         open={gameAlertWithInputOpen}
