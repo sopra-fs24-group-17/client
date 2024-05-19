@@ -1,5 +1,16 @@
 import React from "react";
-import { Modal, Table, Button } from "react-bootstrap";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Button
+} from "@mui/material";
 import styles from "../../styles/Leaderboard.module.css";
 import { useNavigate} from "react-router-dom";
 
@@ -11,13 +22,13 @@ interface LeaderboardEntry {
 
 interface LeaderboardProps {
   show: boolean;
-  onHide: () => void;
+  handleClose: () => void;
   leaderboard: LeaderboardEntry[];
 }
 
 
 
-const Leaderboard: React.FC<LeaderboardProps> = ({ show, onHide, leaderboard }) => {
+const Leaderboard: React.FC<LeaderboardProps> = ({ show, handleClose, leaderboard }) => {
   const navigate = useNavigate();
 
   const handleGoToJoinGame = () => {
@@ -25,32 +36,41 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ show, onHide, leaderboard }) 
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered backdrop="static" keyboard={false}>
-      <Modal.Header>
-        <Modal.Title>Leaderboard</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Table striped bordered hover className={styles.table}>
-          <thead>
-          <tr>
-            <th>Position</th>
-            <th>Username</th>
-          </tr>
-          </thead>
-          <tbody>
-          {leaderboard.map((entry, index) => (
-            <tr key={index}>
-              <td>{entry.position}</td>
-              <td>{entry.username}</td>
-            </tr>
-          ))}
-          </tbody>
+    <Dialog
+      open={show}
+      onClose={(event, reason) => {
+      if (reason !== "backdropClick") {
+        handleClose();
+      }
+    }}
+      fullWidth
+      maxWidth="sm"
+    >
+      <DialogTitle>Leaderboard</DialogTitle>
+      <DialogContent>
+        <Table className={styles.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Position</TableCell>
+              <TableCell>Username</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {leaderboard.map((entry, index) => (
+              <TableRow key={index}>
+                <TableCell>{entry.position}</TableCell>
+                <TableCell>{entry.username}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
         </Table>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="primary" onClick={handleGoToJoinGame}>Home</Button>
-      </Modal.Footer>
-    </Modal>
+      </DialogContent>
+      <DialogActions>
+        <Button variant="contained" color="primary" onClick={handleGoToJoinGame}>
+          Home
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
