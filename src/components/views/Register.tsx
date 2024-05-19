@@ -8,7 +8,7 @@ import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
-} from "./WebsocketConnection";
+} from "../../helpers/WebsocketConnection";
 
 const Register = () => {
   const navigate = useNavigate();

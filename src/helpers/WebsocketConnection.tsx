@@ -1,6 +1,6 @@
 // Websocket Connection
 import { Client } from "@stomp/stompjs";
-import { getDomainWS } from "../../helpers/getDomain";
+import { getDomainWS } from "./getDomain";
 
 let stompClient = null;
 

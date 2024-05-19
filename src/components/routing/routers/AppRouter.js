@@ -19,7 +19,7 @@ import JoinGame from "../../views/JoinGame";
 import AllPlayers from "../../views/AllPlayers";
 import { LobbyGuard } from "../routeProtectors/LobbyGuard";
 import Tutorial from "../../views/Tutorial";
-import WebSocketChat from "../../views/chat";
+import WebSocketChat from "../../views/Chat";
 
 /**
  * Main router of your application.
