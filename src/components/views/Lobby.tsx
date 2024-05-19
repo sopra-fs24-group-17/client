@@ -7,9 +7,9 @@ import {
   disconnectWebSocket,
   subscribeToChannel,
   sendMessage,
-} from "./WebsocketConnection";
+} from "../../helpers/WebsocketConnection";
 import { Grid, Button, Box } from "@mui/material";
-import WebSocketChat from "./chat";
+import WebSocketChat from "./Chat";
 import { hints, getRandomHint } from "components/lobby/hints.js";
 
 const Lobby = () => {

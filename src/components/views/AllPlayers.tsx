@@ -20,7 +20,7 @@ import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
-} from "./WebsocketConnection";
+} from "../../helpers/WebsocketConnection";
 
 const AllPlayers = () => {
   const navigate = useNavigate();

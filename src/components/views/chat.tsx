@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "styles/WebSocketChat.module.css";
+import { StompClient } from "stompjs";
 import {
-  connectWebSocket,
   subscribeToChannel,
   sendMessage,
-  disconnectWebSocket,
   unsubscribeFromChannel,
-} from "components/views/WebsocketConnection";
+} from "helpers/WebsocketConnection";
 
 const colors = [
   "#2196F3",
@@ -25,81 +24,83 @@ const colors = [
   "#4caf50",
 ];
 
-function WebSocketChat() {
+type ChatProps = {
+  stompClientRef: React.RefObject<StompClient>;
+  messages: String[];
+  setMessages: React.Dispatch<React.SetStateAction<String[]>>;
+  connected: boolean;
+  setConnected: React.Dispatch<React.SetStateAction<boolean>>;
+  userColors: {};
+  setUserColors: React.Dispatch<React.SetStateAction<{}>>;
+};
+
+const Chat: React.FC<ChatProps> = ({
+  stompClientRef,
+  messages = [],
+  setMessages,
+  connected,
+  setConnected,
+  userColors = {},
+  setUserColors,
+}) => {
   const storedUsername = localStorage.getItem("username");
   const [username, setUsername] = useState(storedUsername || "");
   const storedgameId = localStorage.getItem("gameId");
   const [roomId, setRoomId] = useState(storedgameId || "");
-  const [connected, setConnected] = useState(false);
-  const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
   const [subscription, setSubscription] = useState(null);
-  const [userColors, setUserColors] = useState({});
   const messagesEndRef = useRef(null);
   const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
-    if (username && !connected) {
+    if (username && !connected && stompClientRef.current) {
       setConnected(true);
-      connectWebSocket()
-        .then((client) => {
-          const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
-            const msgData = JSON.parse(message.body);
-            if (msgData.type === "STATE") {
-              setActiveUsers(msgData.content.split(","));
-              assignColorsToNewUsers(msgData.content.split(","));
-            } else {
-              onMessageReceived(msgData);
-            }
-          });
-          setSubscription(sub);
-          sendMessage(`/app/chat/${roomId}/addUser`, {
-            sender: username,
-            type: "JOIN",
-          });
-        })
-        .catch((error) => {
-          console.error("Connection failed: ", error);
-          setConnected(false);
-        });
-    }
-
-    return () => {
-      if (connected) {
-        disconnectWebSocket();
-        if (subscription) {
-          unsubscribeFromChannel(subscription);
+      const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
+        const msgData = JSON.parse(message.body);
+        if (msgData.type === "STATE") {
+          setActiveUsers(msgData.content.split(","));
+          assignColorsToNewUsers(msgData.content.split(","));
+        } else {
+          onMessageReceived(msgData);
         }
-      }
-    };
-  }, [username, connected, roomId]);
+      });
+      setSubscription(sub);
+      sendMessage(`/app/chat/${roomId}/addUser`, {
+        sender: username,
+        type: "JOIN",
+      });
+    }
+  }, [username, connected, roomId, stompClientRef]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleDisconnect = () => {
-    sendMessage(`/app/chat/${roomId}/addUser`, {
-      sender: username,
-      type: "LEAVE",
-    });
-    setConnected(false);
-    disconnectWebSocket();
-    if (subscription) {
-      unsubscribeFromChannel(subscription);
+    if (stompClientRef.current) {
+      sendMessage(`/app/chat/${roomId}/addUser`, {
+        sender: username,
+        type: "LEAVE",
+      });
+      setConnected(false);
+      if (subscription) {
+        unsubscribeFromChannel(subscription);
+      }
     }
   };
 
   const handleSendMessage = (event) => {
-    event.preventDefault();
-    if (messageContent.trim() && connected) {
-      const chatMessage = {
-        sender: username,
-        content: messageContent,
-        type: "CHAT",
-      };
-      sendMessage(`/app/chat/${roomId}/sendMessage`, chatMessage);
-      setMessageContent("");
+    if (stompClientRef.current) {
+      event.preventDefault();
+      if (messageContent.trim() && connected) {
+        const chatMessage = {
+          sender: username,
+          content: messageContent,
+          type: "CHAT",
+        };
+        sendMessage(`/app/chat/${roomId}/sendMessage`, chatMessage);
+        setMessageContent("");
+      }
     }
   };
 
@@ -206,6 +207,6 @@ function WebSocketChat() {
       )}
     </div>
   );
-}
+};
 
-export default WebSocketChat;
+export default Chat;

@@ -1,18 +1,30 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import CardComponent from "components/ui/CardComponent";
-import { Grid, Stack, Typography, Button, Box } from "@mui/material";
+import {
+  Grid,
+  Stack,
+  Dialog,
+  IconButton,
+  Box,
+  DialogContent,
+  Button,
+  DialogActions,
+} from "@mui/material";
+import { Chat as ChatIcon, Logout as LogoutIcon } from "@mui/icons-material";
 import { cardTypes } from "components/models/cards";
 import {
   connectWebSocket,
+  disconnectWebSocket,
   subscribeToChannel,
   sendMessage,
-} from "components/views/WebsocketConnection";
+} from "helpers/WebsocketConnection";
 import { drawCard } from "components/game/drawCard";
 import GameAlert from "components/ui/GameAlert";
 import GameAlertWithInput from "components/ui/GameAlertWithInput";
 import EnemyPlayers from "components/views/EnemyPlayers";
 import FilledAlert from "./Alert";
+import Chat from "./Chat";
 import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import explosionGif from "components/game/explosionGif.gif";
@@ -55,6 +67,15 @@ const Game = () => {
   const explosionAudioRef = useRef(new Audio(explosionSound));
   const winnerAudioRef = useRef(new Audio(winnerSound));
   const loserAudioRef = useRef(new Audio(loserSound));
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [connected, setConnected] = useState(false);
+  const [userColors, setUserColors] = useState({});
+
+  useEffect(() => {
+    console.log("Messages: ", messages);
+  }, [messages]);
 
   const navigate = useNavigate();
 
@@ -347,7 +368,7 @@ const Game = () => {
 
   useEffect(() => {
     if (isWebSocketConnected) {
-      console.log("trying to send message for relaod")
+      console.log("trying to send message for relaod");
       sendMessage(`/app/reload/${gameId}/${userId}`, {});
     }
   }, [stompClientRef.current]);
@@ -360,7 +381,10 @@ const Game = () => {
 
         if (stompClientRef.current) {
           console.log("WebSocket connected.");
-          subscribeToChannel(`/game/${gameId}/${userId}`, handleIncomingMessageUser);
+          subscribeToChannel(
+            `/game/${gameId}/${userId}`,
+            handleIncomingMessageUser
+          );
           subscribeToChannel(`/game/${gameId}`, handleIncomingMessageGame);
           setIsWebSocketConnected(true);
         } else {
@@ -373,6 +397,15 @@ const Game = () => {
 
     connectAndSubscribe();
   }, []);
+
+  const handleLeave = () => {
+    if (stompClientRef.current) {
+      sendMessage(`/app/leaving/${gameId}/${userId}`, {});
+      disconnectWebSocket();
+    }
+    localStorage.removeItem("gameId");
+    navigate("/dashboard/join-game");
+  };
 
   return (
     <Grid
@@ -457,6 +490,40 @@ const Game = () => {
       <audio ref={winnerAudioRef} src={winnerSound} />
       <audio ref={loserAudioRef} src={loserSound} />
       {playerTurn && <FilledAlert />}
+      <IconButton
+        onClick={() => handleLeave()}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        <LogoutIcon />
+      </IconButton>
+      <IconButton
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        style={{ position: "absolute", top: 0, right: 0 }}
+      >
+        <ChatIcon />
+      </IconButton>
+      <Dialog
+        open={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        PaperProps={{
+          style: { minWidth: "600px" },
+        }}
+      >
+        <DialogContent>
+          <Chat
+            stompClientRef={stompClientRef}
+            messages={messages}
+            setMessages={setMessages}
+            connected={connected}
+            setConnected={setConnected}
+            userColors={userColors}
+            setUserColors={setUserColors}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsChatOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
       <GameAlert
         open={gameAlertOpen}
         handleClose={gameAlertHandleClose}
