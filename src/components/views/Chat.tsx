@@ -53,10 +53,18 @@ const Chat: React.FC<ChatProps> = ({
   const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
+    console.log("connected")
+    console.log(connected)
+    console.log("username")
+    console.log(username)
+    console.log("stomp")
+    console.log(stompClientRef)
     if (username && !connected && stompClientRef.current) {
+      console.log("Attempting to connect and subscribe")
       setConnected(true);
       const sub = subscribeToChannel(`/topic/${roomId}`, (message) => {
         const msgData = JSON.parse(message.body);
+        console.log("Message received:", msgData);
         if (msgData.type === "STATE") {
           setActiveUsers(msgData.content.split(","));
           assignColorsToNewUsers(msgData.content.split(","));

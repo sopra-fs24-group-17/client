@@ -384,6 +384,7 @@ const Game = () => {
       try {
         const client = await connectWebSocket();
         stompClientRef.current = client;
+        console.log(stompClientRef)
 
         if (stompClientRef.current) {
           console.log("WebSocket connected.");

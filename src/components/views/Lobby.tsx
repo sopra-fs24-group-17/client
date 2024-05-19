@@ -23,6 +23,36 @@ const Lobby = () => {
   const [currentHint, setCurrentHint] = useState(getRandomHint());
   const storedUsername = localStorage.getItem("username");
   const creatorName = localStorage.getItem("creator");
+  const stompClientRef = useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [connected, setConnected] = useState(false);
+  const [userColors, setUserColors] = useState({});
+  const userId = localStorage.getItem("id");
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
+
+  useEffect(() => {
+    const connectAndSubscribe = async () => {
+      try {
+        const client = await connectWebSocket();
+        stompClientRef.current = client;
+
+        if (stompClientRef.current) {
+          console.log("WebSocket connected.");
+          await handleSubscribe();
+          setIsWebSocketConnected(true);
+        } else {
+          console.error("WebSocket client is not defined.");
+        }
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+      }
+    };
+    connectAndSubscribe();
+  }, []);
+
+  useEffect(() => {
+    console.log("Messages: ", messages);
+  }, [messages]);
 
   const handleLeaveGame = async () => {
     const token = localStorage.getItem("token");
@@ -45,6 +75,13 @@ const Lobby = () => {
       );
     }
   };
+
+  useEffect(() => {
+    if (isWebSocketConnected) {
+      console.log("trying to send message for relaod");
+      sendMessage(`/app/reload/${gameId}/${userId}`, {});
+    }
+  }, [stompClientRef.current]);
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -110,11 +147,6 @@ const Lobby = () => {
           console.error("Invalid or empty response data");
         }
 
-        const initialiseWebsocketConnection = async () => {
-          await connectWebSocket();
-        };
-        await initialiseWebsocketConnection();
-        await handleSubscribe();
         try {
           await handleJoinGame();
         } catch {
@@ -311,7 +343,24 @@ const Lobby = () => {
             </Box>
           </div>
         </Grid>
+        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: "100%", height: "100vh" }}>
+          {isWebSocketConnected ? (
+            <WebSocketChat
+              stompClientRef={stompClientRef}
+              messages={messages}
+              setMessages={setMessages}
+              connected={connected}
+              setConnected={setConnected}
+              userColors={userColors}
+              setUserColors={setUserColors}
+            />
+          ):(
+            <span>Connecting...</span>
+          )}
+
+        </Grid>
         <Grid item xs={4}></Grid>
+
       </Grid>
     </Box>
   );
