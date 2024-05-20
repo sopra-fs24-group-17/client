@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { api, handleError } from "helpers/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
@@ -21,6 +21,13 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InfoIcon from "@mui/icons-material/Info";
 import { Typography } from "@mui/material";
 import PopupNotification from "components/ui/TutorialPopup";
+import {
+  connectWebSocket,
+  disconnectWebSocket,
+  subscribeToChannel,
+  sendMessage,
+} from "helpers/WebsocketConnection";
+
 
 const CreateGame: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +40,8 @@ const CreateGame: React.FC = () => {
   const [gameCreated, setGameCreated] = useState(false);
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
   const [copySuccess, setCopySuccess] = useState("");
+  const stompClientRef = useRef(null);
+
 
   useEffect(() => {
     console.log("fetching user");
