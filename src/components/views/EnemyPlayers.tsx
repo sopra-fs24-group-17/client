@@ -11,10 +11,7 @@ interface EnemyPlayersProps {
   players: { [key: number]: string };
 }
 
-export default function EnemyPlayers({
-  piles,
-  players,
-}: EnemyPlayersProps) {
+export default function EnemyPlayers({ piles, players }: EnemyPlayersProps) {
   const userId = localStorage.getItem("id");
   const username = localStorage.getItem("username");
   delete players[userId];
@@ -22,14 +19,22 @@ export default function EnemyPlayers({
   return (
     <Stack direction="row" spacing={2} marginBottom={"100px"}>
       {Object.entries(players).map(([playerId, playerData], i) => {
-        const pileCount = piles[playerId]
+        const pileCount = piles[playerId];
         const { name: playerName, avatar: playerAvatar } = playerData;
         return (
           <Stack key={i} alignItems="center">
             <Badge badgeContent={pileCount} color="error">
-              <Avatar alt={`EnemyCards${i + 1}`} src={playerAvatar || placeholder} />
+              <Avatar
+                alt={`EnemyCards${i + 1}`}
+                src={playerAvatar || placeholder}
+              />
             </Badge>
-            <Box bgcolor="white" color="black" borderRadius="5px" marginTop="5px">
+            <Box
+              bgcolor="white"
+              color="black"
+              borderRadius="5px"
+              marginTop="5px"
+            >
               <Typography variant="body1" margin="5px">
                 {playerName}
               </Typography>

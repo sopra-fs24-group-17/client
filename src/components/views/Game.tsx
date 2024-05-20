@@ -121,7 +121,7 @@ const Game = () => {
         setNames(gameState.playerNames);
       }
       if (gameState.players) {
-        setPlayers(gameState.players)
+        setPlayers(gameState.players);
       }
     } else if (gameState.type === "endGame") {
       if (gameState.winningUser === username) {
@@ -551,7 +551,7 @@ const Game = () => {
           alignItems: "center",
         }}
       >
-        <EnemyPlayers piles={piles} players={players}/>
+        <EnemyPlayers piles={piles} players={players} />
       </Grid>
       <Grid item xs={6} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
