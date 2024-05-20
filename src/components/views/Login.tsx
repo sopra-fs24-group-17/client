@@ -38,7 +38,6 @@ const Login = () => {
       } else {
         navigate("/dashboard/tutorial");
       }
-      console.log(response);
     } catch (error) {
       alert(`Something went wrong during the login: \n${handleError(error)}`);
       setLoginFailed(true);

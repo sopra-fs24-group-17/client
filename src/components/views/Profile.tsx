@@ -53,8 +53,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   const [friendRequestStatuses, setFriendRequestStatuses] = useState({});
 
   useEffect(() => {
-    console.log(process.env.REACT_APP_API_URL);
-
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -81,7 +79,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
           headers: { token: token },
         });
         setFriends(response.data.map((friend) => friend.friendId));
-        console.log("Friends fetched successfully.", response.data);
       } catch (error) {
         console.error("Error fetching friends:", error);
       }

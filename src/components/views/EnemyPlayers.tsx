@@ -8,34 +8,40 @@ import placeholder from "components/game/profile_image_placeholder.webp";
 
 interface EnemyPlayersProps {
   piles: { [key: string]: number };
-  playerNames: string[];
+  players: { [key: number]: string };
 }
 
-export default function EnemyPlayers({
-  piles,
-  playerNames,
-}: EnemyPlayersProps) {
+export default function EnemyPlayers({ piles, players }: EnemyPlayersProps) {
   const userId = localStorage.getItem("id");
   const username = localStorage.getItem("username");
-  const pile = Object.entries(piles)
-    .filter(([key]) => key !== "dealer" && key !== "play" && key !== userId)
-    .map(([_, value]) => value);
-  const names = playerNames.filter((name) => name !== username);
+  delete players[userId];
 
   return (
     <Stack direction="row" spacing={2} marginBottom={"100px"}>
-      {pile.map((count, i) => (
-        <Stack key={i} alignItems="center">
-          <Badge badgeContent={count} color="error">
-            <Avatar alt={`EnemyCards${i + 1}`} src={placeholder} />
-          </Badge>
-          <Box bgcolor="white" color="black" borderRadius="5px" marginTop="5px">
-            <Typography variant="body1" margin="5px">
-              {names[i]}
-            </Typography>
-          </Box>
-        </Stack>
-      ))}
+      {Object.entries(players).map(([playerId, playerData], i) => {
+        const pileCount = piles[playerId];
+        const { name: playerName, avatar: playerAvatar } = playerData;
+        return (
+          <Stack key={i} alignItems="center">
+            <Badge badgeContent={pileCount} color="error">
+              <Avatar
+                alt={`EnemyCards${i + 1}`}
+                src={playerAvatar || placeholder}
+              />
+            </Badge>
+            <Box
+              bgcolor="white"
+              color="black"
+              borderRadius="5px"
+              marginTop="5px"
+            >
+              <Typography variant="body1" margin="5px">
+                {playerName}
+              </Typography>
+            </Box>
+          </Stack>
+        );
+      })}
     </Stack>
   );
 }

@@ -62,7 +62,6 @@ const AllPlayers = () => {
         headers: { token: token },
       });
       setFriends(response.data.map((friend) => friend.friendId));
-      console.log("Friends fetched successfully.", response.data);
     } catch (error) {
       console.error("Error fetching friends:", error);
     }

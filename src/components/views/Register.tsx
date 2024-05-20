@@ -40,7 +40,6 @@ const Register = () => {
 
       // Store the token into the local storage.
       const token = response.headers.token;
-      console.log(token);
 
       if (token) {
         localStorage.setItem("token", token);

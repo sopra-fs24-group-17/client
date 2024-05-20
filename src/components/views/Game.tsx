@@ -59,6 +59,7 @@ const Game = () => {
     useState("");
   const [piles, setPiles] = useState([]);
   const [names, setNames] = useState([]);
+  const [players, setPlayers] = useState({});
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -76,10 +77,6 @@ const Game = () => {
   const [connected, setConnected] = useState(false);
   const [userColors, setUserColors] = useState({});
 
-  useEffect(() => {
-    console.log("Messages: ", messages);
-  }, [messages]);
-
   const navigate = useNavigate();
 
   const subscriptionRef = useRef(null);
@@ -91,11 +88,6 @@ const Game = () => {
         ...prevHand,
         ...enhanceCardDetails(gameState.cards),
       ]);
-      console.log(
-        "Received and enhanced cards:",
-        enhanceCardDetails(gameState.cards)
-      );
-      console.log("Player Hand: " + JSON.stringify(playerHand, null, 2));
     } else if (gameState.type === "startTurn") {
       setPlayerTurn(true);
     } else if (gameState.type === "endTurn") {
@@ -127,7 +119,9 @@ const Game = () => {
       }
       if (gameState.playerNames) {
         setNames(gameState.playerNames);
-        console.log(names);
+      }
+      if (gameState.players) {
+        setPlayers(gameState.players);
       }
     } else if (gameState.type === "endGame") {
       if (gameState.winningUser === username) {
@@ -153,9 +147,7 @@ const Game = () => {
 
   const handleCardPlayed = (externalCode) => {
     setPlayerHand((prevHand) => {
-      console.log("Player Hand: " + JSON.stringify(prevHand, null, 2));
       const index = prevHand.findIndex((card) => card.code === externalCode);
-      console.log("Index of card played: " + index);
       if (index !== -1) {
         const newPlayerHand = [...prevHand];
         newPlayerHand.splice(index, 1);
@@ -241,11 +233,9 @@ const Game = () => {
 
   const handleDefuseCard = () => {
     setPlayerHand((prevHand) => {
-      console.log("Player Hand: " + JSON.stringify(prevHand, null, 2));
       const indexOfFirstDefuse = prevHand.findIndex(
         (card) => card.name === "defuse"
       );
-      console.log("Index of first defuse: " + indexOfFirstDefuse);
       if (indexOfFirstDefuse !== -1) {
         const newPlayerHand = [...prevHand];
         newPlayerHand.splice(indexOfFirstDefuse, 1);
@@ -369,10 +359,6 @@ const Game = () => {
   };
 
   useEffect(() => {
-    console.log("Player Hand updated: " + JSON.stringify(playerHand, null, 2));
-  }, [playerHand]);
-
-  useEffect(() => {
     if (isWebSocketConnected) {
       console.log("trying to send message for relaod");
       sendMessage(`/app/reload/${gameId}/${userId}`, {});
@@ -384,7 +370,6 @@ const Game = () => {
       try {
         const client = await connectWebSocket();
         stompClientRef.current = client;
-        console.log(stompClientRef)
 
         if (stompClientRef.current) {
           console.log("WebSocket connected.");
@@ -545,7 +530,6 @@ const Game = () => {
         description={gameAlertWithInputDescription}
         playerNames={names}
         onSubmit={(value) => {
-          console.log("Submitted value: " + value);
           if (gameAlertWithInputTitle === "Favor") {
             // setTargetUsername(value);
             sendMessageCardPlayed([cardCodeFavor], value);
@@ -567,7 +551,7 @@ const Game = () => {
           alignItems: "center",
         }}
       >
-        <EnemyPlayers piles={piles} playerNames={names} />
+        <EnemyPlayers piles={piles} players={players} />
       </Grid>
       <Grid item xs={6} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
@@ -641,13 +625,13 @@ const Game = () => {
           </Stack>
         </Box>
       </Grid>
-    {showLeaderboard && (
-      <Leaderboard
-        show={showLeaderboard}
-        onHide={() => setShowLeaderboard(false)}
-        leaderboard={leaderboard}
-      />
-    )}
+      {showLeaderboard && (
+        <Leaderboard
+          show={showLeaderboard}
+          onHide={() => setShowLeaderboard(false)}
+          leaderboard={leaderboard}
+        />
+      )}
     </Grid>
   );
 };
