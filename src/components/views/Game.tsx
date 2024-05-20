@@ -59,6 +59,7 @@ const Game = () => {
     useState("");
   const [piles, setPiles] = useState([]);
   const [names, setNames] = useState([]);
+  const [players, setPlayers] = useState({});
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -118,6 +119,9 @@ const Game = () => {
       }
       if (gameState.playerNames) {
         setNames(gameState.playerNames);
+      }
+      if (gameState.players) {
+        setPlayers(gameState.players)
       }
     } else if (gameState.type === "endGame") {
       if (gameState.winningUser === username) {
@@ -547,7 +551,7 @@ const Game = () => {
           alignItems: "center",
         }}
       >
-        <EnemyPlayers piles={piles} playerNames={names} />
+        <EnemyPlayers piles={piles} players={players}/>
       </Grid>
       <Grid item xs={6} style={{ display: "flex", justifyContent: "center" }}>
         {/* Closed Deck */}
