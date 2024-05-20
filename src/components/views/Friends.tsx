@@ -78,9 +78,7 @@ const FriendsList = () => {
 
     const filtered = friends.filter(
       (friend) =>
-        friend.username.toLowerCase().includes(query) ||
-        friend.status.toLowerCase().includes(query) ||
-        friend.email.toLowerCase().includes(query)
+        friend.username.toLowerCase().includes(query) 
     );
     setFilteredFriends(filtered);
   };
@@ -88,30 +86,30 @@ const FriendsList = () => {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        // Assuming the token is stored in local storage or context
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("id");
 
         const response = await api.get(`dashboard/${userId}/friends`, {
           headers: {
-            token: token, // Include the token in request headers
+            token: token, 
           },
         });
         console.log(response);
         const transformedFriends = response.data.map((friend) => ({
           ...friend,
-          username: friend.friendName, // Assuming the friendName is the username
-          avatar: friend.friendAvatar, // Direct mapping
-          status: friend.status, // Assuming status is provided by the backend
+          username: friend.friendName, 
+          avatar: friend.friendAvatar, 
+          status: friend.status, 
         }));
+        console.log(transformedFriends);
         setFriends(transformedFriends);
-        setFilteredFriends(transformedFriends); // Initialize with fetched data
+        setFilteredFriends(transformedFriends);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    fetchFriends(); // Call the async function
+    fetchFriends(); 
   }, [userId]);
 
   const handleFriendClick = (userid) => {
@@ -135,7 +133,7 @@ const FriendsList = () => {
             size="small"
             sx={{ mb: 2 }}
             value={searchQuery}
-            onChange={handleSearchChange} // Add onChange handler
+            onChange={handleSearchChange} 
           />
         </Grid>
       </Grid>
@@ -176,11 +174,6 @@ const FriendsList = () => {
                   <TableCell>
                     <Avatar src={friend.avatar} />
                   </TableCell>
-                  <TableCell>{friend.score}</TableCell>
-                  <TableCell>
-                    <Avatar src={friend.countryFlag} variant="square" />
-                  </TableCell>
-                  <TableCell>{friend.email}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
