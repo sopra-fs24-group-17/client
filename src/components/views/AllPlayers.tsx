@@ -319,7 +319,7 @@ const AllPlayers = () => {
                   <TableCell>{player.userid}</TableCell>
                   <TableCell>{player.username}</TableCell>
                   <TableCell>{player.gamesplayed}</TableCell>
-                  <TableCell>{player.winlossratio}</TableCell>
+                  <TableCell>{player.winlossratio.toFixed(2)}</TableCell>
                   <TableCell>{player.achievementsunlocked}</TableCell>
                   <TableCell>
                     {player.lastplayed ? player.lastplayed.slice(0, 10) : "n/a"}
