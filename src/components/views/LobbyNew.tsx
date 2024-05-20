@@ -76,6 +76,8 @@ const LobbyNew = () => {
   useEffect(() => {
     if (currentPlayerCount === Number(maxPlayerCount)) {
       setStartButtonDisabled(false);
+    } else {
+      setStartButtonDisabled(true);
     }
   }, [currentPlayerCount, maxPlayerCount]);
 
@@ -128,7 +130,7 @@ const LobbyNew = () => {
       }
     };
     if (isWebSocketConnected) {
-      const delay = 20; // Delay in milliseconds
+      const delay = 200; // Delay in milliseconds
       setTimeout(handleJoinGame, delay);
     }
   }, [isWebSocketConnected]);
