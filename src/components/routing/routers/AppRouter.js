@@ -15,6 +15,7 @@ import { DashboardGuard } from "../routeProtectors/DashboardGuard";
 import CreateGame from "../../views/CreateGame";
 import FriendsList from "../../views/Friends";
 import Lobby from "../../views/Lobby";
+import LobbyNew from "../../views/LobbyNew";
 import JoinGame from "../../views/JoinGame";
 import AllPlayers from "../../views/AllPlayers";
 import { LobbyGuard } from "../routeProtectors/LobbyGuard";
@@ -50,7 +51,7 @@ const AppRouter = () => {
         </Route>
         s
         <Route path="/lobby/:gameId" element={<LobbyGuard />}>
-          <Route index element={<Lobby />} />
+          <Route index element={<LobbyNew />} />
         </Route>
         <Route path="/dashboard/*" element={<DashboardGuard />}>
           <Route index element={<Drawer />} />

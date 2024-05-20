@@ -118,9 +118,6 @@ const Game = () => {
       }
       if (gameState.piles) {
         setPiles(gameState.piles);
-        if (gameState.piles.dealer === 0) {
-          setClosedDeck([]);
-        }
       }
       if (gameState.playerNames) {
         setNames(gameState.playerNames);
@@ -128,6 +125,8 @@ const Game = () => {
       if (gameState.players) {
         setPlayers(gameState.players);
       }
+    } else if (gameState.type === "loss" && gameState.userName === username) {
+      setLoser(true);
     } else if (gameState.type === "endGame") {
       if (gameState.winningUser === username) {
         setWinner(true);
@@ -229,7 +228,7 @@ const Game = () => {
     if (loser) {
       const timer = setTimeout(() => {
         setExplosionCompleted(true);
-        console.log("Playing winner sound");
+        console.log("Playing loser sound");
         loserAudioRef.current.play();
       }, 3000);
       return () => clearTimeout(timer);

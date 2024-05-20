@@ -2,7 +2,6 @@ import attack from "components/game/cards/attack-1.png";
 import chicken from "components/game/cards/chicken.png";
 import defuse from "components/game/cards/defuse-1.png";
 import favor from "components/game/cards/favor-1.png";
-import nope from "components/game/cards/nope.png";
 import randchick1 from "components/game/cards/randchick-1.png";
 import randchick2 from "components/game/cards/randchick-2.png";
 import randchick3 from "components/game/cards/randchick-3.png";
@@ -23,10 +22,6 @@ export const hints = [
   {
     hint: "Use skip cards wisely to avoid drawing when the deck feels dangerous.",
     image: skip,
-  },
-  {
-    hint: "Stack nope cards for crucial moments to counter significant plays.",
-    image: nope,
   },
   {
     hint: "Peek at the deck with a seethefuture card before making risky moves.",
@@ -57,10 +52,6 @@ export const hints = [
     image: shuffle,
   },
   {
-    hint: "Don't waste a nope card on minor plays; save it for blocking game-changing moves.",
-    image: nope,
-  },
-  {
     hint: "The more players, the higher the chance of drawing an explosion—adjust your strategy accordingly.",
     image: null,
   },
@@ -87,10 +78,6 @@ export const hints = [
   {
     hint: "Gathering information from other players' actions before making your move can be crucial.",
     image: null,
-  },
-  {
-    hint: "Remember that a nope card cannot stop an explosion or defuse—plan accordingly.",
-    image: nope,
   },
   {
     hint: "Shuffle the deck when you feel the current order is too predictable or risky.",
