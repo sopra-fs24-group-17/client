@@ -82,6 +82,10 @@ const Game = () => {
   const [userColors, setUserColors] = useState({});
 
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("info");
+  const [activePlayer, setActivePlayer] = useState(null);
+
   const handleOpenTutorial = () => {setIsTutorialOpen(true);};
   const handleCloseTutorial = () => {setIsTutorialOpen(false);};
 
@@ -128,6 +132,10 @@ const Game = () => {
       }
       if (gameState.players) {
         setPlayers(gameState.players);
+      }
+      if(gameState.activePlayer){
+        setActivePlayer((gameState.activePlayer));
+        console.log(activePlayer)
       }
     } else if (gameState.type === "loss" && gameState.looserUser === username) {
       setLoser(true);
@@ -489,7 +497,7 @@ const Game = () => {
       <audio ref={explosionAudioRef} src={explosionSound} />
       <audio ref={winnerAudioRef} src={winnerSound} />
       <audio ref={loserAudioRef} src={loserSound} />
-      {playerTurn && <FilledAlert />}
+      <FilledAlert pTurn={playerTurn} active={activePlayer} />
       <IconButton
         onClick={() => handleLeave()}
         style={{ position: "absolute", top: 0, left: 0 }}
