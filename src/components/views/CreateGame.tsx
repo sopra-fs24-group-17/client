@@ -28,7 +28,6 @@ import {
   sendMessage,
 } from "helpers/WebsocketConnection";
 
-
 const CreateGame: React.FC = () => {
   const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
@@ -41,7 +40,6 @@ const CreateGame: React.FC = () => {
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
   const [copySuccess, setCopySuccess] = useState("");
   const stompClientRef = useRef(null);
-
 
   useEffect(() => {
     console.log("fetching user");
