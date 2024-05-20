@@ -79,7 +79,7 @@ const Game = () => {
   const [userColors, setUserColors] = useState({});
 
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const handleOpenTutorial = () => {setIsƒTutorialOpen(true);};
+  const handleOpenTutorial = () => {setIsTutorialOpen(true);};
   const handleCloseTutorial = () => {setIsTutorialOpen(false);};
 
   const navigate = useNavigate();
