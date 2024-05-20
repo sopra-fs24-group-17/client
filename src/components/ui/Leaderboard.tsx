@@ -9,11 +9,10 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Button
+  Button,
 } from "@mui/material";
 import styles from "../../styles/Leaderboard.module.css";
-import { useNavigate} from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 
 interface LeaderboardEntry {
   username: string;
@@ -26,9 +25,11 @@ interface LeaderboardProps {
   leaderboard: LeaderboardEntry[];
 }
 
-
-
-const Leaderboard: React.FC<LeaderboardProps> = ({ show, handleClose, leaderboard }) => {
+const Leaderboard: React.FC<LeaderboardProps> = ({
+  show,
+  handleClose,
+  leaderboard,
+}) => {
   const navigate = useNavigate();
 
   const handleGoToJoinGame = () => {
@@ -39,10 +40,10 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ show, handleClose, leaderboar
     <Dialog
       open={show}
       onClose={(event, reason) => {
-      if (reason !== "backdropClick") {
-        handleClose();
-      }
-    }}
+        if (reason !== "backdropClick") {
+          handleClose();
+        }
+      }}
       fullWidth
       maxWidth="sm"
     >
@@ -66,7 +67,11 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ show, handleClose, leaderboar
         </Table>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="primary" onClick={handleGoToJoinGame}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleGoToJoinGame}
+        >
           Home
         </Button>
       </DialogActions>

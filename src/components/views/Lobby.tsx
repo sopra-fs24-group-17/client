@@ -343,7 +343,18 @@ const Lobby = () => {
             </Box>
           </div>
         </Grid>
-        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: "100%", height: "100vh" }}>
+        <Grid
+          item
+          xs={4}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "100vh",
+          }}
+        >
           {isWebSocketConnected ? (
             <WebSocketChat
               stompClientRef={stompClientRef}
@@ -354,13 +365,11 @@ const Lobby = () => {
               userColors={userColors}
               setUserColors={setUserColors}
             />
-          ):(
+          ) : (
             <span>Connecting...</span>
           )}
-
         </Grid>
         <Grid item xs={4}></Grid>
-
       </Grid>
     </Box>
   );
