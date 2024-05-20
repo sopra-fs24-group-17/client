@@ -125,7 +125,7 @@ const Game = () => {
       if (gameState.players) {
         setPlayers(gameState.players);
       }
-    } else if (gameState.type === "loss" && gameState.userName === username) {
+    } else if (gameState.type === "loss" && gameState.looserUser === username) {
       setLoser(true);
     } else if (gameState.type === "endGame") {
       if (gameState.winningUser === username) {
