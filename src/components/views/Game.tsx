@@ -36,6 +36,9 @@ import loserGif from "components/game/rain.gif";
 import loserSound from "components/game/wahwahwah.wav";
 import Leaderboard from "components/ui/Leaderboard";
 import "../../styles/Style.css";
+import Avatar from "@mui/material/Avatar";
+import placeholder from "../game/profile_image_placeholder.webp";
+import Badge from "@mui/material/Badge";
 
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
@@ -118,6 +121,7 @@ const Game = () => {
       }
       if (gameState.piles) {
         setPiles(gameState.piles);
+        console.log(gameState.piles);
       }
       if (gameState.playerNames) {
         setNames(gameState.playerNames);
@@ -569,20 +573,22 @@ const Game = () => {
         <div className="card-stack">
           {closedDeck.map((card) => (
             <div key={card.id} className="card">
-              <CardComponent
-                text=""
-                description=""
-                image={card_back}
-                onClick={() =>
-                  drawCard(
-                    playerTurn,
-                    sendMessage,
-                    setGameAlertOpen,
-                    setGameAlertTitle,
-                    setGameAlertDescription
-                  )
-                }
-              />
+              <Badge badgeContent={piles["dealer"]} color="error">
+                <CardComponent
+                  text=""
+                  description=""
+                  image={card_back}
+                  onClick={() =>
+                    drawCard(
+                      playerTurn,
+                      sendMessage,
+                      setGameAlertOpen,
+                      setGameAlertTitle,
+                      setGameAlertDescription
+                    )
+                  }
+                />
+              </Badge>
             </div>
           ))}
         </div>
