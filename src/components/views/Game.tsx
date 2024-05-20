@@ -11,7 +11,7 @@ import {
   Button,
   DialogActions,
 } from "@mui/material";
-import { Chat as ChatIcon, Logout as LogoutIcon } from "@mui/icons-material";
+import { Chat as ChatIcon, Logout as LogoutIcon, Help as HelpIcon } from "@mui/icons-material";
 import { cardTypes } from "components/models/cards";
 import {
   connectWebSocket,
@@ -25,6 +25,7 @@ import GameAlertWithInput from "components/ui/GameAlertWithInput";
 import EnemyPlayers from "components/views/EnemyPlayers";
 import FilledAlert from "./Alert";
 import Chat from "./Chat";
+import TutorialPopup from "./TutorialPopup"; 
 import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import explosionGif from "components/game/explosionGif.gif";
@@ -76,6 +77,10 @@ const Game = () => {
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
   const [userColors, setUserColors] = useState({});
+
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const handleOpenTutorial = () => {setIsƒTutorialOpen(true);};
+  const handleCloseTutorial = () => {setIsTutorialOpen(false);};
 
   const navigate = useNavigate();
 
@@ -494,6 +499,13 @@ const Game = () => {
       >
         <ChatIcon />
       </IconButton>
+      <IconButton
+        onClick={handleOpenTutorial}
+        style={{ position: "absolute", top: 0, right: 40 }}
+      >
+        <HelpIcon />
+      </IconButton>
+      <TutorialPopup open={isTutorialOpen} onClose={handleCloseTutorial} />
       <Dialog
         open={isChatOpen}
         onClose={() => setIsChatOpen(false)}

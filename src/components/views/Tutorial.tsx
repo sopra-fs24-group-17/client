@@ -5,7 +5,7 @@ import attack from "components/game/cards/attack-1.png";
 import chicken from "components/game/cards/chicken.png";
 import defuse from "components/game/cards/defuse-1.png";
 import favor from "components/game/cards/favor-1.png";
-import nope from "components/game/cards/nope.png";
+import getlucky from "components/game/cards/getlucky.png";
 import randchick1 from "components/game/cards/randchick-1.png";
 import randchick2 from "components/game/cards/randchick-2.png";
 import randchick3 from "components/game/cards/randchick-3.png";
@@ -17,6 +17,7 @@ const currentPath = "dashboard/tutorial";
 
 const Tutorial = () => {
   localStorage.setItem("previousPath", currentPath);
+  
   return (
     <Container maxWidth={false} sx={{ mt: 2 }}>
       <Grid container direction="column" spacing={2}>
@@ -68,9 +69,9 @@ const Tutorial = () => {
               text: "Play a defuse card to stop yourself from exploding upon drawing an explosion card. These cards are extremely valuable. After playing a defuse card, the explosion card must be placed back anywhere in the deck. Playing this card instantly ends a player's turn.",
             },
             {
-              src: nope,
-              alt: "nope",
-              text: "Playing a nope card will stop any action (exceptions are explosion cards and defuse cards, which cannot be noped).",
+              src: getlucky,
+              alt: "getlucky",
+              text: "Playing a getlucky card will give you a random card from the deck.",
             },
             {
               src: seethefuture,
@@ -111,7 +112,7 @@ const Tutorial = () => {
               The following &#34;chicken cards&#34; are multi-cards. Playing two
               wild chicken cards simultaneously has the same effect as a skip
               card. Similarly, two chicktionary, rainbow chicken and surfing
-              chicken cards together have the same effect as a future, attack
+              chicken cards together have the same effect as a seethefuture, attack
               and shuffle card respectively.
             </Typography>
           </Grid>
