@@ -1,11 +1,10 @@
-import React from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import { useNavigate } from "react-router-dom";
 import { api } from "helpers/api";
-
 
 // Define an interface for the component props
 interface TutorialPopupProps {
@@ -14,42 +13,54 @@ interface TutorialPopupProps {
   onClose: () => void;
 }
 
-const TutorialPopup: React.FC<TutorialPopupProps> = ({ open, message, onClose }) => {
-    const navigate = useNavigate();
+const TutorialPopup: React.FC<TutorialPopupProps> = ({
+  open,
+  message,
+  onClose,
+}) => {
+  const navigate = useNavigate();
 
-    enum TutorialFlag {
-      TRUE,
-      FALSE,
-    }  
+  enum TutorialFlag {
+    TRUE,
+    FALSE,
+  }
 
-    const handleClick = async () => {
-      interface UpdateData {
-        tutorialflag?: TutorialFlag
-      }
-      const updateData: UpdateData = {tutorialflag: TutorialFlag.FALSE};
-      await api.put(`dashboard/${localStorage.getItem("id")}/profile`, JSON.stringify(updateData), {
-        headers: {
-          "Content-Type": "application/json",
-          token: localStorage.getItem("token"),
-        }
-      });
-
-      navigate("/dashboard/tutorial");
-    };
-
-    const handleDontShowAgain = async () => {
-      interface UpdateData {
-        tutorialflag?: TutorialFlag
-      }
-      const updateData: UpdateData = {tutorialflag: TutorialFlag.FALSE};
-      await api.put(`dashboard/${localStorage.getItem("id")}/profile`, JSON.stringify(updateData), {
-        headers: {
-          "Content-Type": "application/json",
-          token: localStorage.getItem("token"),
-        }
-      });
-      onClose();
+  const handleClick = async () => {
+    interface UpdateData {
+      tutorialflag?: TutorialFlag;
     }
+    const updateData: UpdateData = { tutorialflag: TutorialFlag.FALSE };
+    await api.put(
+      `dashboard/${localStorage.getItem("id")}/profile`,
+      JSON.stringify(updateData),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+      }
+    );
+
+    navigate("/dashboard/tutorial");
+  };
+
+  const handleDontShowAgain = async () => {
+    interface UpdateData {
+      tutorialflag?: TutorialFlag;
+    }
+    const updateData: UpdateData = { tutorialflag: TutorialFlag.FALSE };
+    await api.put(
+      `dashboard/${localStorage.getItem("id")}/profile`,
+      JSON.stringify(updateData),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+      }
+    );
+    onClose();
+  };
 
   const action = (
     <React.Fragment>
@@ -77,7 +88,7 @@ const TutorialPopup: React.FC<TutorialPopupProps> = ({ open, message, onClose })
       onClose={onClose}
       message={message}
       action={action}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
     />
   );
 };

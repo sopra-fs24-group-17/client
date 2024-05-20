@@ -27,7 +27,7 @@ const Login = () => {
       if (token) {
         localStorage.setItem("token", token);
         localStorage.setItem("id", response.data.id);
-        localStorage.setItem("username", response.data.username)
+        localStorage.setItem("username", response.data.username);
       }
 
       // Login successfully worked --> navigate to the route /dashboard
@@ -38,8 +38,6 @@ const Login = () => {
       } else {
         navigate("/dashboard/tutorial");
       }
-      console.log(response)
-      
     } catch (error) {
       alert(`Something went wrong during the login: \n${handleError(error)}`);
       setLoginFailed(true);

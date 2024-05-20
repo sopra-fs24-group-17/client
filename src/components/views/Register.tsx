@@ -8,7 +8,7 @@ import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
-} from "./WebsocketConnection";
+} from "../../helpers/WebsocketConnection";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -40,7 +40,6 @@ const Register = () => {
 
       // Store the token into the local storage.
       const token = response.headers.token;
-      console.log(token);
 
       if (token) {
         localStorage.setItem("token", token);
@@ -72,7 +71,7 @@ const Register = () => {
   const verifyPassword = (password2) => {
     setPassword2(password2);
     setPasswordsMatch(password === password2);
-  }
+  };
 
   return (
     <Layout>

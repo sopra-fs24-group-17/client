@@ -1,6 +1,6 @@
 // Websocket Connection
 import { Client } from "@stomp/stompjs";
-import { getDomainWS } from "../../helpers/getDomain"
+import { getDomainWS } from "./getDomain";
 
 let stompClient = null;
 
@@ -73,4 +73,3 @@ export const sendMessage = (destination, body, headers = {}) => {
     console.log("WebSocket is not connected. Unable to send message.");
   }
 };
-

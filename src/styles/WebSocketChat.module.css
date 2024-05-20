@@ -1,247 +1,251 @@
 .chatContainer {
-    display: flex;
-    flex-direction: column;
-    max-width: 550px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
 }
 
 .formControl {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 2px solid #ccc;
-    border-radius: 4px;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 2px solid #ccc;
+  border-radius: 4px;
 }
 
-.primary, .accent {
-    padding: 10px 20px;
-    border: none;
-    text-align: center;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 4px;
+.primary,
+.accent {
+  padding: 10px 20px;
+  border: none;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 .primary {
-    background-color: #4CAF50;
-    color: white;
-    height: 45px;
+  background-color: #4caf50;
+  color: white;
+  height: 45px;
 }
 
 .accent {
-    background-color: #f44336;
-    color: white;
+  background-color: #f44336;
+  color: white;
 }
 
 .messageList {
-    list-style: none;
-    padding: 0;
-    overflow-y: auto;
-    max-height: 300px;
+  list-style: none;
+  padding: 0;
+  overflow-y: auto;
+  max-height: 300px;
 }
 
-.chatMessage, .eventMessage {
-    border-radius: 5px;
-    padding: 10px;
-    margin: 5px 0;
-    position: relative;
+.chatMessage,
+.eventMessage {
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px 0;
+  position: relative;
 }
 
 .chatMessage {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 .chatMessage.myMessage {
-    background-color: #e0f7fa;
-    margin-left: auto;
-    border-top-right-radius: 0;
+  background-color: #e0f7fa;
+  margin-left: auto;
+  border-top-right-radius: 0;
 }
 
 .chatMessage.otherMessage {
-    background-color: #f9f9f9;
-    margin-right: auto;
-    border-top-left-radius: 0;
+  background-color: #f9f9f9;
+  margin-right: auto;
+  border-top-left-radius: 0;
 }
 
 .eventMessage {
-    text-align: center;
-    color: #888;
-    font-style: italic;
+  text-align: center;
+  color: #888;
+  font-style: italic;
 }
 
 .messageForm {
-    display: flex;
-    margin-top: 10px;
+  display: flex;
+  margin-top: 10px;
 }
 
 .messageForm input[type="text"] {
-    flex: 1;
-    padding: 10px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
 }
 
 .messageForm button {
-    width: 100px;
-    padding: 10px;
-    background-color: #5c67f2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    margin-left: 10px;
+  width: 100px;
+  padding: 10px;
+  background-color: #5c67f2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-left: 10px;
 }
 
 .otherMessage {
-    text-align: left;
-    margin-right: 50%;
+  text-align: left;
+  margin-right: 50%;
 }
 
 .myMessage {
-    text-align: left;
-    margin-left: 50%;
+  text-align: left;
+  margin-left: 50%;
 }
 
 .messageList {
-    overflow-y: auto;
-    max-height: 400px;
-    padding: 5px;
-    list-style: none;
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 5px;
+  list-style: none;
 }
 
 .activeUsers {
-    margin-bottom: 0px;
-    padding: 10px;
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    color: #333;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+  margin-bottom: 0px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  color: #333;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .messageContent {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .userAvatar {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 8px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
 }
 
 .avatarLetter {
-    color: white;
-    font-weight: bold;
+  color: white;
+  font-weight: bold;
 }
 
-
 .activeUserContainer {
-    display: flex;
-    align-items: center;
-    margin-right: 15px;
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
 }
 
 .userName {
-    margin-left: 8px;
-    color: #333;
-    font-size: 14px;
+  margin-left: 8px;
+  color: #333;
+  font-size: 14px;
 }
 
 .userTag {
-    background-color: #2196F3;
-    color: white;
-    border-radius: 15px;
-    padding: 5px 10px;
-    font-size: 14px;
-    white-space: nowrap;
+  background-color: #2196f3;
+  color: white;
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .messageForm {
-    display: flex;
-    padding: 10px;
-    background: #f4f4f8;
-    border-top: 1px solid #e0e0e0;
+  display: flex;
+  padding: 10px;
+  background: #f4f4f8;
+  border-top: 1px solid #e0e0e0;
 }
 
 .formControl {
-    flex-grow: 1;
-    margin-right: 8px;
-    padding: 8px;
-    border: 2px solid #ccc;
-    border-radius: 20px;
-    outline: none;
+  flex-grow: 1;
+  margin-right: 8px;
+  padding: 8px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  outline: none;
 }
 
 .primary {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .primary:hover {
-    background-color: #45a045;
+  background-color: #45a045;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .messageList li {
-    animation: fadeIn 0.5s ease-out;
-    margin-bottom: 10px;
+  animation: fadeIn 0.5s ease-out;
+  margin-bottom: 10px;
 }
 
 .messageList {
-    padding: 10px;
-    overflow-y: auto;
+  padding: 10px;
+  overflow-y: auto;
 }
 
 .myMessage {
-    align-self: flex-end;
-    background-color: #dcf8c6;
-    border-radius: 15px;
-    padding: 5px 10px;
-    margin: 4px 0;
+  align-self: flex-end;
+  background-color: #dcf8c6;
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin: 4px 0;
 }
 
 .otherMessage {
-    align-self: flex-start;
-    background-color: #f2f2f2;
-    border-radius: 15px;
-    padding: 5px 10px;
-    margin: 4px 0;
+  align-self: flex-start;
+  background-color: #f2f2f2;
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin: 4px 0;
 }
 
 .eventMessage {
-    text-align: center;
-    color: #888;
-    margin: 10px 0;
+  text-align: center;
+  color: #888;
+  margin: 10px 0;
 }
 
 .chatRoomHeader {
-    background-color: white;
-    border: 1px black;
-    padding: 10px;
-    margin-bottom: 5px;
+  background-color: white;
+  border: 1px black;
+  padding: 10px;
+  margin-bottom: 5px;
 }
 
 .chatRoomTitle {
-    color: #333;
-    margin-bottom: 15px;
-    text-align: center;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
 }

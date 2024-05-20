@@ -1,78 +1,164 @@
-import PropTypes from 'prop-types';
-import React, { useEffect, useState , useRef } from "react";
-import { useNavigate, useParams, useLocation  } from "react-router-dom";
+import PropTypes from "prop-types";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { api, handleError } from "helpers/api";
 import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
   sendMessage,
-} from "./WebsocketConnection";
-import {Grid, Button, Box } from "@mui/material";
-import WebSocketChat from './chat'; 
+} from "../../helpers/WebsocketConnection";
+import { Grid, Button, Box } from "@mui/material";
+import WebSocketChat from "./Chat";
 import { hints, getRandomHint } from "components/lobby/hints.js";
 
 const Lobby = () => {
   const [currentPlayers, setCurrentPlayers] = useState(1);
   const navigate = useNavigate();
+  const { gameId } = useParams();
   const [joinButtonDisabled, setJoinButtonDisabled] = useState(true);
   const [leaveButtonDisabled, setLeaveButtonDisabled] = useState(false);
   const [totalPlayersRequired, setTotalPlayersRequired] = useState(2);
-  const { gameId } = useParams();
   const [message, setMessage] = useState(null);
   const [currentHint, setCurrentHint] = useState(getRandomHint());
-
+  const storedUsername = localStorage.getItem("username");
+  const creatorName = localStorage.getItem("creator");
+  const stompClientRef = useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [connected, setConnected] = useState(false);
+  const [userColors, setUserColors] = useState({});
+  const userId = localStorage.getItem("id");
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
   useEffect(() => {
-    
-    if (currentPlayers === totalPlayersRequired) {
+    const connectAndSubscribe = async () => {
+      try {
+        const client = await connectWebSocket();
+        stompClientRef.current = client;
+
+        if (stompClientRef.current) {
+          console.log("WebSocket connected.");
+          await handleSubscribe();
+          setIsWebSocketConnected(true);
+        } else {
+          console.error("WebSocket client is not defined.");
+        }
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+      }
+    };
+    connectAndSubscribe();
+  }, []);
+
+  useEffect(() => {
+    console.log("Messages: ", messages);
+  }, [messages]);
+
+  const handleLeaveGame = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.put(
+        `/dashboard/games/leave/${gameId}`,
+        {},
+        {
+          headers: { token: token },
+        }
+      );
+      localStorage.removeItem("creatorflag");
+      localStorage.removeItem("joinGame");
+      console.log("Left game successfully", response.data);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(
+        "Error leaving game:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (isWebSocketConnected) {
+      console.log("trying to send message for relaod");
+      sendMessage(`/app/reload/${gameId}/${userId}`, {});
+    }
+  }, [stompClientRef.current]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      console.log("Before unload event triggered");
+      handleLeaveGame();
+      event.preventDefault();
+      event.returnValue = ""; // This is necessary for Chrome to trigger the dialog
+    };
+
+    const handlePopState = async () => {
+      console.log("Popstate event triggered");
+      await handleLeaveGame();
+    };
+
+    console.log("Attaching event listeners");
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+    window.history.pushState(null, document.title, window.location.href);
+    console.log("Event listeners attached");
+
+    return () => {
+      console.log("Removing event listeners");
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+      console.log("Event listeners removed");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      currentPlayers === totalPlayersRequired &&
+      storedUsername === localStorage.getItem("creator")
+    ) {
       setJoinButtonDisabled(false);
     } else {
       setJoinButtonDisabled(true);
     }
   }, [currentPlayers, totalPlayersRequired]);
 
-
   useEffect(() => {
     const fetchGameData = async () => {
       const token = localStorage.getItem("token");
       try {
         const response = await api.get(`dashboard/games`, {
-          headers: { 'token': token } 
+          headers: { token: token },
         });
-        // This is to find the game we want from all the slots to take the info we want
         if (response.data && response.data.length > 0) {
-          const game = response.data.find(game => game.gameId === parseInt(gameId, 10));
-          
+          const game = response.data.find(
+            (game) => game.gameId === parseInt(gameId, 10)
+          );
+
           if (game && game.maxPlayers !== undefined) {
             setTotalPlayersRequired(game.maxPlayers);
             setCurrentPlayers(game.currentPlayers);
-            
+            localStorage.setItem("creator", game.initiatingUserName);
+            console.log("Current players:", game.currentPlayers);
           } else {
-            console.error("Game with specified ID not found or lacks 'maxPlayers' data");
+            console.error(
+              "Game with specified ID not found or lacks 'maxPlayers' data"
+            );
           }
         } else {
           console.error("Invalid or empty response data");
         }
-        
 
-        // Initialize WebSocket connection using @stomp/stompjs
-        const initialiseWebsocketConnection = async () => {
-          await connectWebSocket();
-        };
-        await initialiseWebsocketConnection();
-        await handleSubcribe();
         try {
           await handleJoinGame();
         } catch {
-          console.error("Error joining game, did you try to join game with the initiator?")
+          console.error(
+            "Error joining game, did you try to join game with the initiator?"
+          );
         }
-
       } catch (error) {
         console.error("Failed to fetch game data:", error);
       }
     };
-    fetchGameData(); 
+    fetchGameData();
 
     return () => {
       disconnectWebSocket();
@@ -99,27 +185,7 @@ const Lobby = () => {
     }
   };
 
-  const handleLeaveGame = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await api.put(
-        `/dashboard/games/leave/${gameId}`,
-        {},
-        {
-          headers: { token: token },
-        }
-      );
-      console.log("Joined left successfully", response.data);
-      navigate(-1);
-    } catch (error) {
-      console.error(
-        "Error leaving game:",
-        error.response ? error.response.data : error.message
-      );
-    }
-  };
- 
-  const handleSubcribe = async () => {
+  const handleSubscribe = async () => {
     subscribeToChannel(
       `/game/${gameId}`,
       (message) => {
@@ -130,52 +196,49 @@ const Lobby = () => {
           setCurrentPlayers((prevPlayers) => prevPlayers + 1);
         } else if (messageBody.type === "leave") {
           setCurrentPlayers((prevPlayers) => prevPlayers - 1);
+          if (messageBody.userName === creatorName) {
+            console.log("Creator left the game");
+            handleLeaveGame();
+            navigate("/dashboard");
+          }
         }
 
         if (messageBody === "lets all start together guys") {
-          navigate(`/game`); 
+          navigate(`/game/${gameId}`);
         }
       },
       { id: `sub-${gameId}` }
     );
-    };
+  };
+
   const handleStartGame = async () => {
     sendMessage(`/game/${gameId}`, "lets all start together guys");
     sendMessage(`/app/start/${gameId}`, {});
-  }
+  };
 
-
-  
   useEffect(() => {
-    let lastHint = currentHint; // Initialize lastHint with the first random hint already set
-  
-    // Function to update the hint
+    let lastHint = currentHint.hint;
+
     const updateHint = () => {
-      let newHint = getRandomHint();
+      let newHintObject = getRandomHint();
       let attemptCount = 0;
-  
-      while (newHint === lastHint && attemptCount < 10) {
-        newHint = getRandomHint();
+
+      while (newHintObject.hint === lastHint && attemptCount < 10) {
+        newHintObject = getRandomHint();
         attemptCount++;
       }
-  
-      setCurrentHint(newHint); 
-      console.log(newHint);
-      lastHint = newHint; // Update lastHint for the next interval
+
+      setCurrentHint(newHintObject);
+      console.log(newHintObject.hint);
+      lastHint = newHintObject.hint;
     };
-  
-    // Immediately update to a new hint when component mounts
+
     updateHint();
-  
-    // Set up the interval to update hints every 10 seconds
     const intervalId = setInterval(updateHint, 10000);
-  
-    // Clean up the interval when the component unmounts
+
     return () => clearInterval(intervalId);
   }, []);
-  
 
-  
   const lobbyContainerStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -200,77 +263,115 @@ const Lobby = () => {
     marginTop: "10px",
   };
 
-  const hintContainerStyle: React.CSSProperties= {
+  const hintContainerStyle: React.CSSProperties = {
     backgroundColor: "#f0f0f0",
     padding: "20px",
     width: "600px",
     borderRadius: "8px",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    display: "flex",  
-    flexDirection: "column",  
-    alignItems: "center",  
-    justifyContent: "center",     
-    textAlign: "center",  
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
   };
 
-
-  const hintListStyle = {
-    listStyleType: "none",  
-    padding: 0,  
-    margin: 0,  
-    width: "100%",  
+  const hintListStyle: React.CSSProperties = {
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+    width: "100%",
   };
 
   const hintListItemStyle = {
     marginBottom: "5px",
-    textAlign: "center", 
+    textAlign: "center",
   };
 
   return (
     <Box sx={{ flexGrow: 1, height: "100vh" }}>
-    <Grid container spacing={2}>
-      <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}> 
-    <div style={lobbyContainerStyle}>
-      <div style={statusContainerStyle}>
-        <h2>Waiting for players to join...</h2>
-        <div style={playersStatusStyle}>
-          {currentPlayers} out of {totalPlayersRequired} players 
-        </div>
-        {currentPlayers === totalPlayersRequired && (
-          <div style={checkIconStyle}>✓</div>
-        )}
-      </div>
-      <div style={hintContainerStyle}>
-        <ul style={hintListStyle}>
-          {currentHint}
-        </ul>
-      </div>
-      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>  
-        <Button
-          onClick={handleStartGame}  
-          disabled={joinButtonDisabled}  
-          variant="contained"
-          color="success"
+      <Grid container spacing={2}>
+        <Grid
+          item
+          xs={8}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          Start Game
-        </Button>
-        <Button
-          onClick={handleLeaveGame}
-          disabled={leaveButtonDisabled}
-          variant="contained"
-          color="error"
+          <div style={lobbyContainerStyle}>
+            <div style={statusContainerStyle}>
+              <h2>Waiting for players to join...</h2>
+              <div style={playersStatusStyle}>
+                {currentPlayers} out of {totalPlayersRequired} players
+              </div>
+              {currentPlayers === totalPlayersRequired && (
+                <div style={checkIconStyle}>✓</div>
+              )}
+            </div>
+            <div style={hintContainerStyle}>
+              <ul style={hintListStyle}>
+                <li>{currentHint.hint}</li>
+                {currentHint.image ? (
+                  <img
+                    src={currentHint.image}
+                    alt="Card Image"
+                    style={{ maxWidth: "100px", marginTop: "10px" }}
+                  />
+                ) : null}
+              </ul>
+            </div>
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <Button
+                onClick={handleStartGame}
+                disabled={joinButtonDisabled}
+                variant="contained"
+                color="success"
+              >
+                Start Game
+              </Button>
+              <Button
+                onClick={handleLeaveGame}
+                disabled={leaveButtonDisabled}
+                variant="contained"
+                color="error"
+              >
+                Leave Lobby
+              </Button>
+            </Box>
+          </div>
+        </Grid>
+        <Grid
+          item
+          xs={4}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "100vh",
+          }}
         >
-          Leave Lobby
-        </Button>
-      </Box>
-    </div>
-    </Grid>
-      <Grid item xs={4}>
-        <WebSocketChat />  {/* This is where the chat component gets rendered */}
+          {isWebSocketConnected ? (
+            <WebSocketChat
+              stompClientRef={stompClientRef}
+              messages={messages}
+              setMessages={setMessages}
+              connected={connected}
+              setConnected={setConnected}
+              userColors={userColors}
+              setUserColors={setUserColors}
+            />
+          ) : (
+            <span>Connecting...</span>
+          )}
+        </Grid>
+        <Grid item xs={4}></Grid>
       </Grid>
-    </Grid>
-  </Box>
-
+    </Box>
   );
 };
 

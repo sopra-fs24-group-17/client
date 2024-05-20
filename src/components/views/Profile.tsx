@@ -22,8 +22,9 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import EditProfile from "./EditProfile";
 import BlockIcon from "@mui/icons-material/Block";
 import ChangePassword from "./ChangePassword";
-import placeholder from 'components/game/profile_image_placeholder.webp';
-
+import placeholder from "components/game/profile_image_placeholder.webp";
+import { FlagIcon } from "react-flag-kit";
+import countryList from "react-select-country-list";
 
 interface ProfileProps {
   userId: string;
@@ -48,9 +49,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
 
   const currentUserID = localStorage.getItem("id");
 
-  useEffect(() => {
-    console.log(process.env.REACT_APP_API_URL);
+  const [friends, setFriends] = useState([]);
+  const [friendRequestStatuses, setFriendRequestStatuses] = useState({});
 
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -68,8 +70,43 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
         setIsAuthorizedToView(false);
       }
     };
+
+    const fetchFriends = async () => {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("id");
+      try {
+        const response = await api.get(`/dashboard/${userId}/friends`, {
+          headers: { token: token },
+        });
+        setFriends(response.data.map((friend) => friend.friendId));
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      }
+    };
+
     fetchUser();
+    fetchFriends();
   }, [userId]);
+
+  const sendFriendRequest = async (recipientUserId) => {
+    try {
+      const token = localStorage.getItem("token");
+      setFriendRequestStatuses((prevStatuses) => ({
+        ...prevStatuses,
+        [recipientUserId]: "waiting",
+      }));
+      await api.put(
+        `/dashboard/${recipientUserId}/friends/requests`,
+        {},
+        {
+          headers: { token: token },
+        }
+      );
+      console.log("Friend request sent successfully to user:", recipientUserId);
+    } catch (error) {
+      console.error("Failed to send friend request:", error);
+    }
+  };
 
   if (!isAuthorizedToView) {
     return (
@@ -115,6 +152,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   if (isChangingPassword) {
     return <ChangePassword />;
   }
+
+  const countryNameToCode = (countryName) => {
+    const country = countryList()
+      .getData()
+      .find((c) => c.label === countryName);
+    return country ? country.value : null;
+  };
 
   if (user) {
     return (
@@ -177,86 +221,135 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                 sx={{
                   height: "45vh",
                 }}
-                image={
-                  avatarPath
-                    ? avatarPath
-                    : placeholder
-                }
+                image={avatarPath ? avatarPath : placeholder}
                 title="profile"
               />
-              <CardContent>
+
+              <CardContent
+                style={{ paddingLeft: "35px", paddingRight: "35px" }}
+              >
                 <Typography
                   gutterBottom
                   variant="h5"
-                  component="div"
-                  align="center"
-                  marginBottom={2.5}
-                >
-                  {user.username}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
                   color="text.secondary"
                   align="center"
+                  marginBottom={2.5}
                 >
                   {user.status === "ONLINE" ? (
                     <FiberManualRecordIcon
                       style={{
-                        fontSize: 14,
+                        marginRight: 5,
+                        fontSize: 20,
                         color: "green",
-                        verticalAlign: "middle",
+                        verticalAlign: "-2px",
                       }}
                     />
                   ) : (
                     <FiberManualRecordIcon
                       style={{
-                        fontSize: 14,
+                        marginRight: 5,
+                        fontSize: 20,
                         color: "red",
-                        verticalAlign: "middle",
+                        verticalAlign: "-2px",
                       }}
                     />
                   )}
-                  {user.status}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  Created on: {user.creationdate.slice(0, 10)}
+                  {user.username}
                 </Typography>
 
-                {/* optional fields -> set as optional */}
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
                 >
-                  Birthday:{" "}
-                  {user.birthdate ? user.birthdate.slice(0, 10) : "Not set"}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  Email: {user.email}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                  marginBottom={2.5}
-                >
-                  Country:{" "}
-                  {user.countryoforigin ? user.countryoforigin : "Not set"}
-                </Typography>
+                  {[
+                    {
+                      label: "Created on:",
+                      value: user.creationdate.slice(0, 10),
+                    },
+                    {
+                      label: "Birthday:",
+                      value: user.birthdate
+                        ? user.birthdate.slice(0, 10)
+                        : "Not set",
+                    },
+                    { label: "Email:", value: user.email },
+                    {
+                      label: "Country:",
+                      value: user.countryoforigin
+                        ? user.countryoforigin
+                        : "Not set",
+                      flag: user.countryoforigin,
+                    },
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        width: "100%",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <span style={{ paddingRight: "10px" }}>{item.label}</span>
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          fontWeight: "bold",
+                          overflow:
+                            item.label === "Email:" ? "hidden" : undefined,
+                          whiteSpace:
+                            item.label === "Email:" ? "nowrap" : undefined,
+                          textOverflow:
+                            item.label === "Email:" ? "ellipsis" : undefined,
+                          cursor: "default",
+                        }}
+                        title={item.value}
+                      >
+                        {item.value}
+                        {item.flag && (
+                          <FlagIcon
+                            code={countryNameToCode(user.countryoforigin)}
+                            size={35}
+                            style={{ marginLeft: 8, verticalAlign: "middle" }}
+                          />
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
+
+              {user &&
+              user.id &&
+              localStorage.getItem("id") !== user.id.toString() ? (
+                <CardActions sx={{ justifyContent: "center", marginBottom: 0 }}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      sendFriendRequest(user.id);
+                    }}
+                    disabled={
+                      friends.includes(user.id) ||
+                      friendRequestStatuses[user.id] === "waiting"
+                    }
+                  >
+                    {friends.includes(user.id)
+                      ? "Already Added"
+                      : friendRequestStatuses[user.id] === "waiting"
+                        ? "Invitation sent"
+                        : "Add Friend"}
+                  </Button>
+                </CardActions>
+              ) : null}
+
               <CardActions sx={{ justifyContent: "center", marginBottom: 2 }}>
                 {currentUserID === userId && (
                   <Button variant="outlined" size="small" onClick={toggleEdit}>

@@ -72,7 +72,6 @@ const ChangePassword = () => {
     // Only add fields to the update object if they are not empty
     if (password && password.trim() !== "") updateData.password = password;
 
-    console.log(updateData);
     try {
       await api.put(`dashboard/${userId}/profile`, JSON.stringify(updateData), {
         headers: {
