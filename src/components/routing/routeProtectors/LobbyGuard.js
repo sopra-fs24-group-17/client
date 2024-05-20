@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import PropTypes from "prop-types";
-import Lobby from "../../views/Lobby";
+import LobbyNew from "../../views/LobbyNew";
 
 /**
  * @Guard
@@ -14,7 +14,7 @@ export const LobbyGuard = () => {
   if (token && (joinGame || createflag)) {
     return (
       <>
-        <Lobby />
+        <LobbyNew />
       </>
     );
   }
