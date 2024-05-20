@@ -104,9 +104,7 @@ const CreateGame: React.FC = () => {
         },
       });
 
-      const newGameCode = response.data.gameId;
-      setGameCode(newGameCode);
-      localStorage.setItem("gameId", newGameCode);
+      localStorage.setItem("gameId", response.data.gameId);
       localStorage.setItem(
         "gameSetup",
         JSON.stringify({ mode, maxPlayers: totalPlayers })
@@ -122,8 +120,17 @@ const CreateGame: React.FC = () => {
   const startGame = () => {
     localStorage.removeItem("gameSetup");
     localStorage.setItem("createflag", "true");
-    navigate(`/lobby/${gameCode}`);
+    navigate(`/lobby/${localStorage.getItem("gameId")}`);
   };
+
+
+  const createAndStartGame = async () => {
+    if (!gameCreated) {
+      await createGame();
+    }
+    startGame();
+  };
+
 
   return (
     <Box
@@ -164,36 +171,6 @@ const CreateGame: React.FC = () => {
         />
       </FormGroup>
 
-      {isPrivate && (
-        <>
-          <TextField
-            fullWidth
-            variant="outlined"
-            // disabled={gameCreated}
-            value={`${gameCode}\n${"Give this code to your friends to allow them to join your private game"}`}
-            multiline
-            rows={2}
-            InputProps={{
-              readOnly: true,
-              startAdornment: (
-                <InputAdornment position="start">
-                  <InfoIcon />
-                </InputAdornment>
-              ),
-              style: { lineHeight: "normal", whiteSpace: "pre-line" },
-            }}
-            sx={{ mb: 2 }}
-          />
-          <Button onClick={copyToClipboard} variant="contained" sx={{ mb: 2 }}>
-            Copy Game Code
-          </Button>
-          {copySuccess && (
-            <Typography variant="body2" color="primary">
-              {copySuccess}
-            </Typography>
-          )}
-        </>
-      )}
       <FormControl fullWidth sx={{ mb: 2 }}>
         <FormLabel
           htmlFor="number-of-players"
@@ -209,7 +186,6 @@ const CreateGame: React.FC = () => {
           onChange={handleNumberOfPlayersChange}
           variant="outlined"
           sx={{ mb: 2 }}
-          helperText="This is a description"
         >
           {[2, 3, 4, 5].map((option) => (
             <MenuItem key={option} value={option}>
@@ -219,53 +195,12 @@ const CreateGame: React.FC = () => {
         </TextField>
       </FormControl>
 
-      <FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
-        <FormLabel
-          component="legend"
-          sx={{ fontWeight: "900", color: "black" }}
-        >
-          Game Mode <span style={{ color: "red" }}>*</span>
-        </FormLabel>
-        <RadioGroup
-          row
-          aria-label="game mode"
-          name="gameMode"
-          value={gameMode}
-          onChange={(e) => setGameMode(e.target.value)}
-        >
-          <FormControlLabel
-            value="option1"
-            control={<Radio />}
-            label="Option 1"
-          />
-          <FormControlLabel
-            value="option2"
-            control={<Radio />}
-            label="Option 2"
-          />
-          <FormControlLabel
-            value="option3"
-            control={<Radio />}
-            label="Option 3"
-          />
-          <FormControlLabel
-            value="option4"
-            control={<Radio />}
-            label="Option 4"
-          />
-        </RadioGroup>
-      </FormControl>
-
-      <Button variant="contained" onClick={createGame} sx={{ mb: 2 }}>
-        Setup Game
-      </Button>
       <Button
         variant="contained"
-        onClick={startGame}
-        disabled={!gameCreated}
+        onClick={createAndStartGame}
         sx={{ mb: 2 }}
       >
-        Start Lobby
+        {gameCreated ? "Start Lobby" : "Setup Game"}
       </Button>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>

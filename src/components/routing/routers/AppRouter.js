@@ -20,6 +20,7 @@ import AllPlayers from "../../views/AllPlayers";
 import { LobbyGuard } from "../routeProtectors/LobbyGuard";
 import Tutorial from "../../views/Tutorial";
 import WebSocketChat from "../../views/Chat";
+import EditProfile from "../../views/EditProfile";
 
 /**
  * Main router of your application.
@@ -56,6 +57,7 @@ const AppRouter = () => {
           <Route path="join-game" element={<JoinGame />} />
           <Route path="create-game" element={<CreateGame />} />
           <Route path="users/:userId" element={<Profile />} />
+          <Route path="users/:userId/edit" element={<EditProfile />} />
           <Route path="friends" element={<FriendsList />} />
           <Route path="all-players" element={<AllPlayers />} />
           <Route path="tutorial" element={<Tutorial />} />
