@@ -40,7 +40,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
   const [avatarPath, setAvatarPath] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const toggleEdit = () => setIsEditing(!isEditing);
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+    navigate(`/dashboard/users/${userId}/edit`); 
+  }
 
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const toggleChangePassword = () => setIsChangingPassword(!isChangingPassword);
