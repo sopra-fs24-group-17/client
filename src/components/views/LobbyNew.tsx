@@ -50,7 +50,7 @@ const LobbyNew = () => {
           headers: { token: token },
         }
       );
-      localStorage.removeItem("creatorflag");
+      localStorage.removeItem("createflag");
       localStorage.removeItem("joinGame");
       console.log("Left game successfully", response.data);
       navigate("/dashboard/create-game");
