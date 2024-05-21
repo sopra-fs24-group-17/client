@@ -19,7 +19,6 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [isConnected, setIsConnected] = useState(false);
 
-
   const doRegister = async (event) => {
     event.preventDefault();
 

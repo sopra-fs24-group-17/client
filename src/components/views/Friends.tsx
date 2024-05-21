@@ -76,9 +76,8 @@ const FriendsList = () => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
 
-    const filtered = friends.filter(
-      (friend) =>
-        friend.username.toLowerCase().includes(query) 
+    const filtered = friends.filter((friend) =>
+      friend.username.toLowerCase().includes(query)
     );
     setFilteredFriends(filtered);
   };
@@ -91,15 +90,15 @@ const FriendsList = () => {
 
         const response = await api.get(`dashboard/${userId}/friends`, {
           headers: {
-            token: token, 
+            token: token,
           },
         });
         console.log(response);
         const transformedFriends = response.data.map((friend) => ({
           ...friend,
-          username: friend.friendName, 
-          avatar: friend.friendAvatar, 
-          status: friend.status, 
+          username: friend.friendName,
+          avatar: friend.friendAvatar,
+          status: friend.status,
         }));
         console.log(transformedFriends);
         setFriends(transformedFriends);
@@ -109,7 +108,7 @@ const FriendsList = () => {
       }
     };
 
-    fetchFriends(); 
+    fetchFriends();
   }, [userId]);
 
   const handleFriendClick = (userid) => {
@@ -133,7 +132,7 @@ const FriendsList = () => {
             size="small"
             sx={{ mb: 2 }}
             value={searchQuery}
-            onChange={handleSearchChange} 
+            onChange={handleSearchChange}
           />
         </Grid>
       </Grid>
