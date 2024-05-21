@@ -65,10 +65,11 @@ const Game = () => {
   const [gameAlertWithInputTitle, setGameAlertWithInputTitle] = useState("");
   const [gameAlertWithInputDescription, setGameAlertWithInputDescription] =
     useState("");
-  const [piles, setPiles] = useState([]);
+  const [piles, setPiles] = useState({"dealer": 0});
   const [names, setNames] = useState([]);
   const [players, setPlayers] = useState({});
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
+
   const [leaderboard, setLeaderboard] = useState([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -561,6 +562,7 @@ const Game = () => {
         title={gameAlertWithInputTitle}
         description={gameAlertWithInputDescription}
         playerNames={names}
+        piles={piles}
         onSubmit={(value) => {
           if (gameAlertWithInputTitle === "Favor") {
             // setTargetUsername(value);
