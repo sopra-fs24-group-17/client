@@ -15,12 +15,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
+import { Card, Divider } from '@mui/material';
 import { api } from "helpers/api";
 import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
 } from "../../helpers/WebsocketConnection";
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 const AllPlayers = () => {
   const navigate = useNavigate();
@@ -236,28 +238,38 @@ const AllPlayers = () => {
 
       {/* Friend Requests Section */}
       {friendRequests.length > 0 && (
-        <List>
-          {friendRequests.map((request) => (
-            <ListItem key={request.requestId}>
-              <ListItemText
-                primary={`Friend request from ${request.requestingUserUsername}`}
-              />
-              <Button
-                onClick={() => handleAcceptFriendRequest(request.requestId)}
-                color="primary"
-              >
-                Accept
-              </Button>
-              <Button
-                onClick={() => handleRejectFriendRequest(request.requestId)}
-                color="primary"
-              >
-                Reject
-              </Button>
-            </ListItem>
+        <List sx={{ width: '100%' }}>
+          {friendRequests.map((request, index) => (
+            <React.Fragment key={request.requestId}>
+              <Card variant="outlined" sx={{ marginBottom: 2, overflow: 'hidden' }}>
+                <ListItem>
+                  <NotificationsNoneIcon sx={{ marginRight: 2 }} />
+                  <ListItemText
+                    primary={`Friend request from ${request.requestingUserUsername}`}
+                  />
+                  <Button
+                    onClick={() => handleAcceptFriendRequest(request.requestId)}
+                    color="success"
+                    variant="outlined"
+                    sx={{ marginRight: 1 }}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    onClick={() => handleRejectFriendRequest(request.requestId)}
+                    color="error"
+                    variant="outlined"
+                  >
+                    Reject
+                  </Button>
+                </ListItem>
+              </Card>
+              {index !== friendRequests.length - 1 && <Divider />}
+            </React.Fragment>
           ))}
         </List>
-      )}
+)}
+
 
       <Paper sx={{ width: "100%", mb: 2, overflowX: "auto" }}>
         <TableContainer>
