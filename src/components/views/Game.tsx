@@ -11,7 +11,11 @@ import {
   Button,
   DialogActions,
 } from "@mui/material";
-import { Chat as ChatIcon, Logout as LogoutIcon, Help as HelpIcon } from "@mui/icons-material";
+import {
+  Chat as ChatIcon,
+  Logout as LogoutIcon,
+  Help as HelpIcon,
+} from "@mui/icons-material";
 import { cardTypes } from "components/models/cards";
 import {
   connectWebSocket,
@@ -25,7 +29,7 @@ import GameAlertWithInput from "components/ui/GameAlertWithInput";
 import EnemyPlayers from "components/views/EnemyPlayers";
 import FilledAlert from "./Alert";
 import Chat from "./Chat";
-import TutorialPopup from "./TutorialPopup"; 
+import TutorialPopup from "./TutorialPopup";
 import card_back from "components/game/cards/card_back.png";
 import game_background from "components/game/game_background.png";
 import explosionGif from "components/game/explosionGif.gif";
@@ -61,10 +65,11 @@ const Game = () => {
   const [gameAlertWithInputTitle, setGameAlertWithInputTitle] = useState("");
   const [gameAlertWithInputDescription, setGameAlertWithInputDescription] =
     useState("");
-  const [piles, setPiles] = useState([]);
+  const [piles, setPiles] = useState({"dealer": 0});
   const [names, setNames] = useState([]);
   const [players, setPlayers] = useState({});
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
+
   const [leaderboard, setLeaderboard] = useState([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -86,8 +91,12 @@ const Game = () => {
   const [alertSeverity, setAlertSeverity] = useState("info");
   const [activePlayer, setActivePlayer] = useState(null);
 
-  const handleOpenTutorial = () => {setIsTutorialOpen(true);};
-  const handleCloseTutorial = () => {setIsTutorialOpen(false);};
+  const handleOpenTutorial = () => {
+    setIsTutorialOpen(true);
+  };
+  const handleCloseTutorial = () => {
+    setIsTutorialOpen(false);
+  };
 
   const navigate = useNavigate();
 
@@ -133,9 +142,9 @@ const Game = () => {
       if (gameState.players) {
         setPlayers(gameState.players);
       }
-      if(gameState.activePlayer){
-        setActivePlayer((gameState.activePlayer));
-        console.log(activePlayer)
+      if (gameState.activePlayer) {
+        setActivePlayer(gameState.activePlayer);
+        console.log(activePlayer);
       }
     } else if (gameState.type === "loss" && gameState.looserUser === username) {
       setLoser(true);
@@ -192,9 +201,10 @@ const Game = () => {
   };
 
   const cardStolen = (cards) => {
-    const stolenCard = cards[0].internalCode;
+    const stolenCard = cards[0].code;
+    console.log(playerHand);
     setPlayerHand((prevHand) =>
-      prevHand.filter((card) => card.name !== stolenCard)
+      prevHand.filter((card) => card.code !== stolenCard)
     );
   };
 
@@ -552,6 +562,7 @@ const Game = () => {
         title={gameAlertWithInputTitle}
         description={gameAlertWithInputDescription}
         playerNames={names}
+        piles={piles}
         onSubmit={(value) => {
           if (gameAlertWithInputTitle === "Favor") {
             // setTargetUsername(value);

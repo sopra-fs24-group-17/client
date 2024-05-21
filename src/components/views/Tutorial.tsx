@@ -17,7 +17,7 @@ const currentPath = "dashboard/tutorial";
 
 const Tutorial = () => {
   localStorage.setItem("previousPath", currentPath);
-  
+
   return (
     <Container maxWidth={false} sx={{ mt: 2 }}>
       <Grid container direction="column" spacing={2}>
@@ -112,8 +112,8 @@ const Tutorial = () => {
               The following &#34;chicken cards&#34; are multi-cards. Playing two
               wild chicken cards simultaneously has the same effect as a skip
               card. Similarly, two chicktionary, rainbow chicken and surfing
-              chicken cards together have the same effect as a seethefuture, attack
-              and shuffle card respectively.
+              chicken cards together have the same effect as a seethefuture,
+              attack and shuffle card respectively.
             </Typography>
           </Grid>
           {[
