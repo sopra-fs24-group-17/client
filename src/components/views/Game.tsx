@@ -90,6 +90,7 @@ const Game = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("info");
   const [activePlayer, setActivePlayer] = useState(null);
+  const [lessThanThree, setLessThanThree] = useState(false);
 
   const handleOpenTutorial = () => {
     setIsTutorialOpen(true);
@@ -114,6 +115,13 @@ const Game = () => {
     } else if (gameState.type === "endTurn") {
       setPlayerTurn(false);
     } else if (gameState.type === "peekIntoDeck") {
+      // Aparently the game is dispatched after we do this so we always have an extra card
+      console.log(piles["dealer"]);
+      console.log(!lessThanThree);
+      if(!lessThanThree && (piles["dealer"] < 3)) {
+        console.log("Toogling lessThanThree")
+        setLessThanThree(true);
+      }
       peekIntoDeck(gameState.cards);
     } else if (gameState.type === "cardStolen") {
       cardStolen(gameState.cards);
@@ -192,12 +200,21 @@ const Game = () => {
         imageUrl: cardType.imageUrl,
       };
     });
+    console.log(lessThanThree);
+    if(lessThanThree){
+      gameAlertHandleOpen(
+        "See the Future",
+        `The remaining cards in the deck are:`,
+        enhancedCards.reverse()
+      );
+    }else{
+      gameAlertHandleOpen(
+        "See the Future",
+        "The next 3 cards in the deck are:",
+        enhancedCards.reverse()
+      );
+    }
 
-    gameAlertHandleOpen(
-      "See the Future",
-      "The next 3 cards in the deck are:",
-      enhancedCards.reverse()
-    );
   };
 
   const cardStolen = (cards) => {
