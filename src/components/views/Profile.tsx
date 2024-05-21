@@ -184,12 +184,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                     <TableCell>
                       <strong>Win/Loss Ratio</strong>
                     </TableCell>
-                    <TableCell>
-                      <strong>#Friends</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>#Achievements unlocked</strong>
-                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -205,12 +199,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {user.winlossratio}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {user.totalfriends}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {user.achievementsunlocked}
                     </TableCell>
                   </TableRow>
                 </TableBody>
