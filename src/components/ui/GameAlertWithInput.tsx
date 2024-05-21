@@ -32,9 +32,11 @@ export default function GameAlertWithInput({
   const [placementIndex, setPlacementIndex] = React.useState(null);
   const [dealerDeckCount, setDealerDeckCount] = React.useState(0);
 
-  if (piles) {
+  React.useEffect(() => {
+    if (piles) {
     setDealerDeckCount(piles["dealer"]);
   }
+  }, [piles]);
 
   const names = playerNames.filter(
     (name) => name !== localStorage.getItem("username")
