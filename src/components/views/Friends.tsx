@@ -59,7 +59,7 @@ const FriendsList = () => {
   };
 
   useEffect(() => {
-    const sortedFriends = [...filteredFriends].sort((a, b) => {
+    const sortedFriends = [...friends].sort((a, b) => {
       if (a[sortField] < b[sortField]) {
         return sortDirection === "asc" ? -1 : 1;
       }
@@ -69,7 +69,7 @@ const FriendsList = () => {
       return 0;
     });
     setFilteredFriends(sortedFriends);
-  }, [filteredFriends, sortField, sortDirection]);
+  }, [friends, sortField, sortDirection]);
 
   // Function to handle search query change
   const handleSearchChange = (event) => {
