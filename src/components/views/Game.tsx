@@ -65,7 +65,7 @@ const Game = () => {
   const [gameAlertWithInputTitle, setGameAlertWithInputTitle] = useState("");
   const [gameAlertWithInputDescription, setGameAlertWithInputDescription] =
     useState("");
-  const [piles, setPiles] = useState({"dealer": 0});
+  const [piles, setPiles] = useState({ dealer: 0 });
   const [names, setNames] = useState([]);
   const [players, setPlayers] = useState({});
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
