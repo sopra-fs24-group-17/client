@@ -36,6 +36,9 @@ import loserGif from "components/game/rain.gif";
 import loserSound from "components/game/wahwahwah.wav";
 import Leaderboard from "components/ui/Leaderboard";
 import "../../styles/Style.css";
+import Avatar from "@mui/material/Avatar";
+import placeholder from "../game/profile_image_placeholder.webp";
+import Badge from "@mui/material/Badge";
 
 const Game = () => {
   const gameId = localStorage.getItem("gameId");
@@ -79,6 +82,10 @@ const Game = () => {
   const [userColors, setUserColors] = useState({});
 
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("info");
+  const [activePlayer, setActivePlayer] = useState(null);
+
   const handleOpenTutorial = () => {setIsTutorialOpen(true);};
   const handleCloseTutorial = () => {setIsTutorialOpen(false);};
 
@@ -118,12 +125,17 @@ const Game = () => {
       }
       if (gameState.piles) {
         setPiles(gameState.piles);
+        console.log(gameState.piles);
       }
       if (gameState.playerNames) {
         setNames(gameState.playerNames);
       }
       if (gameState.players) {
         setPlayers(gameState.players);
+      }
+      if(gameState.activePlayer){
+        setActivePlayer((gameState.activePlayer));
+        console.log(activePlayer)
       }
     } else if (gameState.type === "loss" && gameState.looserUser === username) {
       setLoser(true);
@@ -485,7 +497,7 @@ const Game = () => {
       <audio ref={explosionAudioRef} src={explosionSound} />
       <audio ref={winnerAudioRef} src={winnerSound} />
       <audio ref={loserAudioRef} src={loserSound} />
-      {playerTurn && <FilledAlert />}
+      <FilledAlert pTurn={playerTurn} active={activePlayer} />
       <IconButton
         onClick={() => handleLeave()}
         style={{ position: "absolute", top: 0, left: 0 }}
@@ -569,20 +581,22 @@ const Game = () => {
         <div className="card-stack">
           {closedDeck.map((card) => (
             <div key={card.id} className="card">
-              <CardComponent
-                text=""
-                description=""
-                image={card_back}
-                onClick={() =>
-                  drawCard(
-                    playerTurn,
-                    sendMessage,
-                    setGameAlertOpen,
-                    setGameAlertTitle,
-                    setGameAlertDescription
-                  )
-                }
-              />
+              <Badge badgeContent={piles["dealer"]} color="error">
+                <CardComponent
+                  text=""
+                  description=""
+                  image={card_back}
+                  onClick={() =>
+                    drawCard(
+                      playerTurn,
+                      sendMessage,
+                      setGameAlertOpen,
+                      setGameAlertTitle,
+                      setGameAlertDescription
+                    )
+                  }
+                />
+              </Badge>
             </div>
           ))}
         </div>
