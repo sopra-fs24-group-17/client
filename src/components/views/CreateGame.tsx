@@ -130,14 +130,12 @@ const CreateGame: React.FC = () => {
     navigate(`/lobby/${localStorage.getItem("gameId")}`);
   };
 
-
   const createAndStartGame = async () => {
     if (!gameCreated) {
       await createGame();
     }
     startGame();
   };
-
 
   return (
     <Box
@@ -202,11 +200,7 @@ const CreateGame: React.FC = () => {
         </TextField>
       </FormControl>
 
-      <Button
-        variant="contained"
-        onClick={createAndStartGame}
-        sx={{ mb: 2 }}
-      >
+      <Button variant="contained" onClick={createAndStartGame} sx={{ mb: 2 }}>
         {gameCreated ? "Start Lobby" : "Setup Game"}
       </Button>
 
