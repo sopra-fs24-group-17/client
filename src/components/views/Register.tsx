@@ -17,16 +17,8 @@ const Register = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [isConnected, setIsConnected] = useState(false); // State to track WebSocket connection
+  const [isConnected, setIsConnected] = useState(false);
 
-  // useEffect(() => {
-  //   // Cleanup WebSocket connection when component unmounts
-  //   return () => {
-  //     if (isConnected) {
-  //       disconnectWebSocket();
-  //     }
-  //   };
-  // }, [isConnected]);
 
   const doRegister = async (event) => {
     event.preventDefault();
@@ -130,7 +122,7 @@ const Register = () => {
             value={password2}
             onChange={(e) => verifyPassword(e.target.value)}
           />
-          {!passwordsMatch && (
+          {!passwordsMatch && password.length > 0 && (
             <Typography variant="body2" color="error">
               Passwords do not match.
             </Typography>

@@ -192,9 +192,10 @@ const Game = () => {
   };
 
   const cardStolen = (cards) => {
-    const stolenCard = cards[0].internalCode;
+    const stolenCard = cards[0].code;
+    console.log(playerHand);
     setPlayerHand((prevHand) =>
-      prevHand.filter((card) => card.name !== stolenCard)
+      prevHand.filter((card) => card.code !== stolenCard)
     );
   };
 
