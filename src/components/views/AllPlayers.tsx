@@ -245,8 +245,8 @@ const AllPlayers = () => {
                 <ListItem>
                   <NotificationsNoneIcon sx={{ marginRight: 2 }} />
                   <ListItemText
-                    primary={`Friend request from ${request.requestingUserUsername}`}
-                  />
+                    primary={<>Friend request from <strong>{request.requestingUserUsername}</strong></>}
+                    />
                   <Button
                     onClick={() => handleAcceptFriendRequest(request.requestId)}
                     color="success"
