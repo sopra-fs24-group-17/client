@@ -198,7 +198,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId }) => {
                       {losses}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {user.winlossratio}
+                      {user.winlossratio.toFixed(2)}
                     </TableCell>
                   </TableRow>
                 </TableBody>

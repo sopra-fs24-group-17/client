@@ -34,8 +34,8 @@ export default function GameAlertWithInput({
 
   React.useEffect(() => {
     if (piles) {
-    setDealerDeckCount(piles["dealer"]);
-  }
+      setDealerDeckCount(piles["dealer"]);
+    }
   }, [piles]);
 
   const names = playerNames.filter(
