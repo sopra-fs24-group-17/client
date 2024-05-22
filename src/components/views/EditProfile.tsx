@@ -266,6 +266,7 @@ const EditProfile = () => {
                     bgcolor: "background.paper",
                     boxShadow: 24,
                     p: 4,
+                    zIndex: 2000
                   }}
                 >
                   <Typography
@@ -379,11 +380,11 @@ const EditProfile = () => {
                         width: "500px",
                         container: (base) => ({
                           ...base,
-                          zIndex: 9999,
+                          zIndex: 1000,
                         }),
                         menu: (base) => ({
                           ...base,
-                          zIndex: 9999,
+                          zIndex: 1000,
                         }),
                       }}
                     />
