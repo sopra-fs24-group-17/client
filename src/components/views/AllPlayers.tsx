@@ -15,14 +15,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { Card, Divider } from '@mui/material';
+import { Card, Divider } from "@mui/material";
 import { api } from "helpers/api";
 import {
   connectWebSocket,
   disconnectWebSocket,
   subscribeToChannel,
 } from "../../helpers/WebsocketConnection";
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 
 const AllPlayers = () => {
   const navigate = useNavigate();
@@ -238,15 +238,23 @@ const AllPlayers = () => {
 
       {/* Friend Requests Section */}
       {friendRequests.length > 0 && (
-        <List sx={{ width: '100%' }}>
+        <List sx={{ width: "100%" }}>
           {friendRequests.map((request, index) => (
             <React.Fragment key={request.requestId}>
-              <Card variant="outlined" sx={{ marginBottom: 2, overflow: 'hidden' }}>
+              <Card
+                variant="outlined"
+                sx={{ marginBottom: 2, overflow: "hidden" }}
+              >
                 <ListItem>
                   <NotificationsNoneIcon sx={{ marginRight: 2 }} />
                   <ListItemText
-                    primary={<>Friend request from <strong>{request.requestingUserUsername}</strong></>}
-                    />
+                    primary={
+                      <>
+                        Friend request from{" "}
+                        <strong>{request.requestingUserUsername}</strong>
+                      </>
+                    }
+                  />
                   <Button
                     onClick={() => handleAcceptFriendRequest(request.requestId)}
                     color="success"
@@ -268,8 +276,7 @@ const AllPlayers = () => {
             </React.Fragment>
           ))}
         </List>
-)}
-
+      )}
 
       <Paper sx={{ width: "100%", mb: 2, overflowX: "auto" }}>
         <TableContainer>
