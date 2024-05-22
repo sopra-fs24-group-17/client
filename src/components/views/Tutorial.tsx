@@ -21,7 +21,7 @@ const Tutorial = () => {
   return (
     <Container maxWidth={false} sx={{ mt: 2 }}>
       <Grid container direction="column" spacing={2}>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 1 }}>
           Tutorial
         </Typography>
         <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>
@@ -56,7 +56,7 @@ const Tutorial = () => {
             {
               src: attack,
               alt: "attack-1",
-              text: "Playing this card forces the next player to take two turns in a row. It also instantly ends your turn without having to draw a card. Attacks can be avoided by also playing an attack card, in which case the attacks (remaining turns) are stacked.",
+              text: "Playing this card forces the next player to take two turns in a row. It also instantly ends your turn without having to draw a card. Attacks can be avoided by also playing an attack card, in which case the next player is attacked.",
             },
             {
               src: chicken,
@@ -117,24 +117,29 @@ const Tutorial = () => {
             </Typography>
           </Grid>
           {[
-            { src: randchick1, alt: "randchick-1" },
-            { src: randchick2, alt: "randchick-2" },
-            { src: randchick3, alt: "randchick-3" },
-            { src: randchick4, alt: "randchick-4" },
+            { src: randchick1, alt: "randchick-1", name: "Wild Chicken" },
+            { src: randchick2, alt: "randchick-2", name: "Chicktionary" },
+            { src: randchick3, alt: "randchick-3", name: "Rainbow Chicken" },
+            { src: randchick4, alt: "randchick-4", name: "Surfing Chicken" },
           ].map((card, index) => (
             <Grid item xs={6} sm={3} md={3} lg={3} key={card.alt}>
-              <img
-                src={card.src}
-                alt={card.alt}
-                style={{
-                  width: "100%",
-                  maxWidth: "100px",
-                  height: "auto",
-                  display: "block",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                }}
-              />
+              <Box>
+                <img
+                  src={card.src}
+                  alt={card.alt}
+                  style={{
+                    width: "100%",
+                    maxWidth: "100px",
+                    height: "auto",
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                />
+                <Typography variant="body2" sx={{ mt: 1, textAlign: "center" }}>
+                  {card.name}
+                </Typography>
+              </Box>
             </Grid>
           ))}
         </Grid>
