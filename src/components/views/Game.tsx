@@ -40,8 +40,6 @@ import loserGif from "components/game/rain.gif";
 import loserSound from "components/game/wahwahwah.wav";
 import Leaderboard from "components/ui/Leaderboard";
 import "../../styles/Style.css";
-import Avatar from "@mui/material/Avatar";
-import placeholder from "../game/profile_image_placeholder.webp";
 import Badge from "@mui/material/Badge";
 
 const Game = () => {
@@ -65,7 +63,7 @@ const Game = () => {
   const [gameAlertWithInputTitle, setGameAlertWithInputTitle] = useState("");
   const [gameAlertWithInputDescription, setGameAlertWithInputDescription] =
     useState("");
-  const [piles, setPiles] = useState({"dealer": 0});
+  const [piles, setPiles] = useState({ dealer: 0 });
   const [names, setNames] = useState([]);
   const [players, setPlayers] = useState({});
   const [cardCodeFavor, setCardCodeFavor] = useState([]);
@@ -87,10 +85,7 @@ const Game = () => {
   const [userColors, setUserColors] = useState({});
 
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState("info");
   const [activePlayer, setActivePlayer] = useState(null);
-  const [lessThanThree, setLessThanThree] = useState(false);
 
   const handleOpenTutorial = () => {
     setIsTutorialOpen(true);
@@ -115,13 +110,6 @@ const Game = () => {
     } else if (gameState.type === "endTurn") {
       setPlayerTurn(false);
     } else if (gameState.type === "peekIntoDeck") {
-      // Aparently the game is dispatched after we do this so we always have an extra card
-      console.log(piles["dealer"]);
-      console.log(!lessThanThree);
-      if(!lessThanThree && (piles["dealer"] < 3)) {
-        console.log("Toogling lessThanThree")
-        setLessThanThree(true);
-      }
       peekIntoDeck(gameState.cards);
     } else if (gameState.type === "cardStolen") {
       cardStolen(gameState.cards);
@@ -135,7 +123,7 @@ const Game = () => {
   const handleIncomingMessageGame = useCallback((message) => {
     const gameState = JSON.parse(message.body);
     if (gameState.type === "explosion") {
-      handleExplosion(gameState.terminatingUser);
+      handleExplosion();
     } else if (gameState.type === "gameState") {
       if (gameState.topCardInternalCode) {
         handleOpenDeck(gameState.topCardInternalCode);
@@ -200,21 +188,20 @@ const Game = () => {
         imageUrl: cardType.imageUrl,
       };
     });
-    console.log(lessThanThree);
-    if(lessThanThree){
+    const cardCount = enhancedCards.length;
+    if (cardCount < 3) {
       gameAlertHandleOpen(
         "See the Future",
-        `The remaining cards in the deck are:`,
+        `The remaining ${cardCount} cards in the deck are:`,
         enhancedCards.reverse()
       );
-    }else{
+    } else {
       gameAlertHandleOpen(
         "See the Future",
         "The next 3 cards in the deck are:",
         enhancedCards.reverse()
       );
     }
-
   };
 
   const cardStolen = (cards) => {
@@ -225,16 +212,10 @@ const Game = () => {
     );
   };
 
-  const handleExplosion = (userName: string) => {
+  const handleExplosion = () => {
     setExplode(true);
     setTimeout(() => {
       setExplode(false);
-      if (userName !== username) {
-        gameAlertHandleOpen(
-          "EXPLOSION!!",
-          `Player ${userName} drew an Exploding Chicken! Do they have a Defuse card?`
-        );
-      }
     }, 3000);
   };
 
@@ -292,7 +273,7 @@ const Game = () => {
     setTimeout(() => {
       gameAlertWithInputHandleOpen(
         "Explosion Time",
-        "Choose where on the dealer deck you want to place the explosion."
+        "Choose where on the dealer deck you want to place the explosion. 0 is the top of the stack, 1 is the second card, and so on. You can also choose -1 to place the explosion at the bottom of the stack."
       );
     }, 3000);
   };
