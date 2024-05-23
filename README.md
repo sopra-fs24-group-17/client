@@ -49,7 +49,25 @@ Finally, it is a good practice to mark a new release with a tag, for example 'M4
 ## Illustrations
 The user flow is as follows:
 1. An existing user logs in and a new user registers to the platform.
-2. The user is redirected to the main dashboard where it is possible to create a new game, join to a existing one, go to user's profile 
+2. The user is redirected to the main dashboard where it is possible to create a new game, join to a existing one, go to user's profile, use the social features, or logout.
+##### Case: Create game
+3. The user can select the game configuration (private or public and number of players). By clicking the `SETUP GAME` button the game lobby is started where users can join and can be started once the number of players is reached. 
+##### Case: Join game
+3. The join game view will display the public available games, the user can either join a public game by clicking the join button or join a private game by entering the game id of the private game.
+##### Social features
+3. All players view will display all existing players. The user can search here for specific players, see their statistics, and add them to their friends network.
+4. The friends view will display all the friends of the user, where the user can see if they are online and their avatar.
+##### User Profile
+3. The user profile shows the data given by the user upon registration and enables the user to modify this data, as well as completing their profile by adding an avatar, birthday, among others.
+##### During the game:
+1. The user can see in the top of the window who is the active player. When the user is the active player they can play their move cards (visible in their hand) and end their turn by grabing a card from the dealer pile (upside down cards).
+2. The player can access the tutorial by clicking the `?` icon at any time of the game.
+3. The player can interact with other players during the game by clicking the chat icon, which will pop out the chat.
+4. The player can leave the game earlier by clicking the exit icon.
+5. Upon completion of the game, a leaderboard with the position of the players will be displayed and users can go back to the home view.
+##### Logout
+1. Ends user session.
+
 
 ## Roadmap (next steps)
 - On game store : Thinking from a buisiness perspective and a way to generate revenue an online store where users can buy upgrades to the game, customizable cards, among others would be a great addition to make this project self-sustainable.
