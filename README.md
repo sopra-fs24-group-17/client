@@ -31,9 +31,9 @@ The server was implemented using the following technologies
 `cd server`
 
 #### Locally
-- Build : `./gradlew build`
-- Run : `./gradlew bootRun`
-- Test: `./gradlew test`
+- Build : `npm run build dev`
+- Run : `npm run dev`
+- Install dependencies: `npm install`
 
 You can verify that the server is running by visiting `localhost:8080` in your browser.
 You can access the local hosted application (client) by visiting `localhost:3000`
