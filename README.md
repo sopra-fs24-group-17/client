@@ -27,7 +27,7 @@ The server was implemented using the following technologies
 
 ## Launch and Deployment
 #### Cloning the repository:
-`git clone https://github.com/sopra-fs24-group-17/server.git`\
+`git clone https://github.com/sopra-fs24-group-17/client.git`\
 `cd server`
 
 #### Locally
@@ -37,6 +37,8 @@ The server was implemented using the following technologies
 
 You can verify that the server is running by visiting `localhost:8080` in your browser.
 You can access the local hosted application (client) by visiting `localhost:3000`
+
+NOTE: The server repository can be found [here](https://github.com/sopra-fs24-group-17/client)
 
 #### Cloud service
 The application is hosted in google cloud service. 
