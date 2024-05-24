@@ -315,14 +315,6 @@ const AllPlayers = () => {
                       : "↓"
                     : ""}
                 </TableCell>
-                <TableCell onClick={() => handleSort("achievementsunlocked")}>
-                  Achievements Unlocked{" "}
-                  {sortField === "achievementsunlocked"
-                    ? sortDirection === "asc"
-                      ? "↑"
-                      : "↓"
-                    : ""}
-                </TableCell>
                 <TableCell>Last Played</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -339,7 +331,6 @@ const AllPlayers = () => {
                   <TableCell>{player.username}</TableCell>
                   <TableCell>{player.gamesplayed}</TableCell>
                   <TableCell>{player.winlossratio.toFixed(2)}</TableCell>
-                  <TableCell>{player.achievementsunlocked}</TableCell>
                   <TableCell>
                     {player.lastplayed ? player.lastplayed.slice(0, 10) : "n/a"}
                   </TableCell>
