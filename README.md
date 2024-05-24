@@ -7,7 +7,7 @@
       - [Locally](#locally)
       - [Cloud service](#cloud-service)
   - [Illustrations](#illustrations)
-    - [Case: Login](#case-login)
+    - [Login and register](#login-and-register)
     - [Case: Create game](#case-create-game)
     - [Case: Join game](#case-join-game)
     - [Social features](#social-features)
@@ -45,6 +45,7 @@ This project offers an innovative user interface and features that enhance colla
 ## Main components
 -  [Game.tsx](https://github.com/sopra-fs24-group-17/client/blob/develop/src/components/views/Game.tsx): This view is what the player sees when they play a game of exploding kittens. It is the main part of our application and this is where most of the magic happens. The most important part here is the Websocket connection to the server, which handles all game-related logic. 
 -  [Chat.tsx](https://github.com/sopra-fs24-group-17/client/blob/develop/src/components/views/Chat.tsx): The chat view enables users to communicate with each other while playing a game. 
+-  [WebsocketConnection.tsx](https://github.com/sopra-fs24-group-17/client/blob/develop/src/helpers/WebsocketConnection.tsx): This helper file is used in many views to facilitate the websocket connection. It is responsible for connecting and disconnecting to the server, as well as subscribing and unsubscribing to channels and sending messages. 
 -  [AllPlayers.tsx, EnemyPlayers.tsx, Friends.tsx](https://github.com/sopra-fs24-group-17/client/blob/develop/src/components/views/AllPlayers.tsx): These views allow users to check out who else is playing Exploding Kittens, send friend requests and look at game related statistics. 
 -  [Profile.tsx](https://github.com/sopra-fs24-group-17/client/blob/develop/src/components/views/Profile.tsx): Here, users can view their own profile and change things like their profile image, their country as well as their e-mail and password. 
 
