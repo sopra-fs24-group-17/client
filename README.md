@@ -19,8 +19,8 @@
   - [Acknowledgments](#acknowledgments)
   - [License](#license)
   - [References](#references)
-        - [Exploding Chickens Card Images](#exploding-chickens-card-images)
-          - [Usage of Project Materials](#usage-of-project-materials)
+    - [Exploding Chickens Card Images](#exploding-chickens-card-images)
+    - [Usage of Project Materials](#usage-of-project-materials)
 
 
 # Introduction
@@ -143,14 +143,14 @@ A special thanks to our tutor [feji08](https://github.com/feji08) for the weekly
 This project is licensed under the MIT License. For more details, see the [LICENSE](https://github.com/sopra-fs24-group-17/server/blob/main/LICENSE.txt) file.
 
 ## References
-##### Exploding Chickens Card Images
+### Exploding Chickens Card Images
 - **Project:** Exploding Chickens Game Cards
 - **Author:** Radison Akerman, Sengdao Inthavong, Vincent Do, Richard Yang
 - **Source:** [GitHub Repository](https://github.com/jeffuntalan/exploding-chickens)
 - **License:** Mozilla Public License 2.0 (MPL 2.0)
 - **License Details:** This project is protected under the MPL 2.0. For more details, see the [LICENSE file](https://github.com/rak3rman/exploding-chickens/blob/main/LICENSE) in the repository.
 
-###### Usage of Project Materials
+### Usage of Project Materials
 
 - The project's materials, meaning the game cards images, are utilized according to the terms of the Mozilla Public License 2.0.
 - Any modifications made to the original materials are clearly documented and attributed to the modifier.
