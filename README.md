@@ -63,7 +63,7 @@ This project offers an innovative user interface and features that enhance colla
 You can verify that the server is running by visiting `localhost:8080` in your browser. By default the development profile is active, utilizing an in-memory H2 database.
 You can access the local hosted application (client) by visiting `localhost:3000`
 
-NOTE: The server repository can be found [here](https://github.com/sopra-fs24-group-17/client)
+NOTE: The server repository can be found [here](https://github.com/sopra-fs24-group-17/server)
 
 #### Cloud service
 - through GitHub workflows, the main branch is automatically deployed onto Google Cloud's App Engine
@@ -140,7 +140,7 @@ We would like to thank the professor and tutors of the Software Engineering Lab 
 A special thanks to our tutor [feji08](https://github.com/feji08) for the weekly meetings and continuous support.
 
 ## License
-This project is licensed under the MIT License. For more details, see the [LICENSE](https://github.com/sopra-fs24-group-17/server/blob/main/LICENSE.txt) file.
+This project is licensed under the MIT License. For more details, see the [LICENSE](https://github.com/sopra-fs24-group-17/client/blob/develop/LICENSE.txt) file.
 
 ## References
 ### Exploding Chickens Card Images
